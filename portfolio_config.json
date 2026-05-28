@@ -1,0 +1,41 @@
+{
+  "purchase_info": {
+    "MU": {
+      "price": 933.01,
+      "shares": 0.436893,
+      "invested_jpy": 65000,
+      "date": "2026-05-28",
+      "is_jpy": false
+    },
+    "AVGO": {
+      "price": 419.92,
+      "shares": 0.224013,
+      "invested_jpy": 15000,
+      "date": "2026-05-28",
+      "is_jpy": false
+    },
+    "8035.T": {
+      "price": 52320.0,
+      "shares": 0.095566,
+      "invested_jpy": 5000,
+      "date": "2026-05-28",
+      "is_jpy": true
+    },
+    "UPST": {
+      "price": 31.29,
+      "shares": 1.002104,
+      "invested_jpy": 5000,
+      "date": "2026-05-28",
+      "is_jpy": false
+    },
+    "KTOS": {
+      "price": 65.5,
+      "shares": 0.95743,
+      "invested_jpy": 10000,
+      "date": "2026-05-28",
+      "is_jpy": false
+    }
+  },
+  "usd_jpy_at_purchase": 159.46,
+  "created": "2026-05-28"
+}
