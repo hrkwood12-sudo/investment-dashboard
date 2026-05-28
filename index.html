@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📊 投資ダッシュボード 05/28</title>
+<style>
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--border:#30363d;
+  --txt:#e6edf3;--muted:#8b949e;--dim:#6e7681;
+  --blue:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#d29922;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;background:var(--bg);color:var(--txt);line-height:1.6;padding:12px;font-size:15px}
+a{color:var(--blue)}
+
+.hdr{text-align:center;padding:18px 0 14px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.hdr h1{font-size:1.6em;color:var(--blue)}
+.hdr .dt{color:var(--muted);font-size:0.85em;margin-top:4px}
+.hdr .sub{color:var(--dim);font-size:0.8em;margin-top:2px}
+
+.sec{margin-bottom:20px}
+.sec-ttl{font-size:1.05em;font-weight:bold;padding:9px 14px;background:var(--bg2);border-radius:8px 8px 0 0;border-left:4px solid var(--blue)}
+.sec-body{background:var(--bg2);border-radius:0 0 8px 8px;padding:12px;border:1px solid var(--border);border-top:none}
+
+.stock-card{background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:8px;border-left:4px solid var(--border)}
+.positive-border{border-left-color:var(--green)}
+.negative-border{border-left-color:var(--red)}
+.neutral-border{border-left-color:var(--border)}
+.stock-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px}
+.ticker{font-weight:bold;font-size:1.05em;color:var(--blue)}
+.company{color:var(--muted);font-size:0.85em}
+.stock-price{font-size:1.1em;font-weight:bold}
+.change{font-size:0.82em;margin-left:6px}
+.stock-meta{font-size:0.8em;color:var(--muted);margin-top:4px}
+.muted{color:var(--muted)}
+.alert{margin-top:8px;padding:7px 10px;border-radius:6px;font-size:0.88em}
+.buy-alert{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.3)}
+.watch-alert{background:rgba(210,153,34,.12);color:var(--yellow);border:1px solid rgba(210,153,34,.3)}
+
+.positive{color:var(--green)}
+.negative{color:var(--red)}
+.neutral{color:var(--muted)}
+
+.idx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px}
+.index-card{background:var(--bg3);border-radius:8px;padding:11px;text-align:center;border-left:3px solid var(--border)}
+.index-name{font-size:0.78em;color:var(--muted);margin-bottom:3px}
+.index-value{font-size:1.15em;font-weight:bold}
+.index-change{font-size:0.82em}
+.vix-danger{background:rgba(248,81,73,.08)}
+.vix-warn{background:rgba(210,153,34,.08)}
+.vix-calm{background:rgba(63,185,80,.05)}
+
+.mkt-exp{padding:9px 12px;margin-bottom:7px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--blue);font-size:0.9em}
+.mkt-exps{margin-top:12px}
+
+.fx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.fx-card{background:var(--bg3);border-radius:8px;padding:12px}
+.fx-pair{font-weight:bold;color:var(--blue);font-size:0.95em}
+.fx-rate{font-size:1.25em;font-weight:bold;margin:3px 0}
+.fx-change{font-size:0.82em}
+.fx-hl{font-size:0.78em;color:var(--dim);margin-top:3px}
+.fx-alert{margin-top:5px;padding:4px 8px;background:rgba(210,153,34,.15);color:var(--yellow);border-radius:4px;font-size:0.8em}
+.fx-advice{margin-top:7px;font-size:0.82em;color:var(--muted);line-height:1.45}
+.best-fx{padding:10px 12px;margin-bottom:10px;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);border-radius:8px;font-size:0.9em}
+
+.news-item{padding:9px 0;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:3px}
+.news-item:last-child{border-bottom:none}
+.news-cat{font-size:0.72em;background:rgba(88,166,255,.15);color:var(--blue);padding:2px 8px;border-radius:10px;width:fit-content}
+.news-title{color:var(--txt);text-decoration:none;font-size:0.88em;line-height:1.4}
+.news-title:hover{color:var(--blue);text-decoration:underline}
+.news-src{font-size:0.72em;color:var(--dim)}
+
+.act-item{padding:11px 13px;border-radius:8px;margin-bottom:7px;font-size:0.92em}
+.act-high{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);color:var(--red)}
+.act-med{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);color:var(--yellow)}
+.act-info{background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.2);color:var(--muted)}
+
+.tip-box{background:linear-gradient(135deg,var(--bg3),var(--bg2));border-radius:8px;padding:15px;border:1px solid rgba(88,166,255,.2)}
+.tip-ttl{font-weight:bold;color:var(--blue);margin-bottom:7px}
+.tip-body{font-size:0.88em;line-height:1.65;color:#c9d1d9}
+
+.footer{text-align:center;padding:16px;color:var(--dim);font-size:0.75em;border-top:1px solid var(--border);margin-top:20px;line-height:1.8}
+
+@media(max-width:480px){
+  .idx-grid{grid-template-columns:repeat(2,1fr)}
+  .fx-grid{grid-template-columns:1fr}
+  .stock-price{font-size:1em}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>📊 毎朝の投資ダッシュボード</h1>
+  <div class="dt">2026年05月28日（木曜日）23:12 JST</div>
+  <div class="sub">ポートフォリオ投資額: ¥110,000 | 毎月積立: ¥50,000 | 予備資金: ¥10,000</div>
+</div>
+
+<div class="sec">
+  <div class="sec-ttl">📊 株価・保有銘柄</div>
+  <div class="sec-body">
+<div class="stock-card negative-border">
+  <div class="stock-header">
+    <div><span class="ticker">MU</span><span class="company"> Micron Technology</span></div>
+    <div class="stock-price negative">$923.50 <span class="change">▼4.91（-0.53%）</span></div>
+  </div>
+  <div class="stock-meta">アナリスト目標: $652.98 <span class="negative">(-29.3%)</span></div>
+  <div class="stock-meta muted">投資額: ¥65,000 | 毎月: ¥30,000</div>
+  
+</div>
+<div class="stock-card negative-border">
+  <div class="stock-header">
+    <div><span class="ticker">AVGO</span><span class="company"> Broadcom Inc.</span></div>
+    <div class="stock-price negative">$419.36 <span class="change">▼2.50（-0.59%）</span></div>
+  </div>
+  <div class="stock-meta">アナリスト目標: $480.49 <span class="positive">(+14.6%)</span></div>
+  <div class="stock-meta muted">投資額: ¥15,000 | 毎月: ¥5,000</div>
+  
+</div>
+<div class="stock-card negative-border">
+  <div class="stock-header">
+    <div><span class="ticker">8035.T</span><span class="company"> 東京エレクトロン</span></div>
+    <div class="stock-price negative">¥52,320.00 <span class="change">▼180.00（-0.34%）</span></div>
+  </div>
+  <div class="stock-meta">アナリスト目標: ¥53,381.82 <span class="positive">(+2.0%)</span></div>
+  <div class="stock-meta muted">投資額: ¥5,000 | 毎月: ¥5,000</div>
+  
+</div>
+<div class="stock-card negative-border">
+  <div class="stock-header">
+    <div><span class="ticker">UPST</span><span class="company"> Upstart Holdings</span></div>
+    <div class="stock-price negative">$30.45 <span class="change">▼0.27（-0.88%）</span></div>
+  </div>
+  <div class="stock-meta">アナリスト目標: $40.2 <span class="positive">(+32.0%)</span></div>
+  <div class="stock-meta muted">投資額: ¥5,000 | 毎月: ¥0</div>
+  
+</div>
+<div class="stock-card positive-border">
+  <div class="stock-header">
+    <div><span class="ticker">KTOS</span><span class="company"> Kratos Defense</span></div>
+    <div class="stock-price positive">$63.84 <span class="change">▲6.54（+11.41%）</span></div>
+  </div>
+  <div class="stock-meta">アナリスト目標: $113.05 <span class="positive">(+77.1%)</span></div>
+  <div class="stock-meta muted">投資額: ¥10,000 | 毎月: ¥0</div>
+  
+</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-ttl">🌏 市場概況</div>
+  <div class="sec-body">
+    <div class="idx-grid">
+<div class="index-card negative-border ">
+  <div class="index-name">NASDAQ</div>
+  <div class="index-value negative">26,660.75</div>
+  <div class="index-change negative">▼ 0.05%</div>
+</div>
+<div class="index-card negative-border ">
+  <div class="index-name">S&P500</div>
+  <div class="index-value negative">7,519.10</div>
+  <div class="index-change negative">▼ 0.02%</div>
+</div>
+<div class="index-card negative-border ">
+  <div class="index-name">SOX半導体指数</div>
+  <div class="index-value negative">12,617.57</div>
+  <div class="index-change negative">▼ 0.67%</div>
+</div>
+<div class="index-card negative-border ">
+  <div class="index-name">日経225</div>
+  <div class="index-value negative">64,693.12</div>
+  <div class="index-change negative">▼ 0.47%</div>
+</div>
+<div class="index-card negative-border vix-calm">
+  <div class="index-name">VIX恐怖指数</div>
+  <div class="index-value negative">16.19</div>
+  <div class="index-change negative">▼ 0.61%</div>
+</div></div>
+    <div class="mkt-exps"><div class="mkt-exp">🔴 半導体指数(SOX)が0.7%下落。MUとAVGOに直接影響します。</div><div class="mkt-exp">🗾 日経225が0.5%下落。東京エレクトロンの動向に注目。</div><div class="mkt-exp">✅ VIX恐怖指数は16.2と落ち着いています。市場は比較的安定中です。</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-ttl">💱 為替ダッシュボード（WISE対応）</div>
+  <div class="sec-body">
+    
+    <div class="fx-grid">
+<div class="fx-card">
+  <div class="fx-pair">USD/JPY</div>
+  <div class="fx-rate">159.46</div>
+  <div class="fx-change positive">▲ 週間 +0.20%　|　本日 +0.03%</div>
+  <div class="fx-hl">1ヶ月: 高値159.79 / 安値156.21</div>
+  
+  <div class="fx-advice">💡 USD/JPY: 159.46円。比較的安定中。急ぎでなければ様子見推奨。</div>
+</div>
+<div class="fx-card">
+  <div class="fx-pair">MYR/JPY</div>
+  <div class="fx-rate">40.09</div>
+  <div class="fx-change negative">▼ 週間 -0.19%　|　本日 -0.30%</div>
+  <div class="fx-hl">1ヶ月: 高値40.43 / 安値39.44</div>
+  
+  <div class="fx-advice">💡 MYR/JPY: 40.0850円。安定中。</div>
+</div>
+<div class="fx-card">
+  <div class="fx-pair">USD/MYR</div>
+  <div class="fx-rate">3.9780</div>
+  <div class="fx-change positive">▲ 週間 +0.39%　|　本日 +0.33%</div>
+  <div class="fx-hl">1ヶ月: 高値3.9780 / 安値3.9100</div>
+  
+  <div class="fx-advice">💡 USD/MYR: 3.9780。ドルとリンギットの交換レートです。</div>
+</div>
+<div class="fx-card">
+  <div class="fx-pair">EUR/JPY</div>
+  <div class="fx-rate">185.24</div>
+  <div class="fx-change positive">▲ 週間 +0.35%　|　本日 -0.15%</div>
+  <div class="fx-hl">1ヶ月: 高値187.05 / 安値183.21</div>
+  
+  <div class="fx-advice">💡 比較的安定（週間+0.3%）。</div>
+</div>
+<div class="fx-card">
+  <div class="fx-pair">GBP/JPY</div>
+  <div class="fx-rate">213.74</div>
+  <div class="fx-change positive">▲ 週間 +0.08%　|　本日 -0.20%</div>
+  <div class="fx-hl">1ヶ月: 高値215.89 / 安値211.50</div>
+  
+  <div class="fx-advice">💡 比較的安定（週間+0.1%）。</div>
+</div>
+<div class="fx-card">
+  <div class="fx-pair">AUD/JPY</div>
+  <div class="fx-rate">113.52</div>
+  <div class="fx-change positive">▲ 週間 +0.08%　|　本日 -0.13%</div>
+  <div class="fx-hl">1ヶ月: 高値114.45 / 安値111.91</div>
+  
+  <div class="fx-advice">💡 比較的安定（週間+0.1%）。</div>
+</div>
+<div class="fx-card">
+  <div class="fx-pair">SGD/JPY</div>
+  <div class="fx-rate">124.61</div>
+  <div class="fx-change positive">▲ 週間 +0.23%　|　本日 -0.13%</div>
+  <div class="fx-hl">1ヶ月: 高値125.10 / 安値122.68</div>
+  
+  <div class="fx-advice">💡 比較的安定（週間+0.2%）。</div>
+</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-ttl">📰 今日の重要ニュース</div>
+  <div class="sec-body">
+<div class="news-item">
+  <span class="news-cat">MU・半導体</span>
+  <a href="https://news.google.com/rss/articles/CBMi1wFBVV95cUxOYWlia2Nmd3luWGcwRFFndmN0YUpDS3RyU0U0Wnd5YmJRVXBJb1pjdE9xNVhZYXRaLW0xYkRQTGRDdWJaQW5SN2tUUWdYUEtKZWo0YzBMcnZVY3lRLTVySlBjR0tzZjNLN0t4cVlsNVpDS1RJN3BBcFFVNHpUQndnZWRSOG1hdEZvdHhCdXlYR0pvVUlOLS1fQTlSb2JLVGtuYjBXXzhPOFdaRXh1TFFOTmJ3ckdiV0ZYcVJwNUw4dkphYS0yX3ItMkQtZlhzS1c3RWVCcGhQa9IB3AFBVV95cUxNR1ZVOHk0REZrSHhsTEdvUmp0MlRyVFVkS0gtMGwydjFVOWtHcTJNWDJJSEVWd21zVVo1aUVlT0h6b1JMd090c3U0VXd2NTZObzd4WE1HUHZ2V2tEU1ZVYzdsXzZoNUV6X2phSlRzU21abnppYWc3aWZ0Ul9aVUZFckVSU2M1SHllSTVGTzkwQVlQUGplS0pQeDY4Z3pGNV9rME1EZXVia1hsWjlQcDFtNjZocGNlUW1LUG1HdkhpLUQtc1NIUmxVdnBQVi1DSXRrR3A3MmFHUjFMWGdy?oc=5" target="_blank" class="news-title">Taking Stock Of Micron Technology (MU) Valuation After Rapid Share Price Momentum - simplywall.st</a>
+  <span class="news-src">simplywall.st</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">MU・半導体</span>
+  <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxPeGdEVVhLdWdSbWpGX3lldlRzUy1yNnlmYXVaWGVVdmdPa0s5Ynl1RFlTQ2JTMWJlNDh5ekpURjgzSnRUVS1TdFFSaE1PT2pmYkg0RGwxc2lSRDY4NFZ0RGZ1N3FuYzB5WGljblAxWTdhdG5TekxnYWNwS0ptSVg5Ri1FenhfV1VVMU4wTWxPb3l2UzJ3?oc=5" target="_blank" class="news-title">Micron Is Nearing $1,000. Is a Stock Split Next? - The Motley Fool</a>
+  <span class="news-src">The Motley Fool</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">AVGO・AI</span>
+  <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxQOS1DZXhjUmM1dktEdE41MEd3TFdOaVZ1RlBGeFVOME1BR2ZEYWdfUWl2NXR5T0psbk5GMFhVV1FBWTdLU1FpTlJwVkRNRXJkbVh3R1k3RndzYmVyei01MWRITU1kOVRwUzg4b1VRbF9faVpoSXJ0ZkhSSHEyVUFZQ2x2UzhERDRjQkd3dlVLMUFBOFVH?oc=5" target="_blank" class="news-title">Broadcom Nearing 52-Week High: Buy, Sell or Hold? - 24/7 Wall St.</a>
+  <span class="news-src">24/7 Wall St.</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">AVGO・AI</span>
+  <a href="https://news.google.com/rss/articles/CBMitgFBVV95cUxQZ2lIdkJJSkpJbFlkY19icHhDSE16Y2RSaFZrZVNmU29tSDEzdzI1MzFEeHVzNWFWN2NzSEpCb19CSFpySzhyOUJaTk9IczJ2ZThhX21EWGxKaC1TbHhYNFBaVTJZZGY1elRrNjRkSzlsZWdpZDUwQnNJTTh1QjJYaVBlclhNd1NrS2YtWGphQWI5bHhLRFhDZVJLMUFDRkdoeXRkendHeTJhZWpDd290dUNDRHVsZw?oc=5" target="_blank" class="news-title">FuriosaAI Partners with Broadcom (AVGO) for Next-Gen AI Accelera - GuruFocus</a>
+  <span class="news-src">GuruFocus</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">東京エレクトロン</span>
+  <a href="https://news.google.com/rss/articles/CBMihAFBVV95cUxPTUNYbzBwYXJkdlVwVDFQc1hFQjMtU18tMDk0a1I5dHcyVC13MWdGOEx4WC1yNndsUzQ2dnNQdl80dGNjSXFuQjRmNGpYcnFuWGVMRGw1OVpHbFREaV8xQnBGZDNlS1MydXpjdjNkM3puNUxWU281QzZNaUkxNUhQQlZYNTI?oc=5" target="_blank" class="news-title">Chip toolmaker Tokyo Electron cuts ties with executive linked to Chinese rivals - Financial Times</a>
+  <span class="news-src">Financial Times</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">東京エレクトロン</span>
+  <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxNRWlCMXlNdTdpVzA5aHlQRnVzeFhlN183eVhiUFVVNm56QUdWS1JxWEsxR3BpaF9RU1o4eTBUUndxUHhEamdadWllNU5FZHdRMHZLUVdEdHhVTWxBcmFYZ3NaYS1LSEowWWpwemZUM0lsZXo1OHpCWXg2VGwtU1ZVQVlHbVJlUnJxRHdqdmxBSVlaZFFTbEtVcEJFOWdLNXpWZU9BWA?oc=5" target="_blank" class="news-title">Notice of New Building Construction at Tokyo Electron Kyushu - Moomoo</a>
+  <span class="news-src">Moomoo</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">UPST</span>
+  <a href="https://news.google.com/rss/articles/CBMi4wFBVV95cUxNUzBzQTZOZkVNRkd5UTNWUzYwZzdidHRxS1JiZGk1N3NWXzNHbVlMaHhMSXpqZUt6SC1qd1RuTEstNzJtWXpCUGhzRUZ0VFdKZmEzemFISG9aajZIamMwSDRWcVNKX1JjTGlWMmFZVUF0SjEtckE0eWhqSW16eFp5Zi11d0dtcld4TThodUN5eUdGM3dXR19UUk9XTUxHeDdIc0pleWFLWklqaWtITVExUVlxNTFyZEdvb0VDS0FOY1RESWt3Y0FHN0Jxam1oUlpad29UWE4xay1DWnEzaHVQRFZhY9IB6AFBVV95cUxQMnRsSUY3cEUtTi1lZ2haOWczSTBXeVpyblo5aUNUNVNLV0s1RzNkNnVDVzYwVDA3SzJXcjJFVkJNb3I0M05MejlYc2xINUdleS1NTjJ0V3pSM2NselNUWV9PTC1zVFBZWEt2NGhEZkFpd1FYUGhwZ2RwbUVGX3hJQmk2WUVvVWN2TFpBMEFDMmszWnpQS2JyR0ZOOE9uQXNtS0ttdEpMX094ekFqWC1JenZMYWc2ZFE2SUw4ZmVLbW1pVlBDRzNZT1gyQ3ZFcTI3RmZhUWVwTWx2SEtQaU52Q1BZQjkyUjNk?oc=5" target="_blank" class="news-title">Why Upstart Holdings (UPST) Is Up 9.0% After Adding Tim Wennes And A New Credit Union Partner - simplywall.st</a>
+  <span class="news-src">simplywall.st</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">UPST</span>
+  <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxObVIwSzg1ZVdvMWhKcUtlWC1jNWRSRjRueXRNVFJQYU5Gc2NWNktoRjRlWGd1VnZrODk2Y3hqTzJ5bjNQbzRuc29rQWdKNXlrOFVnTEg0S1Q5VU9MZnlzdk4xTVpGcU95QjJQd2lFNlBOd2xRdHVzdWhza3VRZF9ZMWlPM2NwX293Y280RmFMc1UyZTRp?oc=5" target="_blank" class="news-title">Why Upstart (UPST) Still Has an AI-Lending Moonshot Case - Yahoo Finance</a>
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">KTOS・防衛</span>
+  <a href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxNUVNYR2lReHI3NUp5c09lb0ZpWUFScjI0dlR6NmFobnhjU3lLZTN4ODdUQmZrY3BtZWtaQjBQTVU2REdDWXExMHdJMTl4MlVoTmttYWV5eHMxVkJYODdEZDZ4Q0RpRXlGbTNyOE0wU0lpd0ZncElhYzJ0WEpNWlRIeEU0aHp4QzB2ZjltWDRkRDFUZnJxRnBmQlI5a0xETTc4SXh4WlZKMkdKUkU?oc=5" target="_blank" class="news-title">AeroVironment, Kratos Lead Drone Stocks Higher on Trump Funding Talks - GuruFocus</a>
+  <span class="news-src">GuruFocus</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">KTOS・防衛</span>
+  <a href="https://news.google.com/rss/articles/CBMi5wFBVV95cUxNM3M5ajJ1MnBwWnA4eEpvbElMeUlWVWVrSE84NmxjWUtJWFBzYnhudjN5Z3AyYzBmVUdqQ2pSOXk0T3dEVkJPX09vYWVvQ2JST1NEbW5INC00VWJvMWtyODh6VnpfWXY3cEhQd1BJQS12dHBlb1JiVnZDRWR1bkRMSHBJR21sOHFEOVpwVGVsbzZEMEZkTmxUd3NNRlY0LWs5c09RU1V0NUVqNlI5NDR2V1hudVJxWlZHa291MjNwYkswZWJxU2dMZ1pHOHRwTGEzNXJkdUdTR1FGdFB6MXRXYVdkYk5PRjg?oc=5" target="_blank" class="news-title">Kratos Defense vs. Curtiss-Wright: Which Defense Play Has More Upside? - The Globe and Mail</a>
+  <span class="news-src">The Globe and Mail</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">FRB・金利</span>
+  <a href="https://news.google.com/rss/articles/CBMi8gFBVV95cUxOOHpMVjBROWItcVMxcjNsWUR1bkRZeTVsWjlGRXJLNTBrZkRfR2pDMjJwX2prUHdnd19BSzhpWXBCQnZPQjdCQUpJQmxuRXRfd29UQkNKYUZsRjVwVHg2c2w3eEdPdWxxZlNxSEltRTN1eFhpSzRaaTR1YTNOLThMWElBa2FRWm5lRkNQSU5HYUlJY2xvaXQwak5xcjRmUUVaUkVPQ1F0eGkyOGk3Z1hSZjM4MWQtVVRCQnBqMkJxc0xOVkQ2YXpGdlE4SXRZaU5UM0ZqUWFkZC1DLU1HSUVQaXd3cW8yZFc5a3dHaDI5a0stZw?oc=5" target="_blank" class="news-title">Fed's inflation gauge heated up in April, cementing that interest rates will remain steady for now - Yahoo Finance</a>
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">FRB・金利</span>
+  <a href="https://news.google.com/rss/articles/CBMikAFBVV95cUxQcjJ2ZXd6MzJPNHBWU3g5TW9MUlBnYnBRVldreHFjczBpOU00cE1ldHJDQWtZMUFNNjNHTm54bzQxVkRGWUhLWWFoU0tUbmpDdXpGRHZDQXBuUnZZZ3hPWXlJZldUOXQtdXgxMU5paURrVDNzU2JNNUFqd2J3RmExVDBUcnphdkhhYzNPTG5WX04?oc=5" target="_blank" class="news-title">What to Expect From Kevin Warsh’s Fed in the First 100 Days - Council on Foreign Relations</a>
+  <span class="news-src">Council on Foreign Relations</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">日銀・円相場</span>
+  <a href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxPWU1ZdTN4VG9UR1BWMElKT3A5V0g1aWc4NUNSREI2TVZHWWVTN3ZORGtFODgyUmVQMEkwTklERmN6LWc1MG1Sc3dtVzM3cnhZTmNYN0J6WmcwdTdqS2I4SUxkQUxlSjMwVHFJc0lKYjhTR29BLXo5enpOb1hpYnV0dVBuaEZWMk5QSnR5Y01tREQwWGRvYjdDS0hsYlFnc3oxc3l2OHg0Z2cxUdIBrwFBVV95cUxNUU5HQnU4R2RFVGV4SjNDQkdIcEVZNlZnbTRDdUlIZGc1QXNzUDlNMVdObl96TmtSRWx3UHBJQjFUSnZUd3BvWS1nOHhHZmlnU3JpTTdhZVNySDh2bEZjYXl3LTMyMHZXRjdxWFV4d0Utb2xpdV9KVHhMRXd0VDJlWDcxNkotM2dvb19NaDZ1WEN2RUd1TE1IdjBVc1VPUktYdFJobEJYTzlPV3lfVkdv?oc=5" target="_blank" class="news-title">Yen nears intervention level; dollar edges higher as Iran conflict weighs on markets - CNBC</a>
+  <span class="news-src">CNBC</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">日銀・円相場</span>
+  <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxOanZmX3NWOEtoaC1NRFRhQi1NNjhtSTRDMnlEbFB1ZHRsR1pKbG5YbHRvdzRLMFlISWNyTjlPQUt1TGdnLTlVRFBxam5fWmZhaDVjYW9SOWNLZWt1d2xGWko4eE5RY25nWE5qWWtLSm5IMzZ5c1Z4dXIwZ2FYTnVwTV9PWXBzUThHZjN6dUxmS0gza3hfb1BCa3Q5NFFWaXNxX0paYQ?oc=5" target="_blank" class="news-title">Japan Intervenes to Save Yen as BoJ June Rate Hike Bets Rise - equiti.com</a>
+  <span class="news-src">equiti.com</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">マレーシア・MYR</span>
+  <a href="https://news.google.com/rss/articles/CBMitAFBVV95cUxOX3VvaVBYZXJieXdUTHNySTE2N21HSS00NHVqbXAyVWdZWndQYV9DNjVLQm5hUk1DMGVGOUE1THdsVVpGTmJPd0lnb2FQajRrYzRRN0lVRmFRRWVHRmRKZm5QM01ES0hCUm1tLTF6eGlfaWJwazdCWkU1RHRIeG1HS2NXRTJ6LXRmck9DWUU5UnpyOVZqUVhIU3RRUkVXTzBKRTRrWWw5cnlTWkRVZ0JlOS1Kc3Q?oc=5" target="_blank" class="news-title">MYR/USD: Malaysia Ringgit Nears Four-Year High as Economy Gains Strength - Bloomberg.com</a>
+  <span class="news-src">Bloomberg.com</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">マレーシア・MYR</span>
+  <a href="https://news.google.com/rss/articles/CBMihwFBVV95cUxNWXEyUG9XTnlyUzdyS3o3aXV6X0xVX2kzQzllMHNzaFBqaW81MUY3N1N4bmhjeGc4bk5xeG5XcHBDeVJQT2JjUUltMXh3OWZqOFlQQTNzeUVEaWpWaXZFblJ0d1hpSUEtUzh1U3Vxa091LWE0RjlqcENDQUlvNEM0NVVoSnV6OEE?oc=5" target="_blank" class="news-title">Amir Hamzah sees further upside to ringgit, 2026 GDP forecast - Yahoo Finance Singapore</a>
+  <span class="news-src">Yahoo Finance Singapore</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">AI・半導体業界</span>
+  <a href="https://news.google.com/rss/articles/CBMi7gFBVV95cUxQSU1lTDNoM2JmTVFkSGpsSS1YV0I1YVRnbnV6YjJkZXRha0hfN3BDNGMybDJIQjlZVEp1MC1sYmZmNXUtbno1RnV3ZUk0R2ZEaVVHeEVZUEFBbWhHZDRKSXRvaFN6Y2dXUEJRdWRRVmNZY3I3QWI1M05LZ3RvaENaYXNVQVNjX1JSVkwwaGE5UjY4dmtlS3pUbTR0cmtfM2lneTljdTA3N0stWXA3Y0lOR3A2WFRXalBEMGVxM0k5ckV4Xzl0RWtib0V3X1lfYWd1d01ZUXBsVzNHUmtMdzBGTm1IX202Qy00M0JvTmJ3?oc=5" target="_blank" class="news-title">Is the AI Trade Entering Its Second Wave? This ETF Could Be a Major Beneficiary. - The Globe and Mail</a>
+  <span class="news-src">The Globe and Mail</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">AI・半導体業界</span>
+  <a href="https://news.google.com/rss/articles/CBMioAFBVV95cUxQYWxKaUI2X19ibFJsTDl3UzJkMHVYQ3FxQmNnRFp1VU1BeFJvM1UxYzNUNXNZSW1nQ0h0WTJTby1aMmZySk0wSjFhTEV4dUhyamFzU2pOeUJ0SklsNEF5TGJCNk1lb2IwSFdBYXRFM1ByY1c5eFp1X1F1b0t6S1NNNmtZNUFYTm9XVFIwRk1HTjlEaDNwXzJqRkM3ajdzLTJr?oc=5" target="_blank" class="news-title">Three Semiconductor Giants Powering the AI Revolution - Kalkine Media</a>
+  <span class="news-src">Kalkine Media</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">NASDAQ市場</span>
+  <a href="https://news.google.com/rss/articles/CBMioAFBVV95cUxQNXRua0VVeDZ2NkVSNVE2bFkxOU0tMG5aN3ViVnoyZWIxa3U1bm4zVktTRGU2QlhMakFIdWJVUVVWZjItT2ExMUVuVVFodHM0TXU4Nkx5bldMMDB6N0xIa0ZRZExVT1RrbUk3VTVNcEgwSGNmX0FuM3BJS2RhUld3bnNHWE84S0p0NHdudzJ3aUk3X3M4Xy1YNFE5RnFRV25m?oc=5" target="_blank" class="news-title">Micron Leads Tech as Nasdaq Hits High: Stock Market Today - Kiplinger</a>
+  <span class="news-src">Kiplinger</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">NASDAQ市場</span>
+  <a href="https://news.google.com/rss/articles/CBMi4AFBVV95cUxPR200cnF2TXo5cU1OYXBxXzR1dDQtcmNLb1lhWDNOOG9UdG1hZkphRmkzbkxFN2E5TG9Kd1pvLVhsZTEtSGhuZ2JzNzVDT2hpZXpDVTl2ekhqSE5nREFHYlphV0kyNi1EbzcxYlhoTFIyU2NlelQ3ZDFfMlRhbUJZTVFoYVMweEE3ak0wOXBlbzBFSWRxYUh6eXJReVdIMDZHLWF4QUxfMFZ0MjBsNHR0d3JaMDZpOWlLdi0wRV9XdDg5eHFHSHhJSG1wSVhpNmtwU2xRdWM1Vy1ySU51N2lOcA?oc=5" target="_blank" class="news-title">Stock Market Today, May 26: Soaring Tech Stocks Push S&P 500 and Nasdaq to New Highs - The Motley Fool</a>
+  <span class="news-src">The Motley Fool</span>
+</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-ttl">⚡ 今日の推奨アクション</div>
+  <div class="sec-body"><div class="act-item act-info">✅ 今日は特別なアクションは不要です。定期ウォッチを継続しましょう。</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-ttl">📚 今日の学習コーナー</div>
+  <div class="sec-body">
+    <div class="tip-box">
+      <div class="tip-ttl">💡 WISEを使った賢い投資戦略</div>
+      <div class="tip-body">通常、銀行でドルを買うと1〜3%の手数料がかかります。WISEを使えば中値レートに近い低コストで換金できます。戦略：円高の時にWISEでJPY→USDに換金してドルを保持→タイミングを見てSBIで米国株を購入。これだけで年間数千円のコスト削減になります。</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  データソース: Yahoo Finance（株価・指数）/ Frankfurter API（為替）/ Google News（ニュース）<br>
+  ※このダッシュボードは情報提供のみです。投資判断は自己責任でお願いします。<br>
+  最終更新: 2026年05月28日（木曜日）23:12 JST
+</div>
+
+<script>
+// Auto-refresh every 10 minutes
+setTimeout(() => location.reload(), 10 * 60 * 1000);
+</script>
+</body>
+</html>
