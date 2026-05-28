@@ -691,49 +691,317 @@ def action_recommendations(stocks, indices, currencies):
     return actions
 
 
-def get_daily_tip(indices, currencies, stocks):
+def get_earnings_calendar():
+    """Fetch next earnings dates for portfolio + watchlist stocks."""
+    watch = ["MU", "AVGO", "UPST", "KTOS", "NVDA", "AMD", "TSM", "PLTR", "RKLB"]
+    results = []
+    jst = pytz.timezone("Asia/Tokyo")
+    now = datetime.now(jst)
+    for ticker in watch:
+        try:
+            info = yf.Ticker(ticker).info
+            ts = info.get("earningsTimestamp") or info.get("earningsDate")
+            if ts:
+                dt = datetime.fromtimestamp(int(ts), tz=jst)
+                days_away = (dt.date() - now.date()).days
+                if -2 <= days_away <= 30:
+                    results.append({
+                        "ticker":     ticker,
+                        "date":       dt.strftime("%m/%d"),
+                        "days_away":  days_away,
+                        "label":      "今日！" if days_away == 0 else (f"明日" if days_away == 1 else f"{days_away}日後"),
+                        "urgent":     days_away <= 3,
+                    })
+        except Exception:
+            pass
+    results.sort(key=lambda x: x["days_away"])
+    return results[:8]
+
+
+# ---- Featured Companies (rotates every day) ----
+FEATURED_COMPANIES = [
+    {
+        "name": "🚀 SpaceX（スペースX）",
+        "status": "非上場（IPO未定） | 創業者: イーロン・マスク",
+        "what": "世界最先端の民間宇宙企業。Starshipロケット・Starlink衛星インターネット・NASAの月探査契約を保有。打ち上げコストを従来比90%削減し宇宙産業を革命中。",
+        "why_now": "2024-2025年に複数のStarship試験飛行に成功。SpaceXの評価額は約2,000億ドルを超え、世界最高評価の非上場企業。IPO観測は常にあるが未定。",
+        "relation": "KTOSが手がける無人機・宇宙通信システムとは補完関係。宇宙産業全体への注目度が上がるとKTOSにも追い風。",
+    },
+    {
+        "name": "🤖 NVIDIA（エヌビディア）",
+        "status": "NASDAQ上場: NVDA | 時価総額 約3兆ドル（世界トップ級）",
+        "what": "AI革命の最大受益者。H100・H200・Blackwell GPUはAIデータセンターの標準インフラ。CUDAエコシステムでAI開発者を囲い込んでいる。",
+        "why_now": "AIブームで売上が急拡大。2024年度の売上高は600億ドル超。ただし株価は既に高値圏で、「バリュエーションが高すぎる」との議論も。",
+        "relation": "AI需要増 → データセンター投資増 → HBMメモリ需要増 → MU（Micron）直接恩恵。AVGOのカスタムAIチップと協力・競合関係。",
+    },
+    {
+        "name": "🛡️ Palantir（パランティア）",
+        "status": "NYSE上場: PLTR | 創業者: ピーター・ティール、アレックス・カープ",
+        "what": "AI・ビッグデータ分析の防衛・政府向け専門企業。米軍・CIA・FBIが主要顧客。AIPプラットフォームで民間企業向けAI事業も急拡大中。",
+        "why_now": "地政学リスク高まりで防衛AI需要が急増。2024年に初の通年黒字達成。S&P500に採用され機関投資家の買いが加速。",
+        "relation": "KTOSと同じ防衛テックセクター。両社とも「AIと防衛の融合」をビジネスモデルとしており、KTOS株の参考指標になる。",
+    },
+    {
+        "name": "💡 OpenAI（オープンAI）",
+        "status": "非上場 | CEO: サム・アルトマン | 評価額 約1,570億ドル",
+        "what": "ChatGPT・GPT-4oを開発するAI最大手。Microsoft（Azure）と提携しクラウドAIサービスを展開。消費者向けAIの代名詞的存在。",
+        "why_now": "2024年に消費者向けサービスの月間アクティブユーザーが2億人超え。企業向けAPIも急成長。IPOの可能性が2025-2026年に議論されている。",
+        "relation": "AI需要の象徴的存在。OpenAIが使うGPUはNVIDIA製 → MU（HBMメモリ）需要増。AVGOのカスタムチップ顧客候補でもある。",
+    },
+    {
+        "name": "🔵 TSMC（台湾積体電路製造）",
+        "status": "NYSE上場(ADR): TSM | 本拠地: 台湾 | 時価総額 約8,000億ドル",
+        "what": "世界最大の半導体受託製造（ファウンドリ）企業。NVIDIA・Apple・AMD・Broadcomの全てのチップを製造。最先端3nmプロセスを独占。",
+        "why_now": "AIブームでN3/N2プロセスの需要が爆発。日本・米国・欧州に工場建設中。地政学的リスク（台湾海峡問題）は常に株価の変動要因。",
+        "relation": "AVGOのチップはTSMCが製造。MUは独自製造だが競合するファウンドリ技術動向を左右。東京エレクトロンはTSMCへの半導体装置の主要サプライヤー。",
+    },
+    {
+        "name": "🌍 ARM Holdings（ARM）",
+        "status": "NASDAQ上場: ARM | 本拠地: 英国ケンブリッジ | 2023年IPO",
+        "what": "世界のスマートフォンの99%に搭載されるCPU設計を行うチップ設計会社。Apple・Qualcomm・NVIDIAにライセンス提供。自社製造はせずロイヤリティで収益。",
+        "why_now": "AI PCとスマートフォンのAI化でARMアーキテクチャの採用が加速。NVIDIA・Google・AmazonもARM系AIチップを開発中。",
+        "relation": "英国企業のため GBP/JPY の動きが株価（円換算）に影響。GBP/JPYをWISEでチェックする価値がある理由のひとつ。",
+    },
+    {
+        "name": "⚡ Anduril Industries（アンデュリル）",
+        "status": "非上場 | CEO: パーマー・ラッキー（Oculus創業者） | 評価額 約280億ドル",
+        "what": "シリコンバレー発の次世代防衛テック企業。AI搭載の無人機・自律型兵器システム・国境警備技術を開発。ペンタゴンから大型契約を次々獲得。",
+        "why_now": "2024年に米国防総省から数千億円規模の複数年契約を獲得。テック人材が国防に本格参入した「防衛テック革命」の象徴的存在。",
+        "relation": "KTOSと直接競合する領域（無人機・自律システム）。Andurilへの注目度 = KTOS市場の成長性の証拠。",
+    },
+    {
+        "name": "🛸 Rocket Lab（ロケットラボ）",
+        "status": "NASDAQ上場: RKLB | 本拠地: 米国・ニュージーランド",
+        "what": "小型衛星打ち上げに特化したロケット会社。ElectronロケットとNeutronロケットを開発。衛星製造・宇宙インフラにも事業拡大中。",
+        "why_now": "2024年に打ち上げ回数が急増。NASAや民間企業から受注拡大。SpaceXより小型・安価なロケットとして独自市場を確立。",
+        "relation": "KTOSが手がける防衛衛星・宇宙通信と隣接する事業領域。宇宙産業の拡大はKTOS・Rocket Lab両方に恩恵。",
+    },
+    {
+        "name": "📊 AMD（アドバンスト・マイクロ・デバイシズ）",
+        "status": "NASDAQ上場: AMD | CEO: リサ・スー",
+        "what": "CPU（Ryzen）とGPU（Radeon・Instinct）を手がけるNVIDIAの最大ライバル。MI300X AIアクセラレーターでデータセンター市場に本格参入。",
+        "why_now": "NVIDIAのGPU供給不足を受け、AMDのMI300XをMicrosoftやMetaが採用。2024年はAIチップ売上が急増。NVIDIAほど高値ではなく「割安なAI株」との見方も。",
+        "relation": "MUのメモリチップはAMDのGPUにも搭載。AMD株の好調 = AI需要強い = MUにも追い風。",
+    },
+    {
+        "name": "🌐 Starlink（スターリンク）",
+        "status": "非上場（SpaceX子会社） | 衛星数: 6,000基超",
+        "what": "SpaceXが運営する衛星インターネットサービス。低軌道衛星網を使い世界中どこでも高速インターネット接続を提供。農村部・船舶・航空機・戦場で利用。",
+        "why_now": "ウクライナ・ガザ紛争での活躍で軍事・緊急通信インフラとして世界が注目。加入者数2024年末時点で400万超え。通信インフラ革命の最前線。",
+        "relation": "KTOSの無人機・防衛システムはStarlinkのような衛星通信インフラと連携。宇宙通信の進化はKTOSの事業機会を広げる。",
+    },
+    {
+        "name": "🧠 Cerebras Systems（セレブラス）",
+        "status": "非上場（IPO申請中） | 本拠地: カリフォルニア州",
+        "what": "世界最大のAIチップ「Wafer Scale Engine」を開発するスタートアップ。NVIDIAのGPUに対し特定用途で100倍以上の速度を主張。大手クラウドと契約交渉中。",
+        "why_now": "2024年にIPO申請を提出。NVIDIAの対抗馬として注目。UAEのAI企業G42と大型契約締結済み。",
+        "relation": "AIチップ市場の競争激化 = MU・AVGOへの影響が出る可能性。新参者が増えるほど半導体全体のパイが拡大する見方もある。",
+    },
+    {
+        "name": "🏦 Upstart（アップスタート）詳細解説",
+        "status": "NASDAQ上場: UPST（保有中）| CEO: デビッド・ジルバーマン",
+        "what": "AIを使った融資審査プラットフォーム。従来の信用スコア（FICO）に代わり、教育歴・職歴なども含む2,000以上のデータポイントでデフォルトリスクを予測。銀行に技術提供するB2Bモデル。",
+        "why_now": "金利上昇期に業績が悪化したが、金利低下局面では劇的に回復する傾向。FRBの利下げ期待で2024年以降株価が大きく動いている。",
+        "relation": "あなたが保有中！金利とAI融資需要の両方に影響される特殊な銘柄。FRBのニュースが出た日はUPSTを特に注視。",
+    },
+    {
+        "name": "🔬 xAI（エックスAI）",
+        "status": "非上場 | CEO: イーロン・マスク | 評価額 約500億ドル",
+        "what": "イーロン・マスクが2023年に設立したAI企業。Grokというチャットボット（X/Twitter統合）とColossus（世界最大級のAI学習クラスター）を開発。",
+        "why_now": "Colossusは100,000台のNVIDIA H100 GPUで構成され、世界最大級のAI学習インフラ。MicrosoftのOpenAIへの対抗馬として注目。OpenAIとの競争が激化中。",
+        "relation": "xAIの大規模AI学習 → NVIDIA GPU需要増 → HBMメモリ需要増 → MU（Micron）に直接恩恵。",
+    },
+    {
+        "name": "☁️ Cloudflare（クラウドフレア）",
+        "status": "NYSE上場: NET | CEO: マシュー・プリンス",
+        "what": "インターネットのセキュリティ・CDN（コンテンツ配信）・AIエッジコンピューティングを提供するインフラ企業。世界200都市以上のネットワーク拠点を保有。",
+        "why_now": "AI推論をクラウドではなく「エッジ（ユーザー近く）」で行う需要が増加中。Workers AIプラットフォームで開発者を獲得。セキュリティ需要も増加。",
+        "relation": "AI・クラウドインフラ関連株として注目。AVGOのネットワーキングチップの最終ユーザー的な存在。テック株全般の動向を示す指標銘柄。",
+    },
+]
+
+INDUSTRY_TRENDS = [
+    {
+        "title": "🤖 AI半導体戦争：NVIDIA vs AMD vs カスタムチップ",
+        "content": "NVIDIAがH100/H200/Blackwellで市場の80%以上を独占する中、AMDのMI300X、GoogleのTPU、AmazonのTrainium、MetaのMTIAなどカスタムチップが追い上げ中。Broadcom（AVGO）はカスタムAIチップ設計でGoogleとMeta向けに急成長。この競争が続くほどHBMメモリ（MUの主力）の需要は拡大し続けます。",
+        "impact": "あなたの保有株への影響：MU ↑ AVGO ↑ 半導体全体に追い風",
+    },
+    {
+        "title": "💾 HBMメモリ革命：AIが変えるメモリ産業",
+        "content": "HBM（High Bandwidth Memory）はAIチップに積み上げる超高速メモリ。従来のDRAMの10倍以上の帯域幅を持ち、ChatGPTなどAIモデルの学習・推論に不可欠。世界シェアはSK Hynix約50%、Micron（MU）・Samsung（三星）が追う構図。Micronは2024-2025年にHBM3E生産を本格化しNVIDIAへの供給を増やしています。",
+        "impact": "あなたの保有株への影響：MU 直接恩恵（HBM売上急増）",
+    },
+    {
+        "title": "🛸 防衛テックの台頭：シリコンバレーが戦争を変える",
+        "content": "Anduril・Palantir・Shield AI・Kratos（KTOS）など「DefenseTech」企業が急成長。伝統的な軍事企業（Lockheed、Raytheon）に代わり、AI・無人機・自律システムが主役に。米国防総省はAI・ドローン予算を急拡大中。地政学リスク（ウクライナ・台湾）で需要が恒常化しています。",
+        "impact": "あなたの保有株への影響：KTOS 直接恩恵（無人機・ドローン）",
+    },
+    {
+        "title": "🌍 半導体サプライチェーンの再編",
+        "content": "米中対立を背景に「半導体の脱中国依存」が世界規模で進行中。米国のCHIPS法（520億ドル補助金）、日本の半導体助成（TSMC熊本工場支援）、欧州CHIPS法など各国が国内製造を強化。東京エレクトロン（TEL）は半導体製造装置の世界3位として全方位で恩恵を受けています。",
+        "impact": "あなたの保有株への影響：東京エレクトロン 中長期追い風",
+    },
+    {
+        "title": "🚀 宇宙産業の民営化：New Space時代",
+        "content": "SpaceX・Rocket Lab・Blue Origin（Amazon）・Relativity Spaceなど民間宇宙企業が急増。打ち上げコストが過去30年で99%削減され、宇宙ビジネスが一般企業にも開放されました。衛星通信・地球観測・宇宙旅行・月探査が現実的なビジネスに。宇宙関連の市場規模は2040年までに1兆ドル超と試算されています。",
+        "impact": "あなたの保有株への影響：KTOS（宇宙通信・防衛衛星分野に参入）",
+    },
+    {
+        "title": "💳 AIフィンテック：融資を変えるUPSTの技術",
+        "content": "従来の銀行融資は「FICO信用スコア」という単純な指標に頼っていましたが、Upstartは2,000以上のデータを使いAIで融資リスクを評価。その結果、デフォルト率を75%削減しながら融資承認率を2倍以上に改善。ただし金利上昇期には銀行パートナーが融資を絞るため業績が落ちやすい構造上の弱点も。",
+        "impact": "あなたの保有株への影響：UPST（金利動向に特に注意が必要）",
+    },
+    {
+        "title": "⚡ データセンターの電力危機とエネルギー株",
+        "content": "AI学習・推論に使う電力需要が爆発的に増加。ChatGPT1回の検索はGoogle検索の10倍の電力を消費。米国では2030年までにAIデータセンターが国全体の電力の10%以上を消費すると予測。原子力（Vistra・Constellation）・天然ガス・太陽光など電力株が注目される副次効果も生まれています。",
+        "impact": "関連銘柄: Vistra(VST)・Constellation Energy(CEG)・NextEra(NEE)",
+    },
+]
+
+INVESTMENT_TERMS = [
+    {"term": "P/E ratio（株価収益率・PER）",
+     "explain": "株価 ÷ 1株当たり純利益（EPS）で計算。例えばPER30倍なら「今の利益の30年分の価格がついている」という意味。一般的にPER15〜25が適正、30以上は割高、10以下は割安とされますが、成長株は高PERが普通です。NVIDIAはPER50〜60倍でも「成長を先取りしている」と評価されています。"},
+    {"term": "EPS（一株当たり利益）",
+     "explain": "会社の純利益 ÷ 発行済み株式数。例えばEPS $5.00 なら1株につき$5の利益を生み出しているという意味。決算発表では「アナリスト予想EPS」と「実際のEPS」を比較し、上回れば株価上昇・下回れば下落するのが一般的です。"},
+    {"term": "時価総額（Market Cap）",
+     "explain": "株価 × 発行済み株式総数。会社の「市場での評価額」です。MicronはMid cap（中型株）約1,200億ドル、NVIDIAはMega cap（超大型株）約3兆ドル。時価総額が小さい株は大きく動きやすく、大きい株は安定しやすい傾向があります。"},
+    {"term": "52週高値・安値",
+     "explain": "過去1年間（52週）の最高値と最安値のこと。現在の株価が52週高値に近い場合は「勢いがある」、52週安値に近い場合は「割安の可能性」と見ることができます。ただし安値に近い理由（業績悪化か市場全体の下落か）を確認することが重要です。"},
+    {"term": "RSI（相対力指数）",
+     "explain": "0〜100の数値で株の「買われすぎ」「売られすぎ」を示す指標。一般的にRSI70以上 = 買われすぎ（売りシグナル）、RSI30以下 = 売られすぎ（買いシグナル）とされています。短期売買で参考にされますが、長期投資では参考程度にとどめましょう。"},
+    {"term": "ボラティリティ（価格変動率）",
+     "explain": "株価がどれだけ大きく動くかを示す指標。ボラティリティが高い = 価格が激しく上下する（ハイリスク・ハイリターン）、低い = 安定している（ローリスク・ローリターン）。半導体株（MU・AVGO）はボラティリティが高い部類で、短期間で±20%動くことも珍しくありません。"},
+    {"term": "ETF（上場投資信託）",
+     "explain": "複数の株をまとめて一つの商品にしたもの。QQQ（NASDAQ100）・SOXX（半導体指数）・XAR（宇宙・防衛）などが代表例。個別株が難しい場合はETFから始めると分散投資の効果が得られます。手数料が低いのも特徴で、長期積立に向いています。"},
+    {"term": "空売り（ショート）とロング",
+     "explain": "ロング = 株を買って値上がりを期待する通常の投資。空売り（ショート）= 株を借りて売り、値下がりしてから買い戻す手法。機関投資家や専門家が使う手法で、「空売り比率が高い = 機関が弱気」というサインになります。個人投資家は基本的にロングだけで十分です。"},
+    {"term": "決算（Earnings）の見方",
+     "explain": "四半期ごとに発表される会社の成績表。重要ポイント：① 売上高（Revenue）が予想を上回ったか ② EPS（利益）が予想を上回ったか ③ 次四半期のガイダンス（見通し）が強いか。この3つ全てOKなら株価上昇しやすく、1つでも外すと下落することがあります。"},
+    {"term": "ガイダンス（業績見通し）",
+     "explain": "決算発表時に会社が示す「次の四半期・年間の売上・利益の見通し」。市場はしばしば実績より「ガイダンス」に反応します。良い決算でも「次の見通しが弱い」と言った瞬間に株価が急落することがあります。MUやAVGOの決算発表後は特にガイダンスに注目しましょう。"},
+    {"term": "WISE vs 銀行の為替手数料比較",
+     "explain": "銀行でドルを買う際の手数料：三菱UFJ銀行の場合、TTSレートで1ドルあたり約1円（約0.6%）の手数料がかかります。¥50,000を両替すると約¥300〜¥500のコスト。WISEは0.4〜0.6%程度の手数料で、1ヶ月に¥50,000を両替するだけで年間数千円の節約になります。長期投資では積み重なると大きな差に。"},
+    {"term": "配当株 vs 成長株",
+     "explain": "配当株：毎年・毎四半期に配当金を支払う株（例：JPモルガン・コカコーラ）。安定収入が得られる反面、株価の大きな上昇は期待しにくい。成長株：配当なしで利益を事業拡大に再投資（例：MU・AVGO・UPST）。株価上昇が主なリターン。あなたのポートフォリオは全て成長株なので、配当収入はなく値上がり益を狙う戦略です。"},
+    {"term": "機関投資家と個人投資家の違い",
+     "explain": "機関投資家 = 年金基金・投資信託・ヘッジファンドなど大口投資家。市場取引の70〜80%を占め、株価を動かす力があります。個人投資家が「大口の動きを理解する」ことが大切です。13F提出書類（四半期ごとに開示）でウォーレン・バフェットなどの有名投資家が何を買っているか確認できます。"},
+]
+
+WISE_TIPS = [
+    {"title": "WISEの口座開設と使い方", "content": "WISEは日本の銀行口座から送金・受取・両替ができる多機能口座。口座開設は無料でスマホから10分ほどで完了します。JPY・USD・MYR・EUR・GBPなど50以上の通貨を保有でき、両替手数料は銀行の1/3〜1/5程度。米国株投資家の必須ツールです。"},
+    {"title": "WISEでJPY→USDに換金する最適タイミング", "content": "①USD/JPYが1週間単位で下落している時（円高）②VIXが高く市場が不安定な時（今は買いより準備）③月初の積立前に円高を確認してから換金。逆にUSD/JPYが急上昇している時（円安トレンド）は焦って換金せず、円高を待つのが得策です。"},
+    {"title": "WISEのレート通知機能を活用", "content": "WISEアプリにはレートアラート機能があります。「USD/JPYが150円以下になったら通知」のように設定しておくと、円高のチャンスを見逃しません。毎日チェックしなくてもスマホに通知が来るので便利。目標レートを設定して待つ「指値換金」戦略に活用できます。"},
+    {"title": "MYRをWISEで賢く管理する方法", "content": "マレーシアリンギット（MYR）はアジア通貨の中では比較的安定。WISEでMYRを保有しておき、マレーシアとの取引や旅行時に活用できます。MYR/JPYが強い時（リンギット高）に一部をJPYに換金し、弱い時は保持するのが基本戦略です。"},
+    {"title": "WISEのデビットカードで海外ショッピング", "content": "WISEカード（デビット）を使うと海外での支払いもリアルタイムで最安レートで決済されます。クレジットカードの外貨手数料（1.6〜3%）と比べて圧倒的に安い。米国株の配当金を受け取るUSD口座としても活用可能です（SBI証券と組み合わせ）。"},
+]
+
+
+def get_learning_content(indices, currencies, stocks):
+    """Return multi-section learning content for the day."""
+    today     = datetime.now(pytz.timezone("Asia/Tokyo"))
+    day_idx   = today.timetuple().tm_yday  # day of year for wider rotation
+
     vix_val    = (indices.get("^VIX") or {}).get("value") or 0
     uj_wk      = (currencies.get("USD/JPY") or {}).get("week_change_pct") or 0
     sox_pct    = (indices.get("^SOX") or {}).get("change_pct") or 0
     any_drop10 = any((d.get("change_pct") or 0) <= -10 for d in stocks.values())
 
+    # Context-aware urgent tip
+    urgent = None
     if vix_val > 25:
-        return {"title": "VIX恐怖指数が高い時の対処法",
-                "content": "VIXが高い時は市場が「恐怖」を感じているサインです。でも歴史的に見ると、VIXが高い時こそ優良株が安く買えるチャンスでもあります。ウォーレン・バフェットの名言：「皆が恐れている時に買え」。ただし無謀な全力投資は禁物。予備資金を少しずつ使うのが賢明です。"}
-    if any_drop10:
-        return {"title": "株が急落した時の判断基準",
-                "content": "保有株が-10%以上下落した時、パニックで売るのは最も損をする行動です。まず「なぜ下落したか」を確認しましょう。①業績悪化（ファンダメンタルの問題）→ 判断が必要。②市場全体の下落や一時的な恐怖→ 買い増しのチャンスかも。MUのような半導体株はサイクルが激しいので、長期目線で持つことが重要です。"}
-    if abs(uj_wk) > 2:
-        return {"title": "円安・円高と米国株投資の関係",
-                "content": "円安（例：1ドル=160円）の時：既に持っている米国株の円換算価値は上がります。でも新たに買う時のコストも高くなります。円高（例：1ドル=140円）の時：米国株を安く買えるチャンス！WISEで円安→円高のタイミングを見てJPY→USDに換金しておくと有利です。"}
-    if abs(sox_pct) > 2:
-        return {"title": "SOX半導体指数とMU・AVGOの関係",
-                "content": "SOX（フィラデルフィア半導体指数）はMicron、Broadcom、NVIDIAなど主要半導体メーカーの集合体です。SOXが動くとあなたのMU・AVGOも連動して動くことが多いです。SOXを毎日チェックすることで保有株の動きを事前に予測できます。"}
+        urgent = {"title": "⚠️ VIX急上昇中の対処法", "content": "VIXが25超え。市場が「恐怖」を感じているサインです。でも歴史的に見ると、VIXが高い時こそ優良株が安く買えるチャンスでもあります。ウォーレン・バフェットの名言：「皆が恐れている時に買え」。ただし全力投資は禁物。予備資金を少しずつ使うのが賢明です。"}
+    elif any_drop10:
+        urgent = {"title": "⚠️ 急落時の判断基準", "content": "保有株が-10%以上下落。パニックで売るのは最も損をする行動です。まず「なぜ下落したか」を確認しましょう。①業績悪化なら慎重に ②市場全体の恐怖なら買い増しのチャンスかも。長期目線で判断することが重要です。"}
+    elif abs(uj_wk) > 2:
+        urgent = {"title": "💱 為替大きく動いています", "content": f"USD/JPYが週間{uj_wk:+.1f}%動いています。{'円安が進んでいます。米国株の購入は円高を待つのも選択肢。' if uj_wk > 0 else '円高進行中！WISEでJPY→USD換金のチャンスです。今すぐWISEアプリをチェックしてください。'}"}
 
-    today = datetime.now(pytz.timezone("Asia/Tokyo"))
-    tips = [
-        {"title": "分散投資の重要性", "content": "複数の業種・銘柄に投資することでリスクを分散できます。あなたのポートフォリオはIT・半導体・防衛など複数セクターに分散されていて、バランスが取れています。一つの銘柄が下落しても他が補う構造です。"},
-        {"title": "ドルコスト平均法（積立投資）", "content": "毎月一定額（¥50,000）を投資する方法です。価格が高い時は少ない株数、安い時は多い株数を買えるため、平均購入コストを自然に下げる効果があります。市場タイミングを気にしすぎず、淡々と続けることが成功の鍵です。"},
-        {"title": "アナリスト目標株価の使い方", "content": "プロのアナリストが予測する「12ヶ月後の目標価格」です。現在価格が目標より大幅に低ければ、まだ上昇余地があるサインかもしれません。ただし目標はあくまで予測なので、複数アナリストの平均値を参考にする程度にとどめましょう。"},
-        {"title": "WISEを使った賢い投資戦略", "content": "通常、銀行でドルを買うと1〜3%の手数料がかかります。WISEを使えば中値レートに近い低コストで換金できます。戦略：円高の時にWISEでJPY→USDに換金してドルを保持→タイミングを見てSBIで米国株を購入。これだけで年間数千円のコスト削減になります。"},
-        {"title": "半導体業界のスーパーサイクル", "content": "半導体はAIブームでデータセンター向け需要が急増中です。MicronはAI向けHBMメモリの主要供給者として注目されています。Broadcomはカスタムチップ（ASIC）でGoogleやMeta向けに供給しています。短期の株価変動より長期の業界成長トレンドを意識しましょう。"},
-        {"title": "予備資金（現金）の重要性", "content": "¥10,000の予備資金を常に持っておく戦略は非常に賢明です。「暴落の時に買う」ためのお金です。投資家の格言：「チャンスの時にお金がない」が一番もったいない。普段は使わず、-10%急落のサインが出た時だけ使うのが正しい使い方です。"},
-        {"title": "損益計算の正しい見方", "content": "短期の損益（今日±X%）に一喜一憂するのは禁物です。重要なのは「投資を始めてからの合計損益」です。毎月¥50,000を積立てながら数年間持ち続けることで、複利の効果が現れてきます。最初の1〜2年は小さく見えても、5年後・10年後に差が出ます。"},
-    ]
-    return tips[today.weekday() % len(tips)]
+    return {
+        "urgent":   urgent,
+        "company":  FEATURED_COMPANIES[day_idx % len(FEATURED_COMPANIES)],
+        "trend":    INDUSTRY_TRENDS[day_idx % len(INDUSTRY_TRENDS)],
+        "term":     INVESTMENT_TERMS[day_idx % len(INVESTMENT_TERMS)],
+        "wise":     WISE_TIPS[day_idx % len(WISE_TIPS)],
+    }
 
 # ============================================================
 # HTML Generation
 # ============================================================
 
-def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table):
+def _earnings_html(earnings):
+    if not earnings:
+        return '<div class="muted" style="padding:8px;font-size:0.88em">今後30日以内の決算発表は確認できませんでした。</div>'
+    chips = ""
+    for e in earnings:
+        cls = "urgent" if e["urgent"] else ""
+        chips += f'<div class="earn-chip {cls}"><strong>{e["ticker"]}</strong><div class="earn-date">{e["date"]} ({e["label"]})</div></div>'
+    return f'<div class="earn-grid">{chips}</div><div class="muted" style="font-size:0.78em;margin-top:8px">※ 決算日は変更される場合があります。事前に確認してください。</div>'
+
+
+def _learning_html(learning):
+    """Render the multi-section learning corner."""
+    parts = []
+
+    # Urgent context-aware tip (only shown when market conditions warrant)
+    if learning.get("urgent"):
+        u = learning["urgent"]
+        parts.append(f"""
+<div class="learn-card urgent">
+  <div class="learn-label">⚠️ 本日の注意</div>
+  <div class="learn-ttl">{u['title']}</div>
+  <div class="learn-body">{u['content']}</div>
+</div>""")
+
+    # Featured company
+    c = learning["company"]
+    parts.append(f"""
+<div class="learn-card company">
+  <div class="learn-label">🚀 今日の注目企業</div>
+  <div class="learn-ttl">{c['name']}</div>
+  <div class="learn-status">{c['status']}</div>
+  <div class="learn-body"><strong>事業内容：</strong>{c['what']}<br><br>
+  <strong>今なぜ注目？：</strong>{c['why_now']}<br><br>
+  <strong>あなたのポートフォリオとの関係：</strong>{c['relation']}</div>
+</div>""")
+
+    # Industry trend
+    t = learning["trend"]
+    parts.append(f"""
+<div class="learn-card trend">
+  <div class="learn-label">🔥 業界トレンド解説</div>
+  <div class="learn-ttl">{t['title']}</div>
+  <div class="learn-body">{t['content']}</div>
+  <div class="learn-impact">📊 {t['impact']}</div>
+</div>""")
+
+    # Investment term
+    tm = learning["term"]
+    parts.append(f"""
+<div class="learn-card term">
+  <div class="learn-label">💡 今日の投資用語</div>
+  <div class="learn-ttl">{tm['term']}</div>
+  <div class="learn-body">{tm['explain']}</div>
+</div>""")
+
+    # WISE tip
+    w = learning["wise"]
+    parts.append(f"""
+<div class="learn-card wise">
+  <div class="learn-label">💳 WISE活用法</div>
+  <div class="learn-ttl">{w['title']}</div>
+  <div class="learn-body">{w['content']}</div>
+</div>""")
+
+    return "\n".join(parts)
+
+
+def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table, earnings):
     jst      = pytz.timezone("Asia/Tokyo")
     now      = datetime.now(jst)
     weekdays = ["月曜日","火曜日","水曜日","木曜日","金曜日","土曜日","日曜日"]
     date_str = now.strftime(f"%Y年%m月%d日（{weekdays[now.weekday()]}）%H:%M JST")
 
     mkt_exps    = market_explanations(indices, currencies)
-    tip         = get_daily_tip(indices, currencies, stocks)
+    learning    = get_learning_content(indices, currencies, stocks)
     best_c, bwk = best_currency_to_hold(currencies)
 
     def fmt_jpy(v):
@@ -1023,10 +1291,22 @@ a{{color:var(--blue)}}
 .act-med{{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);color:var(--yellow)}}
 .act-info{{background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.2);color:var(--muted)}}
 
-/* Tip */
-.tip-box{{background:linear-gradient(135deg,var(--bg3),var(--bg2));border-radius:8px;padding:15px;border:1px solid rgba(88,166,255,.2)}}
-.tip-ttl{{font-weight:bold;color:var(--blue);margin-bottom:7px}}
-.tip-body{{font-size:0.88em;line-height:1.65;color:#c9d1d9}}
+/* Learning */
+.learn-card{{background:var(--bg3);border-radius:8px;padding:14px;margin-bottom:10px;border-left:4px solid var(--blue)}}
+.learn-card.urgent{{border-left-color:var(--yellow);background:rgba(210,153,34,.06)}}
+.learn-card.company{{border-left-color:#bc8cff}}
+.learn-card.trend{{border-left-color:#3fb950}}
+.learn-card.term{{border-left-color:#58a6ff}}
+.learn-card.wise{{border-left-color:#79c0ff}}
+.learn-label{{font-size:0.72em;font-weight:bold;letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;color:var(--muted)}}
+.learn-ttl{{font-weight:bold;font-size:1em;margin-bottom:7px;color:var(--txt)}}
+.learn-body{{font-size:0.87em;line-height:1.7;color:#c9d1d9}}
+.learn-impact{{margin-top:8px;font-size:0.82em;padding:5px 9px;background:rgba(63,185,80,.1);color:#3fb950;border-radius:5px}}
+.learn-status{{font-size:0.78em;color:var(--dim);margin-bottom:5px}}
+.earn-grid{{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}}
+.earn-chip{{padding:5px 10px;border-radius:6px;font-size:0.82em;background:var(--bg2);border:1px solid var(--border)}}
+.earn-chip.urgent{{border-color:var(--red);color:var(--red)}}
+.earn-date{{font-size:0.75em;color:var(--muted)}}
 
 .footer{{text-align:center;padding:16px;color:var(--dim);font-size:0.75em;border-top:1px solid var(--border);margin-top:20px;line-height:1.8}}
 @media(max-width:480px){{
@@ -1087,12 +1367,16 @@ a{{color:var(--blue)}}
 </div>
 
 <div class="sec">
+  <div class="sec-ttl">📅 今週の決算・注目イベント</div>
+  <div class="sec-body">
+    {_earnings_html(earnings)}
+  </div>
+</div>
+
+<div class="sec">
   <div class="sec-ttl">📚 今日の学習コーナー</div>
   <div class="sec-body">
-    <div class="tip-box">
-      <div class="tip-ttl">💡 {tip['title']}</div>
-      <div class="tip-body">{tip['content']}</div>
-    </div>
+    {_learning_html(learning)}
   </div>
 </div>
 
@@ -1131,14 +1415,17 @@ def main():
     print("  ⑥ 換金シミュレーター計算中...")
     jpy_table = jpy_conversion_table(currencies)
 
+    print("  ⑦ 決算カレンダー取得中...")
+    earnings = get_earnings_calendar()
+
     print("  ⑧ ニュース取得中（記事本文を取得しています）...")
     news = get_news()
 
     print("  ⑨ アクション・アドバイス生成中...")
     actions = action_recommendations(stocks, indices, currencies)
 
-    print("  ⑦ HTML生成中...")
-    html = generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table)
+    print("  ⑩ HTML生成中...")
+    html = generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table, earnings)
 
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
     with open(out, "w", encoding="utf-8") as f:

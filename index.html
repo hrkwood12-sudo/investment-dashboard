@@ -116,10 +116,22 @@ a{color:var(--blue)}
 .act-med{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);color:var(--yellow)}
 .act-info{background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.2);color:var(--muted)}
 
-/* Tip */
-.tip-box{background:linear-gradient(135deg,var(--bg3),var(--bg2));border-radius:8px;padding:15px;border:1px solid rgba(88,166,255,.2)}
-.tip-ttl{font-weight:bold;color:var(--blue);margin-bottom:7px}
-.tip-body{font-size:0.88em;line-height:1.65;color:#c9d1d9}
+/* Learning */
+.learn-card{background:var(--bg3);border-radius:8px;padding:14px;margin-bottom:10px;border-left:4px solid var(--blue)}
+.learn-card.urgent{border-left-color:var(--yellow);background:rgba(210,153,34,.06)}
+.learn-card.company{border-left-color:#bc8cff}
+.learn-card.trend{border-left-color:#3fb950}
+.learn-card.term{border-left-color:#58a6ff}
+.learn-card.wise{border-left-color:#79c0ff}
+.learn-label{font-size:0.72em;font-weight:bold;letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;color:var(--muted)}
+.learn-ttl{font-weight:bold;font-size:1em;margin-bottom:7px;color:var(--txt)}
+.learn-body{font-size:0.87em;line-height:1.7;color:#c9d1d9}
+.learn-impact{margin-top:8px;font-size:0.82em;padding:5px 9px;background:rgba(63,185,80,.1);color:#3fb950;border-radius:5px}
+.learn-status{font-size:0.78em;color:var(--dim);margin-bottom:5px}
+.earn-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.earn-chip{padding:5px 10px;border-radius:6px;font-size:0.82em;background:var(--bg2);border:1px solid var(--border)}
+.earn-chip.urgent{border-color:var(--red);color:var(--red)}
+.earn-date{font-size:0.75em;color:var(--muted)}
 
 .footer{text-align:center;padding:16px;color:var(--dim);font-size:0.75em;border-top:1px solid var(--border);margin-top:20px;line-height:1.8}
 @media(max-width:480px){
@@ -135,7 +147,7 @@ a{color:var(--blue)}
 
 <div class="hdr">
   <h1>📊 毎朝の投資ダッシュボード</h1>
-  <div class="dt">2026年05月28日（木曜日）23:47 JST</div>
+  <div class="dt">2026年05月28日（木曜日）23:55 JST</div>
   <div class="sub">投資総額: ¥110,000 | 毎月積立: ¥50,000 | 予備資金: ¥10,000</div>
 </div>
 
@@ -145,18 +157,18 @@ a{color:var(--blue)}
 <div class="stock-card positive-border">
   <div class="stock-header">
     <div><span class="ticker">MU</span><span class="company"> Micron Technology</span></div>
-    <div class="stock-price positive">$936.00 <span class="change">▲7.59（+0.82%）</span></div>
+    <div class="stock-price positive">$931.87 <span class="change">▲3.46（+0.37%）</span></div>
   </div>
-  <div class="stock-meta">アナリスト目標: $652.98 <span class="negative">(-30.2%)</span></div>
+  <div class="stock-meta">アナリスト目標: $652.98 <span class="negative">(-29.9%)</span></div>
   <div class="stock-meta muted">投資額: ¥65,000 | 毎月: ¥30,000</div>
   
 </div>
-<div class="stock-card negative-border">
+<div class="stock-card positive-border">
   <div class="stock-header">
     <div><span class="ticker">AVGO</span><span class="company"> Broadcom Inc.</span></div>
-    <div class="stock-price negative">$420.96 <span class="change">▼0.90（-0.21%）</span></div>
+    <div class="stock-price positive">$421.95 <span class="change">▲0.09（+0.02%）</span></div>
   </div>
-  <div class="stock-meta">アナリスト目標: $480.49 <span class="positive">(+14.1%)</span></div>
+  <div class="stock-meta">アナリスト目標: $480.49 <span class="positive">(+13.9%)</span></div>
   <div class="stock-meta muted">投資額: ¥15,000 | 毎月: ¥5,000</div>
   
 </div>
@@ -172,18 +184,18 @@ a{color:var(--blue)}
 <div class="stock-card positive-border">
   <div class="stock-header">
     <div><span class="ticker">UPST</span><span class="company"> Upstart Holdings</span></div>
-    <div class="stock-price positive">$31.23 <span class="change">▲0.51（+1.66%）</span></div>
+    <div class="stock-price positive">$31.27 <span class="change">▲0.55（+1.79%）</span></div>
   </div>
-  <div class="stock-meta">アナリスト目標: $40.2 <span class="positive">(+28.7%)</span></div>
+  <div class="stock-meta">アナリスト目標: $40.2 <span class="positive">(+28.6%)</span></div>
   <div class="stock-meta muted">投資額: ¥5,000 | 毎月: ¥0</div>
   
 </div>
 <div class="stock-card positive-border">
   <div class="stock-header">
     <div><span class="ticker">KTOS</span><span class="company"> Kratos Defense</span></div>
-    <div class="stock-price positive">$65.46 <span class="change">▲8.16（+14.23%）</span></div>
+    <div class="stock-price positive">$65.49 <span class="change">▲8.19（+14.29%）</span></div>
   </div>
-  <div class="stock-meta">アナリスト目標: $113.05 <span class="positive">(+72.7%)</span></div>
+  <div class="stock-meta">アナリスト目標: $113.05 <span class="positive">(+72.6%)</span></div>
   <div class="stock-meta muted">投資額: ¥10,000 | 毎月: ¥0</div>
   
 </div></div>
@@ -198,8 +210,8 @@ a{color:var(--blue)}
   <div class="pnl-detail">
     <span class="muted">購入: $933.01</span>
     <span class="muted">→</span>
-    <span>現在: $936.00</span>
-    <span class="positive pnl-val">▲ ¥208 (+0.32%)</span>
+    <span>現在: $931.87</span>
+    <span class="negative pnl-val">▼ -¥79 (-0.12%)</span>
   </div>
 </div>
 <div class="pnl-row">
@@ -207,8 +219,8 @@ a{color:var(--blue)}
   <div class="pnl-detail">
     <span class="muted">購入: $419.92</span>
     <span class="muted">→</span>
-    <span>現在: $420.96</span>
-    <span class="positive pnl-val">▲ ¥37 (+0.25%)</span>
+    <span>現在: $421.95</span>
+    <span class="positive pnl-val">▲ ¥73 (+0.48%)</span>
   </div>
 </div>
 <div class="pnl-row">
@@ -225,8 +237,8 @@ a{color:var(--blue)}
   <div class="pnl-detail">
     <span class="muted">購入: $31.29</span>
     <span class="muted">→</span>
-    <span>現在: $31.23</span>
-    <span class="negative pnl-val">▼ -¥10 (-0.19%)</span>
+    <span>現在: $31.27</span>
+    <span class="negative pnl-val">▼ -¥3 (-0.06%)</span>
   </div>
 </div>
 <div class="pnl-row">
@@ -234,21 +246,21 @@ a{color:var(--blue)}
   <div class="pnl-detail">
     <span class="muted">購入: $65.50</span>
     <span class="muted">→</span>
-    <span>現在: $65.46</span>
-    <span class="negative pnl-val">▼ -¥6 (-0.06%)</span>
+    <span>現在: $65.49</span>
+    <span class="negative pnl-val">▼ -¥2 (-0.02%)</span>
   </div>
 </div>
     
-<div class="pnl-total positive-border">
+<div class="pnl-total negative-border">
   <div class="pnl-total-row">
     <span>投資総額</span><span>¥100,000</span>
   </div>
   <div class="pnl-total-row">
-    <span>現在の評価額</span><span>¥100,230</span>
+    <span>現在の評価額</span><span>¥99,988</span>
   </div>
-  <div class="pnl-total-row big positive">
+  <div class="pnl-total-row big negative">
     <span>損益合計</span>
-    <span>▲ ¥230 (+0.23%)</span>
+    <span>▼ -¥12 (-0.01%)</span>
   </div>
 </div>
   </div>
@@ -260,18 +272,18 @@ a{color:var(--blue)}
     <div class="idx-grid">
 <div class="index-card positive-border ">
   <div class="index-name">NASDAQ</div>
-  <div class="index-value positive">26,772.80</div>
-  <div class="index-change positive">▲ 0.37%</div>
+  <div class="index-value positive">26,776.57</div>
+  <div class="index-change positive">▲ 0.38%</div>
 </div>
 <div class="index-card positive-border ">
   <div class="index-name">S&P500</div>
-  <div class="index-value positive">7,544.57</div>
-  <div class="index-change positive">▲ 0.32%</div>
+  <div class="index-value positive">7,545.42</div>
+  <div class="index-change positive">▲ 0.33%</div>
 </div>
 <div class="index-card positive-border ">
   <div class="index-name">SOX半導体指数</div>
-  <div class="index-value positive">12,709.87</div>
-  <div class="index-change positive">▲ 0.06%</div>
+  <div class="index-value positive">12,727.17</div>
+  <div class="index-change positive">▲ 0.20%</div>
 </div>
 <div class="index-card negative-border ">
   <div class="index-name">日経225</div>
@@ -280,8 +292,8 @@ a{color:var(--blue)}
 </div>
 <div class="index-card negative-border vix-calm">
   <div class="index-name">VIX恐怖指数</div>
-  <div class="index-value negative">15.99</div>
-  <div class="index-change negative">▼ 1.84%</div>
+  <div class="index-value negative">16.00</div>
+  <div class="index-change negative">▼ 1.78%</div>
 </div></div>
     <div class="mkt-exps"><div class="mkt-exp">📈 NASDAQが0.4%上昇しました。MU・AVGO・UPSTにとって追い風です。</div><div class="mkt-exp">🗾 日経225が0.5%下落。東京エレクトロンの動向に注目。</div><div class="mkt-exp">✅ VIX恐怖指数は16.0と落ち着いています。市場は比較的安定中です。</div></div>
   </div>
@@ -367,6 +379,14 @@ a{color:var(--blue)}
   <div class="sec-body">
 <div class="news-item">
   <span class="news-cat">MU（Micron）</span>
+  <a href="https://247wallst.com/investing/2026/05/28/beyond-micron-why-tsmc-might-be-the-bigger-value-play-in-semis-as-the-cycle-broadens/?.tsrc=rss" target="_blank" class="news-title">Beyond Micron. Why TSMC Might Be the Bigger Value Play in Semis as the Cycle Broadens</a>
+  <div class="news-summary">It feels like there’s nothing more than extreme overvaluation across the semiconductor names these days. Indeed, sometimes, it just makes more sense to tell yourself you missed a move rather than looking to chase an overheated sector or industry after a parabolic move. With Micron (NASDAQ:MU) up 865% in the past year, surging into the ... Beyond Micron. Why TSMC Might Be the Bigger Value Play in Semis as the Cycle Broadens</div>
+  <div class="news-impact impact-neg">📉 MUに弱気材料。-10%下落時の買い増しシグナルを準備しておきましょう。</div>
+  
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">MU（Micron）</span>
   <a href="https://finance.yahoo.com/m/bf8a1a7c-7d2a-3ee4-96b7-c9c69a4e73e7/snowflake%2C-micron%2C-unusual.html?.tsrc=rss" target="_blank" class="news-title">Snowflake, Micron, Unusual Machines, and More Stocks That Explain the Market Today</a>
   <div class="news-summary">Investors also received another data point on inflation, as the Federal Reserve’s preferred inflation gauge, the PCE price index, accelerated to 3.8% in April, well above the 2% target. The the and the tech-heavy Nasdaq Composite all trended lower Thursday. Balancing the macro trends, Snowflake stock surged 36% after fiscal first-quarter profit smashed Wall Street’s target, potentially dispelling fears that artificial intelligence would destroy its business.</div>
   <div class="news-impact impact-pos">📈 MUに強気材料。株価上昇・アナリスト目標引き上げの可能性があります。</div>
@@ -377,14 +397,6 @@ a{color:var(--blue)}
   <span class="news-cat">MU（Micron）</span>
   <a href="https://finance.yahoo.com/m/b4195f24-854f-3ff3-b183-58f92dab0c77/micron-or-intel-stock%3F-one-is.html?.tsrc=rss" target="_blank" class="news-title">Micron or Intel Stock? One Is a Better AI Play.</a>
   <div class="news-summary">The shares of each company have racked up huge gains but one may have more room to run than the other, according to this analyst</div>
-  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">MU（Micron）</span>
-  <a href="https://finance.yahoo.com/markets/stocks/articles/micron-cheap-stock-valuation-seen-092149451.html?.tsrc=rss" target="_blank" class="news-title">Micron’s Cheap Stock Valuation Seen as a Contrarian Warning Sign</a>
-  <div class="news-summary">(Bloomberg) -- Micron Technology Inc. is the third-best performer in the S&P 500 Index this year and at the same time one of the least expensive stocks in the market. While that dichotomy looks bullish on the surface, it may be more of a warning sign than a green light for investors.Most Read from BloombergSingapore Hands Byju's Founder His First Ever Jail TermIran’s Khamenei Says No Going Back for Middle East Rocked by WarTwo More Oil Supertankers Exit Hormuz to Help Push Up FlowsEx-President B</div>
   <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
   <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
   <span class="news-src">Yahoo Finance</span>
@@ -448,7 +460,7 @@ a{color:var(--blue)}
 <div class="news-item">
   <span class="news-cat">KTOS（防衛）</span>
   <a href="https://www.fool.com/investing/2026/05/28/cathie-wood-goes-bargain-hunting-3-stocks-she-just/?.tsrc=rss" target="_blank" class="news-title">Cathie Wood Goes Bargain Hunting: 3 Stocks She Just Bought</a>
-  <div class="news-summary">Cathie Wood normally thrives in a bull market, but this year hasn't played out that way. The founder CEO of Ark Invest is seeing flat returns for its largest exchange-traded fund in 2026, falling short of the general market's 10% gain. She's not going to rest until she gets back to beating the market again. Wood publishes Ark Invest's transactions at the end of every trading day, so we know what she's buying. Ark added to existing positions in Amazon ( AMZN 0.64% ) , Kratos Defense & Security Solutions ( KTOS +14.12% ) , and Tempus AI ( TEM +9.07% ) on Wednesday. Let's take a closer look at these three stocks. The country's largest company, at least in terms of trailing revenue, has been flirting with joining the $3 trillion market cap club this month. It should get there eventually, but the real prize is higher milestones for long-term investors. Amazon's biggest driver is no longer its</div>
+  <div class="news-summary">Cathie Wood normally thrives in a bull market, but this year hasn't played out that way. The founder CEO of Ark Invest is seeing flat returns for its largest exchange-traded fund in 2026, falling short of the general market's 10% gain. She's not going to rest until she gets back to beating the market again. Wood publishes Ark Invest's transactions at the end of every trading day, so we know what she's buying. Ark added to existing positions in Amazon ( AMZN 0.60% ) , Kratos Defense & Security Solutions ( KTOS +14.10% ) , and Tempus AI ( TEM +8.63% ) on Wednesday. Let's take a closer look at these three stocks. The country's largest company, at least in terms of trailing revenue, has been flirting with joining the $3 trillion market cap club this month. It should get there eventually, but the real prize is higher milestones for long-term investors. Amazon's biggest driver is no longer its</div>
   <div class="news-impact impact-pos">📈 防衛需要の拡大はKTOSに有利。ドローン・無人機分野での追い風。</div>
   <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
   <span class="news-src">Yahoo Finance</span>
@@ -573,19 +585,50 @@ a{color:var(--blue)}
 </div>
 
 <div class="sec">
+  <div class="sec-ttl">📅 今週の決算・注目イベント</div>
+  <div class="sec-body">
+    <div class="earn-grid"><div class="earn-chip "><strong>AVGO</strong><div class="earn-date">06/04 (7日後)</div></div><div class="earn-chip "><strong>MU</strong><div class="earn-date">06/25 (28日後)</div></div></div><div class="muted" style="font-size:0.78em;margin-top:8px">※ 決算日は変更される場合があります。事前に確認してください。</div>
+  </div>
+</div>
+
+<div class="sec">
   <div class="sec-ttl">📚 今日の学習コーナー</div>
   <div class="sec-body">
-    <div class="tip-box">
-      <div class="tip-ttl">💡 WISEを使った賢い投資戦略</div>
-      <div class="tip-body">通常、銀行でドルを買うと1〜3%の手数料がかかります。WISEを使えば中値レートに近い低コストで換金できます。戦略：円高の時にWISEでJPY→USDに換金してドルを保持→タイミングを見てSBIで米国株を購入。これだけで年間数千円のコスト削減になります。</div>
-    </div>
+    
+<div class="learn-card company">
+  <div class="learn-label">🚀 今日の注目企業</div>
+  <div class="learn-ttl">📊 AMD（アドバンスト・マイクロ・デバイシズ）</div>
+  <div class="learn-status">NASDAQ上場: AMD | CEO: リサ・スー</div>
+  <div class="learn-body"><strong>事業内容：</strong>CPU（Ryzen）とGPU（Radeon・Instinct）を手がけるNVIDIAの最大ライバル。MI300X AIアクセラレーターでデータセンター市場に本格参入。<br><br>
+  <strong>今なぜ注目？：</strong>NVIDIAのGPU供給不足を受け、AMDのMI300XをMicrosoftやMetaが採用。2024年はAIチップ売上が急増。NVIDIAほど高値ではなく「割安なAI株」との見方も。<br><br>
+  <strong>あなたのポートフォリオとの関係：</strong>MUのメモリチップはAMDのGPUにも搭載。AMD株の好調 = AI需要強い = MUにも追い風。</div>
+</div>
+
+<div class="learn-card trend">
+  <div class="learn-label">🔥 業界トレンド解説</div>
+  <div class="learn-ttl">💾 HBMメモリ革命：AIが変えるメモリ産業</div>
+  <div class="learn-body">HBM（High Bandwidth Memory）はAIチップに積み上げる超高速メモリ。従来のDRAMの10倍以上の帯域幅を持ち、ChatGPTなどAIモデルの学習・推論に不可欠。世界シェアはSK Hynix約50%、Micron（MU）・Samsung（三星）が追う構図。Micronは2024-2025年にHBM3E生産を本格化しNVIDIAへの供給を増やしています。</div>
+  <div class="learn-impact">📊 あなたの保有株への影響：MU 直接恩恵（HBM売上急増）</div>
+</div>
+
+<div class="learn-card term">
+  <div class="learn-label">💡 今日の投資用語</div>
+  <div class="learn-ttl">ボラティリティ（価格変動率）</div>
+  <div class="learn-body">株価がどれだけ大きく動くかを示す指標。ボラティリティが高い = 価格が激しく上下する（ハイリスク・ハイリターン）、低い = 安定している（ローリスク・ローリターン）。半導体株（MU・AVGO）はボラティリティが高い部類で、短期間で±20%動くことも珍しくありません。</div>
+</div>
+
+<div class="learn-card wise">
+  <div class="learn-label">💳 WISE活用法</div>
+  <div class="learn-ttl">MYRをWISEで賢く管理する方法</div>
+  <div class="learn-body">マレーシアリンギット（MYR）はアジア通貨の中では比較的安定。WISEでMYRを保有しておき、マレーシアとの取引や旅行時に活用できます。MYR/JPYが強い時（リンギット高）に一部をJPYに換金し、弱い時は保持するのが基本戦略です。</div>
+</div>
   </div>
 </div>
 
 <div class="footer">
   データソース: Yahoo Finance（株価・指数）/ Frankfurter API（為替）/ Yahoo Finance RSS + Google News（ニュース）<br>
   ※このダッシュボードは情報提供のみです。予測は参考値であり、将来の利益を保証するものではありません。投資判断は自己責任でお願いします。<br>
-  最終更新: 2026年05月28日（木曜日）23:47 JST
+  最終更新: 2026年05月28日（木曜日）23:55 JST
 </div>
 
 <script>setTimeout(() => location.reload(), 10 * 60 * 1000);</script>
