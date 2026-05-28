@@ -726,7 +726,7 @@ def get_daily_tip(indices, currencies, stocks):
 # HTML Generation
 # ============================================================
 
-def generate_html(stocks, indices, currencies, news, actions, pnl, predictions, jpy_table):
+def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table):
     jst      = pytz.timezone("Asia/Tokyo")
     now      = datetime.now(jst)
     weekdays = ["月曜日","火曜日","水曜日","木曜日","金曜日","土曜日","日曜日"]
@@ -798,50 +798,6 @@ def generate_html(stocks, indices, currencies, news, actions, pnl, predictions, 
     <span>損益合計</span>
     <span>{total_arr} {fmt_jpy(pnl.get('total_pnl',0))} ({pnl.get('total_pnl_pct',0):+.2f}%)</span>
   </div>
-</div>"""
-
-    # -------- Predictions --------
-    pred_rows = ""
-    tot = predictions.get("__total__", {})
-    for ticker, d in predictions.items():
-        if ticker == "__total__": continue
-        sym = "¥" if d["is_jpy"] else "$"
-        c1  = _sign_color(d["pnl1_pct"])
-        c2  = _sign_color(d["pnl2_pct"])
-        pred_rows += f"""
-<div class="pred-row">
-  <div class="pred-name"><span class="ticker">{ticker}</span><span class="company"> {d['name']}</span>
-    <span class="pred-src">({d['source']})</span></div>
-  <div class="pred-cols">
-    <div class="pred-col">
-      <div class="pred-label">現在</div>
-      <div class="pred-price">{sym}{d['cur']:,.2f}</div>
-      <div class="pred-jpy muted">¥{d.get('invested_jpy', predictions.get(ticker,{}).get('invested_jpy',0)):,} 投資</div>
-    </div>
-    <div class="pred-col">
-      <div class="pred-label">1年後予測</div>
-      <div class="pred-price {c1}">{sym}{d['t1']:,.2f}</div>
-      <div class="pred-jpy {c1}">{fmt_jpy(d['pnl1_jpy'])} ({d['pnl1_pct']:+.1f}%)</div>
-    </div>
-    <div class="pred-col">
-      <div class="pred-label">2年後予測</div>
-      <div class="pred-price {c2}">{sym}{d['t2']:,.2f}</div>
-      <div class="pred-jpy {c2}">{fmt_jpy(d['pnl2_jpy'])} ({d['pnl2_pct']:+.1f}%)</div>
-    </div>
-  </div>
-</div>"""
-
-    pred_total_html = ""
-    if tot:
-        pred_total_html = f"""
-<div class="pred-total">
-  <div class="pred-total-title">📊 ポートフォリオ合計予測</div>
-  <div class="pred-total-grid">
-    <div class="pred-total-col"><div class="pred-label">現在の評価額</div><div class="pred-big">¥{pnl.get('total_current',0):,}</div></div>
-    <div class="pred-total-col positive"><div class="pred-label">1年後の予測評価額</div><div class="pred-big positive">¥{tot.get('v1',0):,}</div><div class="pred-sub positive">+¥{tot.get('pnl1',0):,} (+{tot.get('pnl1_pct',0):.1f}%)</div></div>
-    <div class="pred-total-col positive"><div class="pred-label">2年後の予測評価額</div><div class="pred-big positive">¥{tot.get('v2',0):,}</div><div class="pred-sub positive">+¥{tot.get('pnl2',0):,} (+{tot.get('pnl2_pct',0):.1f}%)</div></div>
-  </div>
-  <div class="pred-disclaimer">※予測はアナリスト目標株価および業界成長率に基づく試算です。投資は自己責任でお願いします。</div>
 </div>"""
 
     # -------- Indices --------
@@ -1100,8 +1056,6 @@ a{{color:var(--blue)}}
   <div class="sec-body">
     {pnl_rows}
     {pnl_total_html}
-    <div style="margin-top:16px">{pred_rows}</div>
-    {pred_total_html}
   </div>
 </div>
 
@@ -1174,10 +1128,7 @@ def main():
     print("  ⑤ 損益計算中...")
     pnl = calculate_pnl(stocks, currencies, config)
 
-    print("  ⑥ 収益予測計算中...")
-    predictions = generate_predictions(stocks, currencies, config)
-
-    print("  ⑦ 換金シミュレーター計算中...")
+    print("  ⑥ 換金シミュレーター計算中...")
     jpy_table = jpy_conversion_table(currencies)
 
     print("  ⑧ ニュース取得中（記事本文を取得しています）...")
@@ -1186,8 +1137,8 @@ def main():
     print("  ⑨ アクション・アドバイス生成中...")
     actions = action_recommendations(stocks, indices, currencies)
 
-    print("  ⑩ HTML生成中...")
-    html = generate_html(stocks, indices, currencies, news, actions, pnl, predictions, jpy_table)
+    print("  ⑦ HTML生成中...")
+    html = generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table)
 
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
     with open(out, "w", encoding="utf-8") as f:
