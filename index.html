@@ -70,6 +70,12 @@ a{color:var(--blue)}
 .news-title{color:var(--txt);text-decoration:none;font-size:0.88em;line-height:1.4}
 .news-title:hover{color:var(--blue);text-decoration:underline}
 .news-src{font-size:0.72em;color:var(--dim)}
+.news-summary{font-size:0.85em;color:#c9d1d9;line-height:1.5;margin-top:4px}
+.news-impact{margin-top:6px;padding:6px 10px;border-radius:6px;font-size:0.83em;line-height:1.45}
+.news-outlook{margin-top:4px;padding:5px 10px;border-radius:6px;font-size:0.8em;color:var(--muted);background:rgba(88,166,255,.05);border-left:2px solid rgba(88,166,255,.3)}
+.impact-pos{background:rgba(63,185,80,.1);color:#3fb950;border-left:3px solid rgba(63,185,80,.4)}
+.impact-neg{background:rgba(248,81,73,.1);color:#f85149;border-left:3px solid rgba(248,81,73,.4)}
+.impact-neu{background:rgba(139,148,158,.08);color:var(--muted);border-left:3px solid rgba(139,148,158,.3)}
 
 .act-item{padding:11px 13px;border-radius:8px;margin-bottom:7px;font-size:0.92em}
 .act-high{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);color:var(--red)}
@@ -93,28 +99,28 @@ a{color:var(--blue)}
 
 <div class="hdr">
   <h1>📊 毎朝の投資ダッシュボード</h1>
-  <div class="dt">2026年05月28日（木曜日）23:12 JST</div>
+  <div class="dt">2026年05月28日（木曜日）23:29 JST</div>
   <div class="sub">ポートフォリオ投資額: ¥110,000 | 毎月積立: ¥50,000 | 予備資金: ¥10,000</div>
 </div>
 
 <div class="sec">
   <div class="sec-ttl">📊 株価・保有銘柄</div>
   <div class="sec-body">
-<div class="stock-card negative-border">
+<div class="stock-card positive-border">
   <div class="stock-header">
     <div><span class="ticker">MU</span><span class="company"> Micron Technology</span></div>
-    <div class="stock-price negative">$923.50 <span class="change">▼4.91（-0.53%）</span></div>
+    <div class="stock-price positive">$930.71 <span class="change">▲2.30（+0.25%）</span></div>
   </div>
-  <div class="stock-meta">アナリスト目標: $652.98 <span class="negative">(-29.3%)</span></div>
+  <div class="stock-meta">アナリスト目標: $652.98 <span class="negative">(-29.8%)</span></div>
   <div class="stock-meta muted">投資額: ¥65,000 | 毎月: ¥30,000</div>
   
 </div>
 <div class="stock-card negative-border">
   <div class="stock-header">
     <div><span class="ticker">AVGO</span><span class="company"> Broadcom Inc.</span></div>
-    <div class="stock-price negative">$419.36 <span class="change">▼2.50（-0.59%）</span></div>
+    <div class="stock-price negative">$418.02 <span class="change">▼3.84（-0.91%）</span></div>
   </div>
-  <div class="stock-meta">アナリスト目標: $480.49 <span class="positive">(+14.6%)</span></div>
+  <div class="stock-meta">アナリスト目標: $480.49 <span class="positive">(+14.9%)</span></div>
   <div class="stock-meta muted">投資額: ¥15,000 | 毎月: ¥5,000</div>
   
 </div>
@@ -127,21 +133,21 @@ a{color:var(--blue)}
   <div class="stock-meta muted">投資額: ¥5,000 | 毎月: ¥5,000</div>
   
 </div>
-<div class="stock-card negative-border">
+<div class="stock-card positive-border">
   <div class="stock-header">
     <div><span class="ticker">UPST</span><span class="company"> Upstart Holdings</span></div>
-    <div class="stock-price negative">$30.45 <span class="change">▼0.27（-0.88%）</span></div>
+    <div class="stock-price positive">$31.12 <span class="change">▲0.40（+1.32%）</span></div>
   </div>
-  <div class="stock-meta">アナリスト目標: $40.2 <span class="positive">(+32.0%)</span></div>
+  <div class="stock-meta">アナリスト目標: $40.2 <span class="positive">(+29.2%)</span></div>
   <div class="stock-meta muted">投資額: ¥5,000 | 毎月: ¥0</div>
   
 </div>
 <div class="stock-card positive-border">
   <div class="stock-header">
     <div><span class="ticker">KTOS</span><span class="company"> Kratos Defense</span></div>
-    <div class="stock-price positive">$63.84 <span class="change">▲6.54（+11.41%）</span></div>
+    <div class="stock-price positive">$65.27 <span class="change">▲7.97（+13.91%）</span></div>
   </div>
-  <div class="stock-meta">アナリスト目標: $113.05 <span class="positive">(+77.1%)</span></div>
+  <div class="stock-meta">アナリスト目標: $113.05 <span class="positive">(+73.2%)</span></div>
   <div class="stock-meta muted">投資額: ¥10,000 | 毎月: ¥0</div>
   
 </div></div>
@@ -151,20 +157,20 @@ a{color:var(--blue)}
   <div class="sec-ttl">🌏 市場概況</div>
   <div class="sec-body">
     <div class="idx-grid">
-<div class="index-card negative-border ">
+<div class="index-card positive-border ">
   <div class="index-name">NASDAQ</div>
-  <div class="index-value negative">26,660.75</div>
-  <div class="index-change negative">▼ 0.05%</div>
+  <div class="index-value positive">26,755.69</div>
+  <div class="index-change positive">▲ 0.30%</div>
 </div>
-<div class="index-card negative-border ">
+<div class="index-card positive-border ">
   <div class="index-name">S&P500</div>
-  <div class="index-value negative">7,519.10</div>
-  <div class="index-change negative">▼ 0.02%</div>
+  <div class="index-value positive">7,544.15</div>
+  <div class="index-change positive">▲ 0.32%</div>
 </div>
 <div class="index-card negative-border ">
   <div class="index-name">SOX半導体指数</div>
-  <div class="index-value negative">12,617.57</div>
-  <div class="index-change negative">▼ 0.67%</div>
+  <div class="index-value negative">12,676.92</div>
+  <div class="index-change negative">▼ 0.20%</div>
 </div>
 <div class="index-card negative-border ">
   <div class="index-name">日経225</div>
@@ -173,10 +179,10 @@ a{color:var(--blue)}
 </div>
 <div class="index-card negative-border vix-calm">
   <div class="index-name">VIX恐怖指数</div>
-  <div class="index-value negative">16.19</div>
-  <div class="index-change negative">▼ 0.61%</div>
+  <div class="index-value negative">15.99</div>
+  <div class="index-change negative">▼ 1.84%</div>
 </div></div>
-    <div class="mkt-exps"><div class="mkt-exp">🔴 半導体指数(SOX)が0.7%下落。MUとAVGOに直接影響します。</div><div class="mkt-exp">🗾 日経225が0.5%下落。東京エレクトロンの動向に注目。</div><div class="mkt-exp">✅ VIX恐怖指数は16.2と落ち着いています。市場は比較的安定中です。</div></div>
+    <div class="mkt-exps"><div class="mkt-exp">🗾 日経225が0.5%下落。東京エレクトロンの動向に注目。</div><div class="mkt-exp">✅ VIX恐怖指数は16.0と落ち着いています。市場は比較的安定中です。</div></div>
   </div>
 </div>
 
@@ -248,104 +254,204 @@ a{color:var(--blue)}
   <div class="sec-ttl">📰 今日の重要ニュース</div>
   <div class="sec-body">
 <div class="news-item">
-  <span class="news-cat">MU・半導体</span>
-  <a href="https://news.google.com/rss/articles/CBMi1wFBVV95cUxOYWlia2Nmd3luWGcwRFFndmN0YUpDS3RyU0U0Wnd5YmJRVXBJb1pjdE9xNVhZYXRaLW0xYkRQTGRDdWJaQW5SN2tUUWdYUEtKZWo0YzBMcnZVY3lRLTVySlBjR0tzZjNLN0t4cVlsNVpDS1RJN3BBcFFVNHpUQndnZWRSOG1hdEZvdHhCdXlYR0pvVUlOLS1fQTlSb2JLVGtuYjBXXzhPOFdaRXh1TFFOTmJ3ckdiV0ZYcVJwNUw4dkphYS0yX3ItMkQtZlhzS1c3RWVCcGhQa9IB3AFBVV95cUxNR1ZVOHk0REZrSHhsTEdvUmp0MlRyVFVkS0gtMGwydjFVOWtHcTJNWDJJSEVWd21zVVo1aUVlT0h6b1JMd090c3U0VXd2NTZObzd4WE1HUHZ2V2tEU1ZVYzdsXzZoNUV6X2phSlRzU21abnppYWc3aWZ0Ul9aVUZFckVSU2M1SHllSTVGTzkwQVlQUGplS0pQeDY4Z3pGNV9rME1EZXVia1hsWjlQcDFtNjZocGNlUW1LUG1HdkhpLUQtc1NIUmxVdnBQVi1DSXRrR3A3MmFHUjFMWGdy?oc=5" target="_blank" class="news-title">Taking Stock Of Micron Technology (MU) Valuation After Rapid Share Price Momentum - simplywall.st</a>
-  <span class="news-src">simplywall.st</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">MU・半導体</span>
-  <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxPeGdEVVhLdWdSbWpGX3lldlRzUy1yNnlmYXVaWGVVdmdPa0s5Ynl1RFlTQ2JTMWJlNDh5ekpURjgzSnRUVS1TdFFSaE1PT2pmYkg0RGwxc2lSRDY4NFZ0RGZ1N3FuYzB5WGljblAxWTdhdG5TekxnYWNwS0ptSVg5Ri1FenhfV1VVMU4wTWxPb3l2UzJ3?oc=5" target="_blank" class="news-title">Micron Is Nearing $1,000. Is a Stock Split Next? - The Motley Fool</a>
-  <span class="news-src">The Motley Fool</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">AVGO・AI</span>
-  <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxQOS1DZXhjUmM1dktEdE41MEd3TFdOaVZ1RlBGeFVOME1BR2ZEYWdfUWl2NXR5T0psbk5GMFhVV1FBWTdLU1FpTlJwVkRNRXJkbVh3R1k3RndzYmVyei01MWRITU1kOVRwUzg4b1VRbF9faVpoSXJ0ZkhSSHEyVUFZQ2x2UzhERDRjQkd3dlVLMUFBOFVH?oc=5" target="_blank" class="news-title">Broadcom Nearing 52-Week High: Buy, Sell or Hold? - 24/7 Wall St.</a>
-  <span class="news-src">24/7 Wall St.</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">AVGO・AI</span>
-  <a href="https://news.google.com/rss/articles/CBMitgFBVV95cUxQZ2lIdkJJSkpJbFlkY19icHhDSE16Y2RSaFZrZVNmU29tSDEzdzI1MzFEeHVzNWFWN2NzSEpCb19CSFpySzhyOUJaTk9IczJ2ZThhX21EWGxKaC1TbHhYNFBaVTJZZGY1elRrNjRkSzlsZWdpZDUwQnNJTTh1QjJYaVBlclhNd1NrS2YtWGphQWI5bHhLRFhDZVJLMUFDRkdoeXRkendHeTJhZWpDd290dUNDRHVsZw?oc=5" target="_blank" class="news-title">FuriosaAI Partners with Broadcom (AVGO) for Next-Gen AI Accelera - GuruFocus</a>
-  <span class="news-src">GuruFocus</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">東京エレクトロン</span>
-  <a href="https://news.google.com/rss/articles/CBMihAFBVV95cUxPTUNYbzBwYXJkdlVwVDFQc1hFQjMtU18tMDk0a1I5dHcyVC13MWdGOEx4WC1yNndsUzQ2dnNQdl80dGNjSXFuQjRmNGpYcnFuWGVMRGw1OVpHbFREaV8xQnBGZDNlS1MydXpjdjNkM3puNUxWU281QzZNaUkxNUhQQlZYNTI?oc=5" target="_blank" class="news-title">Chip toolmaker Tokyo Electron cuts ties with executive linked to Chinese rivals - Financial Times</a>
-  <span class="news-src">Financial Times</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">東京エレクトロン</span>
-  <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxNRWlCMXlNdTdpVzA5aHlQRnVzeFhlN183eVhiUFVVNm56QUdWS1JxWEsxR3BpaF9RU1o4eTBUUndxUHhEamdadWllNU5FZHdRMHZLUVdEdHhVTWxBcmFYZ3NaYS1LSEowWWpwemZUM0lsZXo1OHpCWXg2VGwtU1ZVQVlHbVJlUnJxRHdqdmxBSVlaZFFTbEtVcEJFOWdLNXpWZU9BWA?oc=5" target="_blank" class="news-title">Notice of New Building Construction at Tokyo Electron Kyushu - Moomoo</a>
-  <span class="news-src">Moomoo</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">UPST</span>
-  <a href="https://news.google.com/rss/articles/CBMi4wFBVV95cUxNUzBzQTZOZkVNRkd5UTNWUzYwZzdidHRxS1JiZGk1N3NWXzNHbVlMaHhMSXpqZUt6SC1qd1RuTEstNzJtWXpCUGhzRUZ0VFdKZmEzemFISG9aajZIamMwSDRWcVNKX1JjTGlWMmFZVUF0SjEtckE0eWhqSW16eFp5Zi11d0dtcld4TThodUN5eUdGM3dXR19UUk9XTUxHeDdIc0pleWFLWklqaWtITVExUVlxNTFyZEdvb0VDS0FOY1RESWt3Y0FHN0Jxam1oUlpad29UWE4xay1DWnEzaHVQRFZhY9IB6AFBVV95cUxQMnRsSUY3cEUtTi1lZ2haOWczSTBXeVpyblo5aUNUNVNLV0s1RzNkNnVDVzYwVDA3SzJXcjJFVkJNb3I0M05MejlYc2xINUdleS1NTjJ0V3pSM2NselNUWV9PTC1zVFBZWEt2NGhEZkFpd1FYUGhwZ2RwbUVGX3hJQmk2WUVvVWN2TFpBMEFDMmszWnpQS2JyR0ZOOE9uQXNtS0ttdEpMX094ekFqWC1JenZMYWc2ZFE2SUw4ZmVLbW1pVlBDRzNZT1gyQ3ZFcTI3RmZhUWVwTWx2SEtQaU52Q1BZQjkyUjNk?oc=5" target="_blank" class="news-title">Why Upstart Holdings (UPST) Is Up 9.0% After Adding Tim Wennes And A New Credit Union Partner - simplywall.st</a>
-  <span class="news-src">simplywall.st</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">UPST</span>
-  <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxObVIwSzg1ZVdvMWhKcUtlWC1jNWRSRjRueXRNVFJQYU5Gc2NWNktoRjRlWGd1VnZrODk2Y3hqTzJ5bjNQbzRuc29rQWdKNXlrOFVnTEg0S1Q5VU9MZnlzdk4xTVpGcU95QjJQd2lFNlBOd2xRdHVzdWhza3VRZF9ZMWlPM2NwX293Y280RmFMc1UyZTRp?oc=5" target="_blank" class="news-title">Why Upstart (UPST) Still Has an AI-Lending Moonshot Case - Yahoo Finance</a>
+  <span class="news-cat">MU（Micron）</span>
+  <a href="https://finance.yahoo.com/m/bf8a1a7c-7d2a-3ee4-96b7-c9c69a4e73e7/snowflake%2C-micron%2C-unusual.html?.tsrc=rss" target="_blank" class="news-title">Snowflake, Micron, Unusual Machines, and More Stocks That Explain the Market Today</a>
+  <div class="news-summary">Investors also received another data point on inflation, as the Federal Reserve’s preferred inflation gauge, the PCE price index, accelerated to 3.8% in April, well above the 2% target. The the and the tech-heavy Nasdaq Composite all trended lower Thursday. Balancing the macro trends, Snowflake stock surged 36% after fiscal first-quarter profit sma</div>
+  <div class="news-impact impact-pos">📈 MUに強気材料。株価上昇・目標株価引き上げの可能性があります。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
   <span class="news-src">Yahoo Finance</span>
 </div>
 <div class="news-item">
-  <span class="news-cat">KTOS・防衛</span>
-  <a href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxNUVNYR2lReHI3NUp5c09lb0ZpWUFScjI0dlR6NmFobnhjU3lLZTN4ODdUQmZrY3BtZWtaQjBQTVU2REdDWXExMHdJMTl4MlVoTmttYWV5eHMxVkJYODdEZDZ4Q0RpRXlGbTNyOE0wU0lpd0ZncElhYzJ0WEpNWlRIeEU0aHp4QzB2ZjltWDRkRDFUZnJxRnBmQlI5a0xETTc4SXh4WlZKMkdKUkU?oc=5" target="_blank" class="news-title">AeroVironment, Kratos Lead Drone Stocks Higher on Trump Funding Talks - GuruFocus</a>
-  <span class="news-src">GuruFocus</span>
+  <span class="news-cat">MU（Micron）</span>
+  <a href="https://finance.yahoo.com/m/b4195f24-854f-3ff3-b183-58f92dab0c77/micron-or-intel-stock%3F-one-is.html?.tsrc=rss" target="_blank" class="news-title">Micron or Intel Stock? One Is a Better AI Play.</a>
+  <div class="news-summary">The shares of each company have racked up huge gains but one may have more room to run than the other, according to this analyst</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
+  <span class="news-src">Yahoo Finance</span>
 </div>
 <div class="news-item">
-  <span class="news-cat">KTOS・防衛</span>
-  <a href="https://news.google.com/rss/articles/CBMi5wFBVV95cUxNM3M5ajJ1MnBwWnA4eEpvbElMeUlWVWVrSE84NmxjWUtJWFBzYnhudjN5Z3AyYzBmVUdqQ2pSOXk0T3dEVkJPX09vYWVvQ2JST1NEbW5INC00VWJvMWtyODh6VnpfWXY3cEhQd1BJQS12dHBlb1JiVnZDRWR1bkRMSHBJR21sOHFEOVpwVGVsbzZEMEZkTmxUd3NNRlY0LWs5c09RU1V0NUVqNlI5NDR2V1hudVJxWlZHa291MjNwYkswZWJxU2dMZ1pHOHRwTGEzNXJkdUdTR1FGdFB6MXRXYVdkYk5PRjg?oc=5" target="_blank" class="news-title">Kratos Defense vs. Curtiss-Wright: Which Defense Play Has More Upside? - The Globe and Mail</a>
-  <span class="news-src">The Globe and Mail</span>
+  <span class="news-cat">MU（Micron）</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/micron-cheap-stock-valuation-seen-092149451.html?.tsrc=rss" target="_blank" class="news-title">Micron’s Cheap Stock Valuation Seen as a Contrarian Warning Sign</a>
+  <div class="news-summary">(Bloomberg) -- Micron Technology Inc. is the third-best performer in the S&P 500 Index this year and at the same time one of the least expensive stocks in the market. While that dichotomy looks bullish on the surface, it may be more of a warning sign than a green light for investors.Most Read from BloombergSingapore Hands Byju's Founder His First E</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">AVGO（Broadcom）</span>
+  <a href="https://247wallst.com/investing/2026/05/28/etf-turns-100k-to-1-28m-in-1-year-reddit-says-itll-double-again/?.tsrc=rss" target="_blank" class="news-title">ETF Turns $100k to $1.28m in 1 Year. Reddit Says It’ll Double Again</a>
+  <div class="news-summary">One hundred thousand dollars dropped into Direxion Daily Semiconductor Bull 3X Shares (NYSEARCA:SOXL) on May 28, 2025 was worth around $1.28 million by the close on May 27, 2026. People who bought a 3x leveraged semiconductor fund into the back half of the AI capex cycle and held are laughing their way to the bank, ... ETF Turns $100k to $1.28m in </div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">AVGO（Broadcom）</span>
+  <a href="https://247wallst.com/investing/2026/05/28/microsofts-ai-spending-wont-derail-dividend-safety-inside-vanguards-vig/?.tsrc=rss" target="_blank" class="news-title">Microsoft’s AI Spending Won’t Derail Dividend Safety Inside Vanguard’s VIG</a>
+  <div class="news-summary">The Vanguard Dividend Appreciation ETF (NYSEARCA:VIG) owns only companies with at least 10 consecutive years of dividend growth, screens out the highest yielders, and lets compounding work. VIG has returned 22% over the past year and 244% over the past decade, a track record that owes as much to its tech-heavy roster as to traditional ... Microsoft</div>
+  <div class="news-impact impact-pos">📈 AVGOのAI/ネットワーク需要に追い風。上昇トレンド継続の可能性。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">AVGO（Broadcom）</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/broadcom-avgo-top-10-steve-131433990.html?.tsrc=rss" target="_blank" class="news-title">Broadcom (AVGO): Top 10 Steve Cohen Stock To Buy</a>
+  <div class="news-summary">Broadcom Inc. (NASDAQ:AVGO) is one of the 10 Best Stocks in Steve Cohen’s Portfolio. Broadcom Inc. (NASDAQ:AVGO) renewed its partnership with London Stock Exchange Group (LSEG) on May 19, 2026, with a new five-year agreement. The deal expands LSEG’s deployment of VMware Cloud Foundation 9 across its complex infrastructure, adding strength to its mu</div>
+  <div class="news-impact impact-pos">📈 AVGOのAI/ネットワーク需要に追い風。上昇トレンド継続の可能性。</div>
+  
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">UPST</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/upstart-holdings-inc-upst-attracting-130004369.html?.tsrc=rss" target="_blank" class="news-title">Upstart Holdings, Inc. (UPST) is Attracting Investor Attention: Here is What You Should Know</a>
+  <div class="news-summary">Recently, Zacks.com users have been paying close attention to Upstart (UPST). This makes it worthwhile to examine what the stock has in store.</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">UPST</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/3-growth-companies-insider-ownership-113548840.html?.tsrc=rss" target="_blank" class="news-title">3 Growth Companies With Insider Ownership As High As 38%</a>
+  <div class="news-summary">The United States market has experienced a positive trend, with a 1.3% increase over the last week and a substantial 28% rise over the past year, while earnings are projected to grow by 17% annually. In this environment, growth companies with significant insider ownership can be appealing as they often indicate strong confidence in the company's po</div>
+  <div class="news-impact impact-pos">📈 UPSTのAI融資モデルに好材料。金利低下局面で特に恩恵を受けます。</div>
+  <div class="news-outlook">🔭 今後の見通し: 次の決算発表に注目。</div>
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">UPST</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/top-growth-companies-significant-insider-173609975.html?.tsrc=rss" target="_blank" class="news-title">Top Growth Companies With Significant Insider Ownership May 2026</a>
+  <div class="news-summary">The United States market has shown robust performance recently, climbing 2.5% in the last 7 days and achieving a 26% increase over the past year, with earnings projected to grow by 17% annually. In this favorable environment, growth companies with significant insider ownership can be particularly appealing as they often indicate strong confidence f</div>
+  <div class="news-impact impact-pos">📈 UPSTのAI融資モデルに好材料。金利低下局面で特に恩恵を受けます。</div>
+  <div class="news-outlook">🔭 今後の見通し: 次の決算発表に注目。</div>
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">KTOS（防衛）</span>
+  <a href="https://finance.yahoo.com/m/20b9f725-56c7-31f3-8fd3-dcd033559ef6/drone-stocks-jump-as-trump.html?.tsrc=rss" target="_blank" class="news-title">Drone Stocks Jump As Trump Administration Pursues Funding Deals</a>
+  <div class="news-summary">The Trump administration continues efforts to bolster its drone arsenal as the Pentagon discusses potential funding deals with companies.</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">KTOS（防衛）</span>
+  <a href="https://www.fool.com/investing/2026/05/28/cathie-wood-goes-bargain-hunting-3-stocks-she-just/?.tsrc=rss" target="_blank" class="news-title">Cathie Wood Goes Bargain Hunting: 3 Stocks She Just Bought</a>
+  <div class="news-summary">The widely followed growth investor keeps making moves.</div>
+  <div class="news-impact impact-pos">📈 防衛需要の拡大はKTOSに有利。ドローン・無人機分野での追い風。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">KTOS（防衛）</span>
+  <a href="https://investorshub.advfn.com/market-news/article/29155/drone-stocks-rally-after-report-of-pentagon-backed-funding-discussions?.tsrc=rss" target="_blank" class="news-title">Drone stocks rally after report of Pentagon-backed funding discussions</a>
+  <div class="news-summary">Shares of several U. S. drone manufacturers moved sharply higher Monday after a report from The Wall Street Journal said the Trump administration is considering funding agreements with domestic drone companies to strengthen U.</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">東京エレクトロン</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/united-microelectronics-umc-hits-time-035110474.html?.tsrc=rss" target="_blank" class="news-title">United Microelectronics (UMC) Hits All-Time High on Expansion Initiatives</a>
+  <div class="news-summary">United Microelectronics Corp. (NYSE:UMC) is one of the 10 Stocks With Jaw-Dropping 14-74% Gains. United Microelectronics bounced back on Tuesday to hit a new all-time high, as investors took heart from its ongoing expansion plan supported by the acquisition of several assets. In intra-day trading, United Microelectronics Corp. (NYSE:UMC) climbed to</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">東京エレクトロン</span>
+  <a href="https://finance.yahoo.com/sectors/technology/articles/softbank-group-soars-nvidia-ai-123422630.html?.tsrc=rss" target="_blank" class="news-title">SoftBank Group Soars on Nvidia AI Boost</a>
+  <div class="news-summary">Shares rose nearly 20% as Nvidia results lifted AI-linked stocks.</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
+  <span class="news-src">Yahoo Finance</span>
+</div>
+<div class="news-item">
+  <span class="news-cat">東京エレクトロン</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/tokyo-electrons-taiwan-unit-says-015539816.html?.tsrc=rss" target="_blank" class="news-title">Tokyo Electron's Taiwan unit says it will not appeal ruling in TSMC trade secrets case</a>
+  <div class="news-summary">Tokyo Electron's ‌Taiwan unit ‌told Reuters in a ​written response on Thursday that it respects the ‌judicial process, ⁠takes the court ruling seriously ⁠and will not appeal ​in the ​TSMC ​trade secret ‌case. In April, a Taiwan court fined the Taiwan unit of Japan's ‌Tokyo Electron ​T$150 million ($5 ​million) ​in a ‌case involving trade ​secrets ​</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
+  <span class="news-src">Yahoo Finance</span>
 </div>
 <div class="news-item">
   <span class="news-cat">FRB・金利</span>
   <a href="https://news.google.com/rss/articles/CBMi8gFBVV95cUxOOHpMVjBROWItcVMxcjNsWUR1bkRZeTVsWjlGRXJLNTBrZkRfR2pDMjJwX2prUHdnd19BSzhpWXBCQnZPQjdCQUpJQmxuRXRfd29UQkNKYUZsRjVwVHg2c2w3eEdPdWxxZlNxSEltRTN1eFhpSzRaaTR1YTNOLThMWElBa2FRWm5lRkNQSU5HYUlJY2xvaXQwak5xcjRmUUVaUkVPQ1F0eGkyOGk3Z1hSZjM4MWQtVVRCQnBqMkJxc0xOVkQ2YXpGdlE4SXRZaU5UM0ZqUWFkZC1DLU1HSUVQaXd3cW8yZFc5a3dHaDI5a0stZw?oc=5" target="_blank" class="news-title">Fed's inflation gauge heated up in April, cementing that interest rates will remain steady for now - Yahoo Finance</a>
+  <div class="news-summary">Fed's inflation gauge heated up in April, cementing that interest rates will remain steady for now Yahoo Finance</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
   <span class="news-src">Yahoo Finance</span>
 </div>
 <div class="news-item">
   <span class="news-cat">FRB・金利</span>
   <a href="https://news.google.com/rss/articles/CBMikAFBVV95cUxQcjJ2ZXd6MzJPNHBWU3g5TW9MUlBnYnBRVldreHFjczBpOU00cE1ldHJDQWtZMUFNNjNHTm54bzQxVkRGWUhLWWFoU0tUbmpDdXpGRHZDQXBuUnZZZ3hPWXlJZldUOXQtdXgxMU5paURrVDNzU2JNNUFqd2J3RmExVDBUcnphdkhhYzNPTG5WX04?oc=5" target="_blank" class="news-title">What to Expect From Kevin Warsh’s Fed in the First 100 Days - Council on Foreign Relations</a>
+  <div class="news-summary">What to Expect From Kevin Warsh’s Fed in the First 100 Days Council on Foreign Relations</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  
   <span class="news-src">Council on Foreign Relations</span>
 </div>
 <div class="news-item">
   <span class="news-cat">日銀・円相場</span>
-  <a href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxPWU1ZdTN4VG9UR1BWMElKT3A5V0g1aWc4NUNSREI2TVZHWWVTN3ZORGtFODgyUmVQMEkwTklERmN6LWc1MG1Sc3dtVzM3cnhZTmNYN0J6WmcwdTdqS2I4SUxkQUxlSjMwVHFJc0lKYjhTR29BLXo5enpOb1hpYnV0dVBuaEZWMk5QSnR5Y01tREQwWGRvYjdDS0hsYlFnc3oxc3l2OHg0Z2cxUdIBrwFBVV95cUxNUU5HQnU4R2RFVGV4SjNDQkdIcEVZNlZnbTRDdUlIZGc1QXNzUDlNMVdObl96TmtSRWx3UHBJQjFUSnZUd3BvWS1nOHhHZmlnU3JpTTdhZVNySDh2bEZjYXl3LTMyMHZXRjdxWFV4d0Utb2xpdV9KVHhMRXd0VDJlWDcxNkotM2dvb19NaDZ1WEN2RUd1TE1IdjBVc1VPUktYdFJobEJYTzlPV3lfVkdv?oc=5" target="_blank" class="news-title">Yen nears intervention level; dollar edges higher as Iran conflict weighs on markets - CNBC</a>
-  <span class="news-src">CNBC</span>
+  <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxOanZmX3NWOEtoaC1NRFRhQi1NNjhtSTRDMnlEbFB1ZHRsR1pKbG5YbHRvdzRLMFlISWNyTjlPQUt1TGdnLTlVRFBxam5fWmZhaDVjYW9SOWNLZWt1d2xGWko4eE5RY25nWE5qWWtLSm5IMzZ5c1Z4dXIwZ2FYTnVwTV9PWXBzUThHZjN6dUxmS0gza3hfb1BCa3Q5NFFWaXNxX0paYQ?oc=5" target="_blank" class="news-title">Japan Intervenes to Save Yen as BoJ June Rate Hike Bets Rise - equiti.com</a>
+  <div class="news-summary">Japan Intervenes to Save Yen as BoJ June Rate Hike Bets Rise equiti.com</div>
+  <div class="news-impact impact-neg">📉 円高進行。WISEでのJPY→USD換金チャンスを確認しましょう。</div>
+  <div class="news-outlook">🔭 今後の見通し: 日銀の政策変更がある場合は円相場に大きな動きが出る可能性。</div>
+  <span class="news-src">equiti.com</span>
 </div>
 <div class="news-item">
   <span class="news-cat">日銀・円相場</span>
-  <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxOanZmX3NWOEtoaC1NRFRhQi1NNjhtSTRDMnlEbFB1ZHRsR1pKbG5YbHRvdzRLMFlISWNyTjlPQUt1TGdnLTlVRFBxam5fWmZhaDVjYW9SOWNLZWt1d2xGWko4eE5RY25nWE5qWWtLSm5IMzZ5c1Z4dXIwZ2FYTnVwTV9PWXBzUThHZjN6dUxmS0gza3hfb1BCa3Q5NFFWaXNxX0paYQ?oc=5" target="_blank" class="news-title">Japan Intervenes to Save Yen as BoJ June Rate Hike Bets Rise - equiti.com</a>
-  <span class="news-src">equiti.com</span>
+  <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxQcFp2NWlVdlVLU3VyZjl2ZVlRX3UtNkNxdHgyZVlmQjlNV0owSHRYY3dDemQ4SFRBNEpQQ3pvVW93ZWZvVHlRRUY5ZGJqOWJ6MzRCMWdoMzNrQ1lBS1JraTl5ZVFELW5Pa3hWQlZQQXY1MEdwNnZDbVpnNGNudXRTNHczeThFMkxsYlFVVS04ZG9LYURE0gGaAUFVX3lxTE5KRkozNjU4ZS05NjFzUUV4TXZMa0dIazY1M05VeU9ZMV9rT2NiNzRjYl9hUXU2TUotTE81OFJWMmo1TG0wQWxuTm5ibWtLWl8tdl9Yb2NIMkVMWkE5ZlF4ckNjOFVUcFNVcVl6NF9MWEVyS04tc3EwSTVxZmJFZzQzbzBrd0dmOHdwUWtrZVItVU5ISkJvQmpIN0E?oc=5" target="_blank" class="news-title">Japan may have fired its yen bazooka twice, but markets are testing Tokyo’s resolve - CNBC</a>
+  <div class="news-summary">Japan may have fired its yen bazooka twice, but markets are testing Tokyo’s resolve CNBC</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  <div class="news-outlook">🔭 今後の見通し: 日銀の政策変更がある場合は円相場に大きな動きが出る可能性。</div>
+  <span class="news-src">CNBC</span>
 </div>
 <div class="news-item">
   <span class="news-cat">マレーシア・MYR</span>
   <a href="https://news.google.com/rss/articles/CBMitAFBVV95cUxOX3VvaVBYZXJieXdUTHNySTE2N21HSS00NHVqbXAyVWdZWndQYV9DNjVLQm5hUk1DMGVGOUE1THdsVVpGTmJPd0lnb2FQajRrYzRRN0lVRmFRRWVHRmRKZm5QM01ES0hCUm1tLTF6eGlfaWJwazdCWkU1RHRIeG1HS2NXRTJ6LXRmck9DWUU5UnpyOVZqUVhIU3RRUkVXTzBKRTRrWWw5cnlTWkRVZ0JlOS1Kc3Q?oc=5" target="_blank" class="news-title">MYR/USD: Malaysia Ringgit Nears Four-Year High as Economy Gains Strength - Bloomberg.com</a>
+  <div class="news-summary">MYR/USD: Malaysia Ringgit Nears Four-Year High as Economy Gains Strength Bloomberg.com</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
   <span class="news-src">Bloomberg.com</span>
 </div>
 <div class="news-item">
   <span class="news-cat">マレーシア・MYR</span>
   <a href="https://news.google.com/rss/articles/CBMihwFBVV95cUxNWXEyUG9XTnlyUzdyS3o3aXV6X0xVX2kzQzllMHNzaFBqaW81MUY3N1N4bmhjeGc4bk5xeG5XcHBDeVJQT2JjUUltMXh3OWZqOFlQQTNzeUVEaWpWaXZFblJ0d1hpSUEtUzh1U3Vxa091LWE0RjlqcENDQUlvNEM0NVVoSnV6OEE?oc=5" target="_blank" class="news-title">Amir Hamzah sees further upside to ringgit, 2026 GDP forecast - Yahoo Finance Singapore</a>
+  <div class="news-summary">Amir Hamzah sees further upside to ringgit, 2026 GDP forecast Yahoo Finance Singapore</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  
   <span class="news-src">Yahoo Finance Singapore</span>
 </div>
 <div class="news-item">
   <span class="news-cat">AI・半導体業界</span>
-  <a href="https://news.google.com/rss/articles/CBMi7gFBVV95cUxQSU1lTDNoM2JmTVFkSGpsSS1YV0I1YVRnbnV6YjJkZXRha0hfN3BDNGMybDJIQjlZVEp1MC1sYmZmNXUtbno1RnV3ZUk0R2ZEaVVHeEVZUEFBbWhHZDRKSXRvaFN6Y2dXUEJRdWRRVmNZY3I3QWI1M05LZ3RvaENaYXNVQVNjX1JSVkwwaGE5UjY4dmtlS3pUbTR0cmtfM2lneTljdTA3N0stWXA3Y0lOR3A2WFRXalBEMGVxM0k5ckV4Xzl0RWtib0V3X1lfYWd1d01ZUXBsVzNHUmtMdzBGTm1IX202Qy00M0JvTmJ3?oc=5" target="_blank" class="news-title">Is the AI Trade Entering Its Second Wave? This ETF Could Be a Major Beneficiary. - The Globe and Mail</a>
-  <span class="news-src">The Globe and Mail</span>
+  <a href="https://news.google.com/rss/articles/CBMikwFBVV95cUxPTEdTZUhkU0c2LXRqUlYtYVBTSDB0NVRnQnBUZGFNX0x4UGNLNm55aVc3cktybjhob0ZXbDVEaGNVR2J2SWFCQ2VYOExLNDZPbDgxaUVrVlIyLW1NS1o1V1I4Sk8tazFPeDVDYjlYZTRtTUhPTVVmODhMb3lEbGJYaHFEOV9QRzdlUTlNdjEyaDJRTU0?oc=5" target="_blank" class="news-title">Nvidia, ON Semi Lead AI Chip Rally to New Highs - Gotrade</a>
+  <div class="news-summary">Nvidia, ON Semi Lead AI Chip Rally to New Highs Gotrade</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
+  <span class="news-src">Gotrade</span>
 </div>
 <div class="news-item">
   <span class="news-cat">AI・半導体業界</span>
-  <a href="https://news.google.com/rss/articles/CBMioAFBVV95cUxQYWxKaUI2X19ibFJsTDl3UzJkMHVYQ3FxQmNnRFp1VU1BeFJvM1UxYzNUNXNZSW1nQ0h0WTJTby1aMmZySk0wSjFhTEV4dUhyamFzU2pOeUJ0SklsNEF5TGJCNk1lb2IwSFdBYXRFM1ByY1c5eFp1X1F1b0t6S1NNNmtZNUFYTm9XVFIwRk1HTjlEaDNwXzJqRkM3ajdzLTJr?oc=5" target="_blank" class="news-title">Three Semiconductor Giants Powering the AI Revolution - Kalkine Media</a>
-  <span class="news-src">Kalkine Media</span>
+  <a href="https://news.google.com/rss/articles/CBMijwFBVV95cUxQODFoOE1KX2Zfd3JqOThieExqOGpIY2JHdDlGYTJyc3BGYmlTakNiUk5IczRQZHFNZHBqbWtrUmFHaDB0VlFCZk54S0VSX1czRVFBb1BfenZqSW5LUzJEUFhDYUZzbTgyZ0hsNnJIT2VkN2dFWU9wcWlad2xQTUE4QnZBZkdvX2lPMzRPWFJLbw?oc=5" target="_blank" class="news-title">Nvidia sends blunt message on China AI chip demand - thestreet.com</a>
+  <div class="news-summary">Nvidia sends blunt message on China AI chip demand thestreet.com</div>
+  <div class="news-impact impact-pos">📈 半導体セクター全体に追い風。MU・AVGOの株価上昇が期待されます。</div>
+  <div class="news-outlook">🔭 今後の見通し: AI需要は2025年も継続が見込まれます。</div>
+  <span class="news-src">thestreet.com</span>
 </div>
 <div class="news-item">
   <span class="news-cat">NASDAQ市場</span>
-  <a href="https://news.google.com/rss/articles/CBMioAFBVV95cUxQNXRua0VVeDZ2NkVSNVE2bFkxOU0tMG5aN3ViVnoyZWIxa3U1bm4zVktTRGU2QlhMakFIdWJVUVVWZjItT2ExMUVuVVFodHM0TXU4Nkx5bldMMDB6N0xIa0ZRZExVT1RrbUk3VTVNcEgwSGNmX0FuM3BJS2RhUld3bnNHWE84S0p0NHdudzJ3aUk3X3M4Xy1YNFE5RnFRV25m?oc=5" target="_blank" class="news-title">Micron Leads Tech as Nasdaq Hits High: Stock Market Today - Kiplinger</a>
-  <span class="news-src">Kiplinger</span>
+  <a href="https://news.google.com/rss/articles/CBMiowFBVV95cUxNQS1MbFBBdmVWcTBtREVDUTRUZk9aM1NaVGltQmNHZ25fUnVycHB2Y3ljLTR3REYtZExyZUVIMjdvZkt6bTFLdTBmYVBSOHdIWk5kY0VSMXNmRHZOemJGUDFaT1hDTmFMc3FJTG42NnFnbkRtT0tqbWF2UjlSOWlQYVFzclRFRmZqSWJyaGhqWTBuVkJDYlFXTU0ycXlUbEMtUmU0?oc=5" target="_blank" class="news-title">NASDAQ index reaches 26,343 as tech stocks climb, Fed rate outlook shifts - eciks.org</a>
+  <div class="news-summary">NASDAQ index reaches 26,343 as tech stocks climb, Fed rate outlook shifts eciks.org</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  
+  <span class="news-src">eciks.org</span>
 </div>
 <div class="news-item">
   <span class="news-cat">NASDAQ市場</span>
-  <a href="https://news.google.com/rss/articles/CBMi4AFBVV95cUxPR200cnF2TXo5cU1OYXBxXzR1dDQtcmNLb1lhWDNOOG9UdG1hZkphRmkzbkxFN2E5TG9Kd1pvLVhsZTEtSGhuZ2JzNzVDT2hpZXpDVTl2ekhqSE5nREFHYlphV0kyNi1EbzcxYlhoTFIyU2NlelQ3ZDFfMlRhbUJZTVFoYVMweEE3ak0wOXBlbzBFSWRxYUh6eXJReVdIMDZHLWF4QUxfMFZ0MjBsNHR0d3JaMDZpOWlLdi0wRV9XdDg5eHFHSHhJSG1wSVhpNmtwU2xRdWM1Vy1ySU51N2lOcA?oc=5" target="_blank" class="news-title">Stock Market Today, May 26: Soaring Tech Stocks Push S&P 500 and Nasdaq to New Highs - The Motley Fool</a>
-  <span class="news-src">The Motley Fool</span>
+  <a href="https://news.google.com/rss/articles/CBMingFBVV95cUxPXzYwdUZpQ01oRXY1ODExTkhMczJUQl9BRnVuR2JjT0E1RG9FX0lhWHgxdFd6WHh1YlR6SEpLRnBOR0VjSHR5blAzZDBLbXJzd05DaVBHejI4WkoxdF9kMERCTTZRczJxNnhpbWJqSFhfUlhVaFVmbUdSWXJpdHd1TF9rOW52eXR5VFJpTnVLVV9TRE5iTi1xYTlPR0pxQQ?oc=5" target="_blank" class="news-title">2026 Outlook Market Technology: Dawn of a New Operating Reality - Nasdaq</a>
+  <div class="news-summary">2026 Outlook Market Technology: Dawn of a New Operating Reality Nasdaq</div>
+  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的と見られます。</div>
+  
+  <span class="news-src">Nasdaq</span>
 </div></div>
 </div>
 
@@ -367,7 +473,7 @@ a{color:var(--blue)}
 <div class="footer">
   データソース: Yahoo Finance（株価・指数）/ Frankfurter API（為替）/ Google News（ニュース）<br>
   ※このダッシュボードは情報提供のみです。投資判断は自己責任でお願いします。<br>
-  最終更新: 2026年05月28日（木曜日）23:12 JST
+  最終更新: 2026年05月28日（木曜日）23:29 JST
 </div>
 
 <script>

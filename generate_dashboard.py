@@ -12,6 +12,8 @@ import pytz
 import feedparser
 import os
 import time
+import re
+import html as html_lib
 
 # ============================================================
 # Portfolio Configuration
@@ -235,30 +237,157 @@ def get_currency_data():
     return currencies
 
 
-def get_news():
-    items    = []
-    seen     = set()
-    base_url = "https://news.google.com/rss/search?q={}&hl=en&gl=US&ceid=US:en"
+def clean_text(text):
+    """Strip HTML tags, unescape entities, and trim."""
+    text = html_lib.unescape(text or "")
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text[:350]
 
-    for query, category in NEWS_QUERIES:
+
+def analyze_news_impact(title, description, category):
+    """Keyword-based Japanese portfolio impact analysis."""
+    full = (title + " " + description).lower()
+
+    pos_words = ["beat", "exceed", "surge", "upgrade", "buy", "strong", "record",
+                 "growth", "raise", "bullish", "outperform", "demand", "win",
+                 "positive", "profit", "revenue growth", "ai demand", "data center"]
+    neg_words = ["miss", "cut", "fall", "downgrade", "sell", "weak", "loss",
+                 "layoff", "warn", "bearish", "decline", "below", "tariff",
+                 "risk", "recession", "default", "rate hike", "inventory"]
+
+    pos = sum(1 for w in pos_words if w in full)
+    neg = sum(1 for w in neg_words if w in full)
+
+    if pos > neg:
+        sentiment, emoji = "positive", "📈"
+    elif neg > pos:
+        sentiment, emoji = "negative", "📉"
+    else:
+        sentiment, emoji = "neutral", "📊"
+
+    impact_map = {
+        ("MU",            "positive"): "MUに強気材料。株価上昇・目標株価引き上げの可能性があります。",
+        ("MU",            "negative"): "MUに弱気材料。-10%下落時の買い増しシグナルを準備しておきましょう。",
+        ("AVGO",          "positive"): "AVGOのAI/ネットワーク需要に追い風。上昇トレンド継続の可能性。",
+        ("AVGO",          "negative"): "AVGOに下落圧力。短期的な調整に注意。",
+        ("UPST",          "positive"): "UPSTのAI融資モデルに好材料。金利低下局面で特に恩恵を受けます。",
+        ("UPST",          "negative"): "UPSTは金利・信用リスクに敏感。下落に注意してください。",
+        ("KTOS",          "positive"): "防衛需要の拡大はKTOSに有利。ドローン・無人機分野での追い風。",
+        ("KTOS",          "negative"): "KTOSに逆風。防衛予算・契約動向の注視が必要です。",
+        ("東京エレクトロン", "positive"): "東京エレクトロンに好材料。半導体装置の需要増加が期待されます。",
+        ("東京エレクトロン", "negative"): "東京エレクトロンに注意。半導体設備投資の動向を確認してください。",
+        ("AI・半導体",     "positive"): "半導体セクター全体に追い風。MU・AVGOの株価上昇が期待されます。",
+        ("AI・半導体",     "negative"): "半導体セクター全体に下押し圧力。MU・AVGOの動向を注視。",
+        ("FRB・金利",      "positive"): "金利低下はグロース株に有利。MU・UPST・AVGOへの追い風になります。",
+        ("FRB・金利",      "negative"): "金利上昇はグロース株に不利。ポートフォリオ全体への下落圧力に注意。",
+        ("日銀・円相場",   "positive"): "円安継続。ドル建て米国株の円換算価値が上がります。",
+        ("日銀・円相場",   "negative"): "円高進行。WISEでのJPY→USD換金チャンスを確認しましょう。",
+        ("マレーシア・MYR","positive"): "MYR強化トレンド。WISEでのMYR保有者にとって有利な状況です。",
+        ("マレーシア・MYR","negative"): "MYR弱化。WISEでMYR→JPY換金を検討するタイミングかもしれません。",
+    }
+
+    impact_text = None
+    for (cat_key, sent), text in impact_map.items():
+        if cat_key in category and sent == sentiment:
+            impact_text = text
+            break
+
+    if not impact_text:
+        if sentiment == "positive":
+            impact_text = "市場にとってポジティブな材料です。保有株への好影響が期待されます。"
+        elif sentiment == "negative":
+            impact_text = "注意が必要なニュースです。ポートフォリオへの影響を確認しましょう。"
+        else:
+            impact_text = "中立的なニュースです。現時点では大きな影響は限定的と見られます。"
+
+    outlook_map = {
+        "earnings":      "次の決算発表に注目。",
+        "ai":            "AI需要は2025年も継続が見込まれます。",
+        "interest rate": "今後のFRB会合での発言に注目。",
+        "tariff":        "貿易政策の動向を引き続き注視。",
+        "yen":           "日銀の政策変更がある場合は円相場に大きな動きが出る可能性。",
+        "memory":        "データセンター向けメモリ需要の回復が株価の鍵を握ります。",
+        "defense":       "地政学リスクの動向が防衛株の行方を左右します。",
+    }
+    outlook = next((v for k, v in outlook_map.items() if k in full), "")
+
+    return {
+        "sentiment": sentiment,
+        "emoji":     emoji,
+        "impact":    f"{emoji} {impact_text}",
+        "outlook":   f"🔭 今後の見通し: {outlook}" if outlook else "",
+    }
+
+
+def get_news():
+    items = []
+    seen  = set()
+
+    # Yahoo Finance RSS — stock-specific, includes real article descriptions
+    stock_feeds = [
+        ("MU",     "https://finance.yahoo.com/rss/headline?s=MU",    "MU（Micron）"),
+        ("AVGO",   "https://finance.yahoo.com/rss/headline?s=AVGO",  "AVGO（Broadcom）"),
+        ("UPST",   "https://finance.yahoo.com/rss/headline?s=UPST",  "UPST"),
+        ("KTOS",   "https://finance.yahoo.com/rss/headline?s=KTOS",  "KTOS（防衛）"),
+        ("8035.T", "https://finance.yahoo.com/rss/headline?s=8035.T","東京エレクトロン"),
+    ]
+
+    for ticker, url, category in stock_feeds:
+        try:
+            feed = feedparser.parse(url)
+            for entry in feed.entries[:3]:
+                title = entry.get("title", "").strip()
+                if not title or title in seen:
+                    continue
+                seen.add(title)
+                desc   = clean_text(entry.get("description") or entry.get("summary") or "")
+                impact = analyze_news_impact(title, desc, category)
+                items.append({
+                    "title":    title,
+                    "summary":  desc,
+                    "link":     entry.get("link", "#"),
+                    "category": category,
+                    "source":   entry.get("source", {}).get("title", "Yahoo Finance"),
+                    "impact":   impact,
+                })
+        except Exception as e:
+            print(f"Stock news error ({ticker}): {e}")
+
+    # Google News RSS — macro and sector
+    macro_queries = [
+        ("Federal Reserve interest rate inflation",  "FRB・金利"),
+        ("Bank of Japan yen dollar BOJ policy",      "日銀・円相場"),
+        ("Malaysia economy ringgit MYR",             "マレーシア・MYR"),
+        ("AI semiconductor chip demand nvidia",      "AI・半導体業界"),
+        ("NASDAQ stock market technology outlook",   "NASDAQ市場"),
+        ("defense drone military spending",          "防衛・宇宙"),
+    ]
+
+    for query, category in macro_queries:
         try:
             encoded = requests.utils.quote(query)
-            feed    = feedparser.parse(base_url.format(encoded))
+            url     = f"https://news.google.com/rss/search?q={encoded}&hl=en&gl=US&ceid=US:en"
+            feed    = feedparser.parse(url)
             for entry in feed.entries[:2]:
                 title = entry.get("title", "").strip()
                 if not title or title in seen:
                     continue
                 seen.add(title)
+                desc   = clean_text(entry.get("description") or entry.get("summary") or "")
+                impact = analyze_news_impact(title, desc, category)
                 items.append({
                     "title":    title,
+                    "summary":  desc,
                     "link":     entry.get("link", "#"),
                     "category": category,
                     "source":   entry.get("source", {}).get("title", "Google News"),
+                    "impact":   impact,
                 })
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Macro news error ({category}): {e}")
 
-    return items[:20]
+    return items[:25]
 
 # ============================================================
 # Analysis & Advice
@@ -613,10 +742,23 @@ def generate_html(stocks, indices, currencies, news, actions):
     # -------- News --------
     news_html = ""
     for item in news:
+        summary_html = f'<div class="news-summary">{item["summary"]}</div>' if item.get("summary") else ""
+        impact       = item.get("impact", {})
+        impact_html  = ""
+        outlook_html = ""
+        if impact:
+            sent     = impact.get("sentiment", "neutral")
+            cls      = {"positive": "impact-pos", "negative": "impact-neg"}.get(sent, "impact-neu")
+            impact_html  = f'<div class="news-impact {cls}">{impact.get("impact", "")}</div>'
+            if impact.get("outlook"):
+                outlook_html = f'<div class="news-outlook">{impact["outlook"]}</div>'
         news_html += f"""
 <div class="news-item">
   <span class="news-cat">{item['category']}</span>
   <a href="{item['link']}" target="_blank" class="news-title">{item['title']}</a>
+  {summary_html}
+  {impact_html}
+  {outlook_html}
   <span class="news-src">{item['source']}</span>
 </div>"""
     if not news_html:
@@ -701,6 +843,12 @@ a{{color:var(--blue)}}
 .news-title{{color:var(--txt);text-decoration:none;font-size:0.88em;line-height:1.4}}
 .news-title:hover{{color:var(--blue);text-decoration:underline}}
 .news-src{{font-size:0.72em;color:var(--dim)}}
+.news-summary{{font-size:0.85em;color:#c9d1d9;line-height:1.5;margin-top:4px}}
+.news-impact{{margin-top:6px;padding:6px 10px;border-radius:6px;font-size:0.83em;line-height:1.45}}
+.news-outlook{{margin-top:4px;padding:5px 10px;border-radius:6px;font-size:0.8em;color:var(--muted);background:rgba(88,166,255,.05);border-left:2px solid rgba(88,166,255,.3)}}
+.impact-pos{{background:rgba(63,185,80,.1);color:#3fb950;border-left:3px solid rgba(63,185,80,.4)}}
+.impact-neg{{background:rgba(248,81,73,.1);color:#f85149;border-left:3px solid rgba(248,81,73,.4)}}
+.impact-neu{{background:rgba(139,148,158,.08);color:var(--muted);border-left:3px solid rgba(139,148,158,.3)}}
 
 .act-item{{padding:11px 13px;border-radius:8px;margin-bottom:7px;font-size:0.92em}}
 .act-high{{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);color:var(--red)}}
