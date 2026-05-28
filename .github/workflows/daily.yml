@@ -2,8 +2,8 @@ name: 毎朝の投資ダッシュボード更新
 
 on:
   schedule:
-    # 7:00 AM JST = 22:00 UTC (前日)
-    - cron: '0 22 * * *'
+    # 6:00 AM JST = 21:00 UTC (前日)
+    - cron: '0 21 * * *'
   workflow_dispatch:  # 手動実行も可能
 
 permissions:
