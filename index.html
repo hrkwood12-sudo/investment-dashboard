@@ -2,673 +2,723 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📊 投資ダッシュボード 06/03</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>投資ダッシュボード 06/03</title>
 <style>
 :root{
-  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--border:#30363d;
-  --txt:#e6edf3;--muted:#8b949e;--dim:#6e7681;
-  --blue:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#d29922;
-  --purple:#bc8cff;--orange:#ffa657;
+  --bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;
+  --sep:rgba(255,255,255,.1);
+  --t1:#fff;--t2:rgba(235,235,245,.75);--t3:rgba(235,235,245,.40);
+  --g:#30d158;--r:#ff453a;--b:#0a84ff;--o:#ff9f0a;--y:#ffd60a;--p:#bf5af2;--teal:#5ac8fa;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;background:var(--bg);color:var(--txt);line-height:1.6;padding:12px;font-size:15px}
-a{color:var(--blue)}
-.hdr{text-align:center;padding:18px 0 14px;border-bottom:1px solid var(--border);margin-bottom:18px}
-.hdr h1{font-size:1.6em;color:var(--blue)}
-.hdr .dt{color:var(--muted);font-size:0.85em;margin-top:4px}
-.hdr .sub{color:var(--dim);font-size:0.8em;margin-top:2px}
-.hdr .pnl-badge{display:inline-block;margin-top:8px;padding:4px 14px;border-radius:20px;font-size:0.9em;font-weight:bold}
-.pnl-badge.positive{background:rgba(63,185,80,.15);color:var(--green);border:1px solid rgba(63,185,80,.3)}
-.pnl-badge.negative{background:rgba(248,81,73,.15);color:var(--red);border:1px solid rgba(248,81,73,.3)}
-.pnl-badge.neutral{background:rgba(139,148,158,.1);color:var(--muted);border:1px solid var(--border)}
-.sec{margin-bottom:20px}
-.sec-ttl{font-size:1.05em;font-weight:bold;padding:9px 14px;background:var(--bg2);border-radius:8px 8px 0 0;border-left:4px solid var(--blue)}
-.sec-body{background:var(--bg2);border-radius:0 0 8px 8px;padding:12px;border:1px solid var(--border);border-top:none}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;
+  background:var(--bg);color:var(--t1);font-size:16px;
+  -webkit-font-smoothing:antialiased;
+  max-width:430px;margin:0 auto;padding-bottom:48px;
+}
+a{color:var(--b);text-decoration:none}
+.t2{color:var(--t2)}.t3{color:var(--t3)}
+.tg{color:var(--g)}.tr{color:var(--r)}.to{color:var(--o)}
 
-/* Stocks */
-.stock-card{background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:8px;border-left:4px solid var(--border)}
-.positive-border{border-left-color:var(--green)}
-.negative-border{border-left-color:var(--red)}
-.neutral-border{border-left-color:var(--border)}
-.stock-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px}
-.ticker{font-weight:bold;font-size:1.05em;color:var(--blue)}
-.company{color:var(--muted);font-size:0.85em}
-.stock-price{font-size:1.1em;font-weight:bold}.change{font-size:0.82em;margin-left:6px}
-.stock-meta{font-size:0.8em;color:var(--muted);margin-top:4px}
-.stock-pnl{display:flex;flex-wrap:wrap;gap:8px;font-size:0.84em;margin-top:6px;padding:6px 8px;background:var(--bg2);border-radius:5px;align-items:center}
-.pnl-arrow{color:var(--dim)}
-.pnl-inline{font-weight:bold}
-.muted{color:var(--muted)}
-.alert{margin-top:8px;padding:7px 10px;border-radius:6px;font-size:0.88em}
-.buy-alert{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.3)}
-.watch-alert{background:rgba(210,153,34,.12);color:var(--yellow);border:1px solid rgba(210,153,34,.3)}
-.positive{color:var(--green)}.negative{color:var(--red)}.neutral{color:var(--muted)}
+/* ── Header ── */
+.hdr{padding:56px 20px 20px;border-bottom:.5px solid var(--sep)}
+.hdr-lbl{font-size:13px;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.hdr-title{font-size:36px;font-weight:700;letter-spacing:-.5px;line-height:1.1}
+.hdr-time{font-size:14px;color:var(--t2);margin-top:6px}
+.hdr-pnl{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:7px 16px;border-radius:22px;font-size:16px;font-weight:600}
+.hdr-pnl.pos{background:rgba(48,209,88,.15);color:var(--g)}
+.hdr-pnl.neg{background:rgba(255,69,58,.15);color:var(--r)}
+.hdr-pnl.neu{background:var(--c1);color:var(--t2)}
 
-/* P&L Total */
-.pnl-total{border-radius:8px;padding:12px;border-left:4px solid var(--border);background:var(--bg3);margin-top:10px}
-.pnl-total-row{display:flex;justify-content:space-between;padding:4px 0;font-size:0.9em;border-bottom:1px solid var(--border)}
-.pnl-total-row:last-child{border-bottom:none}
-.pnl-total-row.big{font-size:1.05em;font-weight:bold;padding-top:8px}
+/* ── Section wrapper ── */
+.pg{padding:32px 20px 0}
+.pg-ttl{font-size:24px;font-weight:700;letter-spacing:-.3px;margin-bottom:14px}
+.card{background:var(--c1);border-radius:14px;overflow:hidden}
+.card+.card{margin-top:10px}
 
-/* Indices */
-.idx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px}
-.index-card{background:var(--bg3);border-radius:8px;padding:11px;text-align:center;border-left:3px solid var(--border)}
-.index-name{font-size:0.78em;color:var(--muted);margin-bottom:3px}
-.index-value{font-size:1.15em;font-weight:bold}.index-change{font-size:0.82em}
-.vix-danger{background:rgba(248,81,73,.08)}.vix-warn{background:rgba(210,153,34,.08)}.vix-calm{background:rgba(63,185,80,.05)}
-.mkt-exp{padding:9px 12px;margin-bottom:7px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--blue);font-size:0.9em}
-.mkt-exps{margin-top:12px}
+/* ── Stock rows (iOS Stocks) ── */
+.s-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--sep)}
+.s-row:last-of-type{border-bottom:none}
+.s-left{flex:1;min-width:0;padding-right:12px}
+.s-right{text-align:right;flex-shrink:0}
+.s-ticker{font-size:17px;font-weight:600}
+.s-name{font-size:13px;color:var(--t2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-price{font-size:17px;font-weight:500}
+.s-sub{padding:5px 16px 9px;font-size:12px;color:var(--t3);background:rgba(255,255,255,.03);border-bottom:.5px solid var(--sep);line-height:1.6}
 
-/* Currencies */
-.fx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
-.fx-card{background:var(--bg3);border-radius:8px;padding:12px}
-.fx-pair{font-weight:bold;color:var(--blue);font-size:0.95em}
-.fx-rate{font-size:1.25em;font-weight:bold;margin:3px 0}
-.fx-change{font-size:0.82em}.fx-hl{font-size:0.78em;color:var(--dim);margin-top:3px}
-.fx-alert{margin-top:5px;padding:4px 8px;background:rgba(210,153,34,.15);color:var(--yellow);border-radius:4px;font-size:0.8em}
-.fx-advice{margin-top:7px;font-size:0.82em;color:var(--muted);line-height:1.45}
-.best-fx{padding:10px 12px;margin-bottom:10px;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);border-radius:8px;font-size:0.9em}
-.jpy-conv{margin-top:14px;background:var(--bg3);border-radius:8px;padding:12px}
-.jpy-conv-title{font-weight:bold;color:var(--blue);margin-bottom:8px;font-size:0.95em}
-.table-wrap{overflow-x:auto}
-.conv-table{width:100%;border-collapse:collapse;font-size:0.85em}
-.conv-table th{background:var(--bg2);padding:7px 10px;text-align:right;color:var(--muted);font-weight:normal;border-bottom:1px solid var(--border)}
-.conv-table th:first-child{text-align:left}
-.conv-table td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--border)}
-.conv-table td:first-child{text-align:left}
-.conv-table tr:last-child td{border-bottom:none}
-.curr-name{font-weight:bold;color:var(--blue)}
+/* ── Pills ── */
+.pill{display:inline-block;padding:4px 9px;border-radius:7px;font-size:13px;font-weight:600;margin-top:4px;letter-spacing:-.1px}
+.pill-g{background:var(--g);color:#000}
+.pill-r{background:var(--r);color:#fff}
+.pill-n{background:var(--c2);color:var(--t2)}
 
-/* News */
-.news-item{padding:12px 0;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
+/* ── Alert stripes ── */
+.alert-stripe{padding:8px 16px;font-size:13px;font-weight:500;border-bottom:.5px solid var(--sep)}
+.alert-buy{background:rgba(255,69,58,.12);color:var(--r)}
+.alert-watch{background:rgba(255,159,10,.1);color:var(--o)}
+
+/* ── P&L block ── */
+.pnl-block{background:var(--c1);border-radius:14px;padding:4px 0;margin-top:10px}
+.pnl-row{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:.5px solid var(--sep);font-size:15px}
+.pnl-row:last-child{border-bottom:none}
+.pnl-big{font-size:17px;font-weight:600;padding:14px 16px}
+
+/* ── Index chips (horizontal scroll) ── */
+.idx-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.idx-scroll::-webkit-scrollbar{display:none}
+.idx-chip{background:var(--c1);border-radius:14px;padding:13px 14px;min-width:108px;flex-shrink:0;text-align:center}
+.idx-chip.vx-d{background:rgba(255,69,58,.1)}
+.idx-chip.vx-w{background:rgba(255,159,10,.08)}
+.idx-chip.vx-c{background:rgba(48,209,88,.06)}
+.idx-name{font-size:12px;color:var(--t2);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.idx-val{font-size:19px;font-weight:600}
+.idx-chg{font-size:13px;margin-top:3px}
+.mkt-note{background:var(--c1);border-radius:12px;padding:11px 14px;font-size:14px;color:var(--t2);margin-top:8px;line-height:1.6;border-left:3px solid var(--b)}
+.mkt-note+.mkt-note{margin-top:6px}
+
+/* ── FX rows ── */
+.fx-row{display:flex;align-items:flex-start;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--sep)}
+.fx-pair{font-size:17px;font-weight:600}
+.fx-chg{font-size:13px;margin-top:3px}
+.fx-hl{font-size:12px;color:var(--t3);margin-top:3px}
+.fx-right{text-align:right;flex-shrink:0;padding-left:12px}
+.fx-rate-big{font-size:20px;font-weight:500}
+.fx-pill{margin-top:4px;display:inline-block}
+.fx-advice-row{padding:7px 16px 10px;font-size:12px;color:var(--t3);background:rgba(255,255,255,.025);border-bottom:.5px solid var(--sep)}
+.fx-big-move{color:var(--o);margin-top:3px}
+.best-banner{background:rgba(10,132,255,.1);border:.5px solid rgba(10,132,255,.3);border-radius:12px;padding:11px 14px;font-size:14px;color:var(--b);margin-bottom:10px}
+
+/* ── JPY converter ── */
+.conv-wrap{background:var(--c1);border-radius:14px;margin-top:10px;overflow:hidden}
+.conv-ttl{padding:13px 16px;font-size:15px;font-weight:600;border-bottom:.5px solid var(--sep)}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.conv-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.conv-tbl th{padding:8px 11px;text-align:right;color:var(--t2);font-weight:500;font-size:12px;background:rgba(255,255,255,.03);border-bottom:.5px solid var(--sep)}
+.conv-tbl th:first-child{text-align:left}
+.conv-tbl td{padding:9px 11px;text-align:right;border-top:.5px solid var(--sep)}
+.conv-tbl td:first-child{text-align:left}
+.conv-curr{font-weight:700;color:var(--b)}
+.conv-note{padding:8px 14px 12px;font-size:11px}
+
+/* ── News ── */
+.news-item{padding:14px 16px;border-bottom:.5px solid var(--sep)}
 .news-item:last-child{border-bottom:none}
-.news-cat{font-size:0.72em;background:rgba(88,166,255,.15);color:var(--blue);padding:2px 8px;border-radius:10px;width:fit-content}
-.news-title{color:var(--txt);text-decoration:none;font-size:0.92em;line-height:1.4;font-weight:500}
-.news-title:hover{color:var(--blue);text-decoration:underline}
-.news-summary{font-size:0.85em;color:#c9d1d9;line-height:1.6;margin-top:3px}
-.news-impact{margin-top:6px;padding:7px 10px;border-radius:6px;font-size:0.84em;line-height:1.5}
-.news-outlook{margin-top:4px;padding:5px 10px;border-radius:6px;font-size:0.8em;color:var(--muted);background:rgba(88,166,255,.05);border-left:2px solid rgba(88,166,255,.3)}
-.impact-pos{background:rgba(63,185,80,.1);color:#3fb950;border-left:3px solid rgba(63,185,80,.4)}
-.impact-neg{background:rgba(248,81,73,.1);color:#f85149;border-left:3px solid rgba(248,81,73,.4)}
-.impact-neu{background:rgba(139,148,158,.08);color:var(--muted);border-left:3px solid rgba(139,148,158,.3)}
-.news-src{font-size:0.72em;color:var(--dim)}
+.cat-pill{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;background:rgba(10,132,255,.15);color:var(--b);margin-bottom:6px}
+.news-ttl{font-size:15px;font-weight:500;line-height:1.45;color:var(--t1);display:block;margin-bottom:5px}
+.news-ttl:hover{color:var(--b)}
+.news-body{font-size:13px;color:var(--t2);line-height:1.65;margin-bottom:7px}
+.news-imp{font-size:13px;padding:7px 10px;border-radius:8px;margin-bottom:5px;line-height:1.5}
+.imp-pos{background:rgba(48,209,88,.1);color:var(--g)}
+.imp-neg{background:rgba(255,69,58,.1);color:var(--r)}
+.imp-neu{background:rgba(255,255,255,.05);color:var(--t2)}
+.news-out{font-size:12px;color:var(--t3);padding-left:10px;border-left:2px solid rgba(10,132,255,.3);margin-bottom:5px}
+.news-src{font-size:11px}
 
-/* Opportunities Section 5 */
-.opp-block{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)}
-.opp-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.opp-block-ttl{font-size:0.88em;font-weight:bold;color:var(--muted);margin-bottom:8px;letter-spacing:.03em}
-.opp-dates{display:flex;flex-direction:column;gap:7px}
-.opp-date-chip{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--border)}
-.opp-date-chip.opp-date-urgent{border-left-color:var(--orange);background:rgba(255,166,87,.06)}
-.opp-date-icon{font-size:1.2em}
-.opp-date-event{font-size:0.92em;font-weight:bold}
-.opp-date-label{font-size:0.78em;color:var(--muted);margin-top:1px}
-.fp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
-.fp-card{background:var(--bg3);border-radius:8px;padding:11px;border-left:3px solid var(--purple)}
-.fp-header{margin-bottom:4px}
-.fp-price{font-size:1em;font-weight:bold;margin-bottom:4px}
-.fp-reason{font-size:0.8em;color:var(--muted);margin-bottom:2px}
-.fp-timing{font-size:0.8em;color:var(--orange)}
-.opp-card{background:var(--bg3);border-radius:8px;padding:11px;margin-bottom:7px}
-.opp-strong{border-left:3px solid var(--red);background:rgba(248,81,73,.05)}
-.opp-mod{border-left:3px solid var(--yellow);background:rgba(210,153,34,.05)}
-.opp-ticker-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
-.opp-pct{font-weight:bold;font-size:0.95em}
-.opp-msg{font-size:0.84em;color:var(--muted)}
-.earn-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.earn-chip{padding:5px 10px;border-radius:6px;font-size:0.82em;background:var(--bg2);border:1px solid var(--border)}
-.earn-chip.urgent{border-color:var(--red);color:var(--red)}
-.earn-date{font-size:0.75em;color:var(--muted)}
+/* ── Opportunities ── */
+.seg-lbl{font-size:12px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:14px 16px 7px}
+.date-row{display:flex;align-items:center;gap:13px;padding:13px 16px;border-bottom:.5px solid var(--sep)}
+.date-row:last-child{border-bottom:none}
+.date-row.urg .date-event{color:var(--o)}
+.date-icon{font-size:22px;width:34px;text-align:center;flex-shrink:0}
+.date-event{font-size:15px;font-weight:500}
+.date-cd{font-size:13px;margin-top:2px}
+.fp-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--sep)}
+.fp-row:last-child{border-bottom:none}
+.fp-timing{font-size:12px;color:var(--o);margin-top:4px}
+.dip-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--sep)}
+.dip-row:last-child{border-bottom:none}
+.dip-strong{background:rgba(255,69,58,.06)}
+.dip-mod{background:rgba(255,159,10,.04)}
+.earn-scroll{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.earn-scroll::-webkit-scrollbar{display:none}
+.earn-chip{background:var(--c2);border-radius:10px;padding:9px 13px;flex-shrink:0;font-size:14px;font-weight:600;text-align:center;min-width:68px}
+.earn-chip.earn-urg{background:rgba(255,69,58,.2);color:var(--r)}
+.earn-d{font-size:11px;color:var(--t2);font-weight:400;margin-top:3px}
 
-/* Actions */
-.act-item{padding:11px 13px;border-radius:8px;margin-bottom:7px;font-size:0.92em}
-.act-high{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);color:var(--red)}
-.act-med{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);color:var(--yellow)}
-.act-info{background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.2);color:var(--muted)}
+/* ── Actions (Minna Bank style) ── */
+.act-row{display:flex;align-items:center;gap:14px;padding:15px 16px;border-bottom:.5px solid var(--sep)}
+.act-row:last-child{border-bottom:none}
+.act-icon{font-size:22px;width:34px;text-align:center;flex-shrink:0}
+.act-text{flex:1;font-size:15px;line-height:1.5}
+.act-chev{font-size:20px;flex-shrink:0}
 
-/* Learning */
-.learn-card{background:var(--bg3);border-radius:8px;padding:14px;margin-bottom:10px;border-left:4px solid var(--blue)}
-.learn-card.urgent{border-left-color:var(--yellow);background:rgba(210,153,34,.06)}
-.learn-card.company{border-left-color:var(--purple)}
-.learn-card.trend{border-left-color:var(--green)}
-.learn-card.term{border-left-color:var(--blue)}
-.learn-card.wise{border-left-color:#79c0ff}
-.learn-label{font-size:0.72em;font-weight:bold;letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;color:var(--muted)}
-.learn-ttl{font-weight:bold;font-size:1em;margin-bottom:7px;color:var(--txt)}
-.learn-body{font-size:0.87em;line-height:1.7;color:#c9d1d9}
-.learn-impact{margin-top:8px;font-size:0.82em;padding:5px 9px;background:rgba(63,185,80,.1);color:#3fb950;border-radius:5px}
-.learn-status{font-size:0.78em;color:var(--dim);margin-bottom:5px}
+/* ── Learning ── */
+.learn-item{padding:15px 16px;border-bottom:.5px solid var(--sep)}
+.learn-item:last-child{border-bottom:none}
+.learn-lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.learn-lbl.lc{color:var(--p)}.learn-lbl.lt{color:var(--g)}.learn-lbl.lk{color:var(--b)}.learn-lbl.lw{color:var(--teal)}.learn-lbl.lu{color:var(--y)}
+.learn-ttl{font-size:16px;font-weight:600;margin-bottom:8px}
+.learn-meta{font-size:12px;color:var(--t3);margin-bottom:6px}
+.learn-body{font-size:14px;color:var(--t2);line-height:1.7}
+.learn-impact{font-size:12px;margin-top:9px;padding:5px 10px;background:rgba(48,209,88,.1);color:var(--g);border-radius:6px}
 
-.footer{text-align:center;padding:16px;color:var(--dim);font-size:0.75em;border-top:1px solid var(--border);margin-top:20px;line-height:1.8}
-@media(max-width:480px){
-  .idx-grid{grid-template-columns:repeat(2,1fr)}
-  .fx-grid{grid-template-columns:1fr}
-  .fp-grid{grid-template-columns:1fr}
-  .stock-price{font-size:1em}
-  .stock-pnl{gap:5px}
-}
+/* ── Footer ── */
+.footer{padding:28px 20px;font-size:11px;color:var(--t3);line-height:1.9;border-top:.5px solid var(--sep);margin-top:32px;text-align:center}
 </style>
 </head>
 <body>
 
+<!-- Header -->
 <div class="hdr">
-  <h1>📊 毎朝の投資ダッシュボード</h1>
-  <div class="dt">2026年06月03日（水曜日）10:55 JST</div>
-  <div class="sub">投資額: ¥82,660 | 毎月積立: ¥50,000（6月〜）| NVDA・KTOS・UPST・UBER・TMC</div>
-  <div class="pnl-badge positive">▲ 損益合計: ¥124 (+0.15%)</div>
+  <div class="hdr-lbl">投資ダッシュボード</div>
+  <div class="hdr-title">6月3日</div>
+  <div class="hdr-time">水曜日　15:44 JST 更新</div>
+  <div class="hdr-pnl pos">▲&nbsp;¥124&nbsp;(+0.15%)</div>
 </div>
 
-<!-- ① 保有株の損益・株価・アラート -->
-<div class="sec">
-  <div class="sec-ttl">📊 保有株の損益・株価・アラート</div>
-  <div class="sec-body">
-    
-<div class="stock-card negative-border">
-  <div class="stock-header">
-    <div><span class="ticker">NVDA</span><span class="company"> NVIDIA Corp.</span></div>
-    <div class="stock-price negative">$222.82 <span class="change">▼1.54（-0.69%）</span></div>
+<!-- ① 保有株 -->
+<div class="pg">
+  <div class="pg-ttl">📊 保有株</div>
+  <div class="card">
+<div class="s-row">
+  <div class="s-left">
+    <div class="s-ticker">NVDA</div>
+    <div class="s-name">NVIDIA Corp.</div>
   </div>
-  <div class="stock-meta">アナリスト目標: $296.81 <span class="positive">(+33.2%)</span></div>
-  <div class="stock-pnl"><span class="muted">取得: $215.87</span><span class="muted pnl-arrow">→</span><span>現在: $222.82</span><span class="positive pnl-inline">▲ ¥1,180 (+3.22%)</span></div>
+  <div class="s-right">
+    <div class="s-price">$222.82</div>
+    <div class="pill pill-r">▼0.69%</div>
+  </div>
+</div><div class="s-sub">取得 $215.87 → 現在 $222.82　<span class="tg">▲ ¥1,180 (+3.22%)</span><span class="t3"> 目標$296.81（+33.2%）</span></div>
+<div class="s-row">
+  <div class="s-left">
+    <div class="s-ticker">KTOS</div>
+    <div class="s-name">Kratos Defense</div>
+  </div>
+  <div class="s-right">
+    <div class="s-price">$63.27</div>
+    <div class="pill pill-r">▼0.35%</div>
+  </div>
+</div><div class="s-sub">取得 $66.55 → 現在 $63.27　<span class="tr">▼ -¥1,010 (-4.93%)</span><span class="t3"> 目標$113.05（+78.7%）</span></div>
+<div class="s-row">
+  <div class="s-left">
+    <div class="s-ticker">UPST</div>
+    <div class="s-name">Upstart Holdings</div>
+  </div>
+  <div class="s-right">
+    <div class="s-price">$32.39</div>
+    <div class="pill pill-r">▼3.63%</div>
+  </div>
+</div><div class="s-sub">取得 $33.92 → 現在 $32.39　<span class="tr">▼ -¥471 (-4.51%)</span><span class="t3"> 目標$40.2（+24.1%）</span></div>
+<div class="s-row">
+  <div class="s-left">
+    <div class="s-ticker">UBER</div>
+    <div class="s-name">Uber Technologies</div>
+  </div>
+  <div class="s-right">
+    <div class="s-price">$71.62</div>
+    <div class="pill pill-r">▼2.91%</div>
+  </div>
+</div><div class="s-sub">取得 $71.62 → 現在 $71.62　<span class="t2">－ ¥25 (+0.00%)</span><span class="t3"> 目標$104.45（+45.8%）</span></div>
+<div class="s-row">
+  <div class="s-left">
+    <div class="s-ticker">TMC</div>
+    <div class="s-name">TMC the metals co.</div>
+  </div>
+  <div class="s-right">
+    <div class="s-price">$6.49</div>
+    <div class="pill pill-g">▲2.04%</div>
+  </div>
+</div><div class="s-sub">取得 $6.00 → 現在 $6.49　<span class="tg">▲ ¥400 (+8.17%)</span><span class="t3"> 目標$11.0（+69.5%）</span></div></div>
   
-</div>
-<div class="stock-card negative-border">
-  <div class="stock-header">
-    <div><span class="ticker">KTOS</span><span class="company"> Kratos Defense</span></div>
-    <div class="stock-price negative">$63.27 <span class="change">▼0.22（-0.35%）</span></div>
-  </div>
-  <div class="stock-meta">アナリスト目標: $113.05 <span class="positive">(+78.7%)</span></div>
-  <div class="stock-pnl"><span class="muted">取得: $66.55</span><span class="muted pnl-arrow">→</span><span>現在: $63.27</span><span class="negative pnl-inline">▼ -¥1,010 (-4.93%)</span></div>
-  
-</div>
-<div class="stock-card negative-border">
-  <div class="stock-header">
-    <div><span class="ticker">UPST</span><span class="company"> Upstart Holdings</span></div>
-    <div class="stock-price negative">$32.39 <span class="change">▼1.22（-3.63%）</span></div>
-  </div>
-  <div class="stock-meta">アナリスト目標: $40.2 <span class="positive">(+24.1%)</span></div>
-  <div class="stock-pnl"><span class="muted">取得: $33.92</span><span class="muted pnl-arrow">→</span><span>現在: $32.39</span><span class="negative pnl-inline">▼ -¥471 (-4.51%)</span></div>
-  
-</div>
-<div class="stock-card negative-border">
-  <div class="stock-header">
-    <div><span class="ticker">UBER</span><span class="company"> Uber Technologies</span></div>
-    <div class="stock-price negative">$71.62 <span class="change">▼2.15（-2.91%）</span></div>
-  </div>
-  <div class="stock-meta">アナリスト目標: $104.45 <span class="positive">(+45.8%)</span></div>
-  <div class="stock-pnl"><span class="muted">取得: $71.62</span><span class="muted pnl-arrow">→</span><span>現在: $71.62</span><span class="neutral pnl-inline">－ ¥25 (+0.00%)</span></div>
-  
-</div>
-<div class="stock-card positive-border">
-  <div class="stock-header">
-    <div><span class="ticker">TMC</span><span class="company"> TMC the metals co.</span></div>
-    <div class="stock-price positive">$6.49 <span class="change">▲0.13（+2.04%）</span></div>
-  </div>
-  <div class="stock-meta">アナリスト目標: $11.0 <span class="positive">(+69.5%)</span></div>
-  <div class="stock-pnl"><span class="muted">取得: $6.00</span><span class="muted pnl-arrow">→</span><span>現在: $6.49</span><span class="positive pnl-inline">▲ ¥400 (+8.17%)</span></div>
-  
-</div>
-    
-<div class="pnl-total positive-border">
-  <div class="pnl-total-row"><span>投資総額</span><span>¥82,660</span></div>
-  <div class="pnl-total-row"><span>現在の評価額</span><span>¥82,784</span></div>
-  <div class="pnl-total-row big positive">
-    <span>損益合計</span>
-    <span>▲ ¥124 (+0.15%)</span>
+<div class="pnl-block">
+  <div class="pnl-row"><span class="t2">投資総額</span><span>¥82,660</span></div>
+  <div class="pnl-row"><span class="t2">現在の評価額</span><span>¥82,784</span></div>
+  <div class="pnl-row pnl-big">
+    <span class="t2">損益合計</span>
+    <span class="tg">▲ ¥124 (+0.15%)</span>
   </div>
 </div>
-  </div>
 </div>
 
-<!-- ② 市場状況 -->
-<div class="sec">
-  <div class="sec-ttl">🌏 市場状況（なぜ動いたか日本語解説）</div>
-  <div class="sec-body">
-    <div class="idx-grid">
-<div class="index-card positive-border ">
-  <div class="index-name">NASDAQ</div>
-  <div class="index-value positive">27,093.90</div>
-  <div class="index-change positive">▲ 0.03%</div>
+<!-- ② 市場 -->
+<div class="pg">
+  <div class="pg-ttl">🌏 市場状況</div>
+  <div class="idx-scroll">
+<div class="idx-chip">
+  <div class="idx-name">NASDAQ</div>
+  <div class="idx-val tg">27,093.90</div>
+  <div class="idx-chg tg">▲ 0.03%</div>
 </div>
-<div class="index-card positive-border ">
-  <div class="index-name">S&P500</div>
-  <div class="index-value positive">7,609.78</div>
-  <div class="index-change positive">▲ 0.13%</div>
+<div class="idx-chip">
+  <div class="idx-name">S&P500</div>
+  <div class="idx-val tg">7,609.78</div>
+  <div class="idx-chg tg">▲ 0.13%</div>
 </div>
-<div class="index-card positive-border ">
-  <div class="index-name">SOX半導体指数</div>
-  <div class="index-value positive">13,726.27</div>
-  <div class="index-change positive">▲ 5.87%</div>
+<div class="idx-chip">
+  <div class="idx-name">SOX半導体指数</div>
+  <div class="idx-val tg">13,726.27</div>
+  <div class="idx-chg tg">▲ 5.87%</div>
 </div>
-<div class="index-card positive-border ">
-  <div class="index-name">日経225</div>
-  <div class="index-value positive">68,164.76</div>
-  <div class="index-change positive">▲ 2.14%</div>
+<div class="idx-chip">
+  <div class="idx-name">日経225</div>
+  <div class="idx-val tg">68,465.56</div>
+  <div class="idx-chg tg">▲ 2.59%</div>
 </div>
-<div class="index-card negative-border vix-calm">
-  <div class="index-name">VIX恐怖指数</div>
-  <div class="index-value negative">15.77</div>
-  <div class="index-change negative">▼ 1.74%</div>
+<div class="idx-chip vx-c">
+  <div class="idx-name">VIX恐怖指数</div>
+  <div class="idx-val tr">15.77</div>
+  <div class="idx-chg tr">▼ 1.74%</div>
 </div></div>
-    <div class="mkt-exps"><div class="mkt-exp">🔵 半導体指数(SOX)が5.9%上昇。NVDAと購入予定のAVGO・MUに直接影響します。</div><div class="mkt-exp">🗾 日経225が2.1%上昇。購入予定の東京エレクトロンの動向に注目。</div><div class="mkt-exp">✅ VIX恐怖指数は15.8と落ち着いています。市場は比較的安定中です。</div></div>
-  </div>
+  <div class="mkt-note">🔵 半導体指数(SOX)が5.9%上昇。NVDAと購入予定のAVGO・MUに直接影響します。</div><div class="mkt-note">🗾 日経225が2.6%上昇。購入予定の東京エレクトロンの動向に注目。</div><div class="mkt-note">✅ VIX恐怖指数は15.8と落ち着いています。市場は比較的安定中です。</div>
 </div>
 
-<!-- ③ 為替ダッシュボード -->
-<div class="sec">
-  <div class="sec-ttl">💱 為替ダッシュボード（WISE対応）</div>
-  <div class="sec-body">
-    
-    <div class="fx-grid">
-<div class="fx-card">
-  <div class="fx-pair">USD/JPY</div>
-  <div class="fx-rate">159.75</div>
-  <div class="fx-change positive">▲ 週間 +0.21%　|　本日 +0.00%</div>
-  <div class="fx-hl">1ヶ月: 高値159.75 / 安値156.21</div>
+<!-- ③ 為替 -->
+<div class="pg">
+  <div class="pg-ttl">💱 為替（WISE）</div>
   
-  <div class="fx-advice">💡 USD/JPY: 159.75円。比較的安定中。急ぎでなければ様子見推奨。</div>
+  <div class="card">
+<div class="fx-row">
+  <div>
+    <div class="fx-pair">USD/JPY</div>
+    <div class="fx-chg tg">週間 +0.21%　本日 +0.00%</div>
+    <div class="fx-hl">1ヶ月: 高値 159.75 ／ 安値 156.21</div>
+  </div>
+  <div class="fx-right">
+    <div class="fx-rate-big">159.75</div>
+    <div class="pill pill-g fx-pill">▲0.21%</div>
+  </div>
 </div>
-<div class="fx-card">
-  <div class="fx-pair">MYR/JPY</div>
-  <div class="fx-rate">40.29</div>
-  <div class="fx-change positive">▲ 週間 +0.21%　|　本日 +0.00%</div>
-  <div class="fx-hl">1ヶ月: 高値40.29 / 安値39.75</div>
-  
-  <div class="fx-advice">💡 MYR/JPY: 40.2900円。安定中。</div>
+<div class="fx-advice-row">💡 USD/JPY: 159.75円。比較的安定中。急ぎでなければ様子見推奨。</div>
+<div class="fx-row">
+  <div>
+    <div class="fx-pair">MYR/JPY</div>
+    <div class="fx-chg tg">週間 +0.21%　本日 +0.00%</div>
+    <div class="fx-hl">1ヶ月: 高値 40.29 ／ 安値 39.75</div>
+  </div>
+  <div class="fx-right">
+    <div class="fx-rate-big">40.29</div>
+    <div class="pill pill-g fx-pill">▲0.21%</div>
+  </div>
 </div>
-<div class="fx-card">
-  <div class="fx-pair">USD/MYR</div>
-  <div class="fx-rate">3.9650</div>
-  <div class="fx-change neutral">－ 週間 +0.00%　|　本日 +0.00%</div>
-  <div class="fx-hl">1ヶ月: 高値3.9780 / 安値3.9100</div>
-  
-  <div class="fx-advice">💡 USD/MYR: 3.9650。ドルとリンギットの交換レートです。</div>
+<div class="fx-advice-row">💡 MYR/JPY: 40.2900円。安定中。</div>
+<div class="fx-row">
+  <div>
+    <div class="fx-pair">USD/MYR</div>
+    <div class="fx-chg t2">週間 +0.00%　本日 +0.00%</div>
+    <div class="fx-hl">1ヶ月: 高値 3.9780 ／ 安値 3.9100</div>
+  </div>
+  <div class="fx-right">
+    <div class="fx-rate-big">3.9650</div>
+    <div class="pill pill-n fx-pill">－0.00%</div>
+  </div>
 </div>
-<div class="fx-card">
-  <div class="fx-pair">EUR/JPY</div>
-  <div class="fx-rate">186.09</div>
-  <div class="fx-change positive">▲ 週間 +0.31%　|　本日 +0.00%</div>
-  <div class="fx-hl">1ヶ月: 高値186.09 / 安値183.74</div>
-  
-  <div class="fx-advice">💡 比較的安定（週間+0.3%）。</div>
+<div class="fx-advice-row">💡 USD/MYR: 3.9650。ドルとリンギットの交換レートです。</div>
+<div class="fx-row">
+  <div>
+    <div class="fx-pair">EUR/JPY</div>
+    <div class="fx-chg tg">週間 +0.31%　本日 +0.00%</div>
+    <div class="fx-hl">1ヶ月: 高値 186.09 ／ 安値 183.74</div>
+  </div>
+  <div class="fx-right">
+    <div class="fx-rate-big">186.09</div>
+    <div class="pill pill-g fx-pill">▲0.31%</div>
+  </div>
 </div>
-<div class="fx-card">
-  <div class="fx-pair">GBP/JPY</div>
-  <div class="fx-rate">215.22</div>
-  <div class="fx-change positive">▲ 週間 +0.49%　|　本日 +0.00%</div>
-  <div class="fx-hl">1ヶ月: 高値215.22 / 安値211.79</div>
-  
-  <div class="fx-advice">💡 比較的安定（週間+0.5%）。</div>
+<div class="fx-advice-row">💡 比較的安定（週間+0.3%）。</div>
+<div class="fx-row">
+  <div>
+    <div class="fx-pair">GBP/JPY</div>
+    <div class="fx-chg tg">週間 +0.49%　本日 +0.00%</div>
+    <div class="fx-hl">1ヶ月: 高値 215.22 ／ 安値 211.79</div>
+  </div>
+  <div class="fx-right">
+    <div class="fx-rate-big">215.22</div>
+    <div class="pill pill-g fx-pill">▲0.49%</div>
+  </div>
 </div>
-<div class="fx-card">
-  <div class="fx-pair">AUD/JPY</div>
-  <div class="fx-rate">114.72</div>
-  <div class="fx-change positive">▲ 週間 +0.92%　|　本日 +0.00%</div>
-  <div class="fx-hl">1ヶ月: 高値114.72 / 安値112.86</div>
-  
-  <div class="fx-advice">💡 比較的安定（週間+0.9%）。</div>
+<div class="fx-advice-row">💡 比較的安定（週間+0.5%）。</div>
+<div class="fx-row">
+  <div>
+    <div class="fx-pair">AUD/JPY</div>
+    <div class="fx-chg tg">週間 +0.92%　本日 +0.00%</div>
+    <div class="fx-hl">1ヶ月: 高値 114.72 ／ 安値 112.86</div>
+  </div>
+  <div class="fx-right">
+    <div class="fx-rate-big">114.72</div>
+    <div class="pill pill-g fx-pill">▲0.92%</div>
+  </div>
 </div>
-<div class="fx-card">
-  <div class="fx-pair">SGD/JPY</div>
-  <div class="fx-rate">124.96</div>
-  <div class="fx-change positive">▲ 週間 +0.15%　|　本日 +0.00%</div>
-  <div class="fx-hl">1ヶ月: 高値124.96 / 安値123.15</div>
+<div class="fx-advice-row">💡 比較的安定（週間+0.9%）。</div>
+<div class="fx-row">
+  <div>
+    <div class="fx-pair">SGD/JPY</div>
+    <div class="fx-chg tg">週間 +0.15%　本日 +0.00%</div>
+    <div class="fx-hl">1ヶ月: 高値 124.96 ／ 安値 123.15</div>
+  </div>
+  <div class="fx-right">
+    <div class="fx-rate-big">124.96</div>
+    <div class="pill pill-g fx-pill">▲0.15%</div>
+  </div>
+</div>
+<div class="fx-advice-row">💡 比較的安定（週間+0.1%）。</div></div>
   
-  <div class="fx-advice">💡 比較的安定（週間+0.1%）。</div>
-</div></div>
-    
-<div class="jpy-conv">
-  <div class="jpy-conv-title">💴 日本円換金シミュレーター（今すぐ両替すると）</div>
-  <div class="table-wrap">
-    <table class="conv-table">
+<div class="conv-wrap">
+  <div class="conv-ttl">💴 換金シミュレーター</div>
+  <div class="table-scroll">
+    <table class="conv-tbl">
       <thead><tr><th>通貨</th><th>¥10,000</th><th>¥30,000</th><th>¥50,000</th><th>¥100,000</th></tr></thead>
-      <tbody><tr><td class='curr-name'>USD</td><td>62.60 USD</td><td>187.79 USD</td><td>312.99 USD</td><td>625.98 USD</td></tr><tr><td class='curr-name'>MYR</td><td>248.20 MYR</td><td>744.60 MYR</td><td>1,241.00 MYR</td><td>2,482.01 MYR</td></tr><tr><td class='curr-name'>EUR</td><td>53.74 EUR</td><td>161.21 EUR</td><td>268.69 EUR</td><td>537.37 EUR</td></tr><tr><td class='curr-name'>SGD</td><td>80.03 SGD</td><td>240.08 SGD</td><td>400.13 SGD</td><td>800.26 SGD</td></tr><tr><td class='curr-name'>AUD</td><td>87.17 AUD</td><td>261.51 AUD</td><td>435.84 AUD</td><td>871.69 AUD</td></tr></tbody>
+      <tbody><tr><td class='conv-curr'>USD</td><td>62.60</td><td>187.79</td><td>312.99</td><td>625.98</td></tr><tr><td class='conv-curr'>MYR</td><td>248.20</td><td>744.60</td><td>1,241.00</td><td>2,482.01</td></tr><tr><td class='conv-curr'>EUR</td><td>53.74</td><td>161.21</td><td>268.69</td><td>537.37</td></tr><tr><td class='conv-curr'>SGD</td><td>80.03</td><td>240.08</td><td>400.13</td><td>800.26</td></tr><tr><td class='conv-curr'>AUD</td><td>87.17</td><td>261.51</td><td>435.84</td><td>871.69</td></tr></tbody>
     </table>
   </div>
-  <div class="muted" style="font-size:0.78em;margin-top:6px">※ Frankfurter API（欧州中央銀行レート）に基づく参考値。WISEの実際のレートとは若干異なる場合があります。</div>
+  <div class="t3 conv-note">※ 欧州中央銀行レート基準。WISEの実際のレートとは若干異なります。</div>
 </div>
-  </div>
 </div>
 
 <!-- ④ ニュース -->
-<div class="sec">
-  <div class="sec-ttl">📰 ニュース全文（要約・現状・今後・影響）</div>
-  <div class="sec-body">
+<div class="pg">
+  <div class="pg-ttl">📰 ニュース</div>
+  <div class="card">
 <div class="news-item">
-  <span class="news-cat">NVDA（NVIDIA）</span>
-  <a href="https://www.fool.com/investing/2026/06/02/should-you-double-down-on-bitcoin-after-the-dip/?.tsrc=rss" target="_blank" class="news-title">Should You Double Down on Bitcoin After the Dip?</a>
-  <div class="news-summary">There was an interesting piece of information hidden in Robinhood 's ( HOOD 2.78% ) first-quarter 2026 earnings update. Year over year, the broker's transaction-based crypto trading revenues fell 47%, while revenues from prediction markets rose 320%. This is important to digest if you are looking at the dip in the value of Bitcoin ( BTC 6.12% ) . Over the past year, Bitcoin has lost roughly a third of its value. It is down by over 40% from its all-time high in 2025. This is the fifth time Bitcoin has seen a drawdown of this magnitude. That's notable because it shows how mercurial investors can push the price of this cryptocurrency higher and lower in shockingly dramatic fashion. The big-picture takeaway is that the only thing supporting the price of Bitcoin is the willingness of people to buy it. There is no fundamental value, as with a company with physical business operations ; Bitcoin</div>
-  <div class="news-impact impact-pos">📈 NVDAに強気材料。AI・データセンター需要への追い風で株価上昇が期待されます。</div>
-  <div class="news-outlook">🔭 今後の見通し: 次の決算発表に注目。</div>
-  <span class="news-src">Yahoo Finance</span>
+  <span class="cat-pill">NVDA（NVIDIA）</span>
+  <a href="https://www.fool.com/investing/2026/06/03/will-tesla-merge-with-spacex/?.tsrc=rss" target="_blank" class="news-ttl">Will Tesla Merge With SpaceX?</a>
+  <div class="news-body">The investing world is going into overdrive in anticipation of the SpaceX initial public offering ( IPO ) in June. Elon Musk's ambitious space company is aiming to raise $75 billion in capital markets funding to embark on new business ventures, including its massive Starship rocket, orbital data centers for artificial intelligence ( AI ), and space exploration. Rumors have already surfaced that SpaceX is planning to merge with another Musk-controlled megacap stock: Tesla ( TSLA +1.94% ) . While it may seem far-fetched, there are hints that a potential merger may arrive in the next year. Here are three reasons why SpaceX may merge with Tesla. The first reason SpaceX and Tesla may merge comes from within the Elon Musk empire. A CNBC report states that Musk has discussed with his colleagues a possible merger of the two businesses. Seeing that he controls the most voting power in these two c</div>
+  <div class="news-imp imp-pos">📈 NVDAに強気材料。AI・データセンター需要への追い風で株価上昇が期待されます。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
 </div>
 <div class="news-item">
-  <span class="news-cat">NVDA（NVIDIA）</span>
-  <a href="https://www.fool.com/investing/2026/06/02/why-marvell-stock-rocketed-new-all-time-high-today/?.tsrc=rss" target="_blank" class="news-title">Why Marvell Stock Rocketed to a New All-Time High Today</a>
-  <div class="news-summary">Shares of Marvell Technology ( MRVL +32.71% ) soared to a record high on Tuesday after Nvidia CEO Jensen Huang said the chipmaker was on its way to becoming a vastly more valuable business. Marvell has a lucrative custom chip design business. The semiconductor maker's application-specific integrated circuits (ASICs) help to accelerate artificial intelligence (AI) workloads in cloud data centers. Yet Marvell's optical networking and connectivity solutions could prove to be even more profitable. "When you take a computing problem, and you disaggregate it into a lot of parts, and you distribute it across the entire data center, what's necessary is connectivity... That's the reason why Marvell is so essential," Huang said during the COMPUTEX technology conference in Taiwan. Huang, in turn, believes Marvell will be the "next trillion-dollar company." That's a big statement about a company tha</div>
-  <div class="news-impact impact-pos">📈 NVDAに強気材料。AI・データセンター需要への追い風で株価上昇が期待されます。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">Yahoo Finance</span>
+  <span class="cat-pill">NVDA（NVIDIA）</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/nvidia-optics-shift-puts-lumentum-061120526.html?.tsrc=rss" target="_blank" class="news-ttl">Nvidia Optics Shift Puts Lumentum At Center Of AI Data Centers</a>
+  <div class="news-body">Nvidia CEO Jensen Huang recently highlighted a shift from copper to optical interconnects for AI data center connectivity, citing physical limits to copper. Huang pointed to photonics suppliers, including Lumentum Holdings (NasdaqGS:LITE), as important to solving AI infrastructure bottlenecks. Nvidia has committed significant investment to Lumentum and other optical networking firms to support next generation AI data center build outs. Lumentum Holdings (NasdaqGS:LITE) is in the spotlight...</div>
+  <div class="news-imp imp-pos">📈 NVDAに強気材料。AI・データセンター需要への追い風で株価上昇が期待されます。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
 </div>
 <div class="news-item">
-  <span class="news-cat">NVDA（NVIDIA）</span>
-  <a href="https://www.fool.com/investing/2026/06/02/why-ast-spacemobile-stock-zoomed-535-higher-last-m/?.tsrc=rss" target="_blank" class="news-title">Why AST SpaceMobile Stock Zoomed 53.5% Higher Last Month</a>
-  <div class="news-summary">Shares of AST SpaceMobile ( ASTS +11.85% ) bumped 53.5% last month, according to data from S&P Global Market Intelligence . As a space economy stock trying to directly compete with Starlink in satellite internet, AST SpaceMobile is getting love ahead of the upcoming SpaceX IPO, with the stock up a whopping 389% in the last year alone. Here's why AST SpaceMobile stock jumped in May, and whether the stock is a buy in June. Starlink is the undisputed leader in satellite internet services in 2026, generating $11.4 billion in revenue in 2025 alone. While it will keep putting more satellites in orbit, there is one hiccup to getting Starlink internet: the terminals. To use Starlink, customers need to buy a terminal that serves as an antenna to receive high-speed satellite internet. AST SpaceMobile believes it will be the first satellite constellation capable of delivering high-speed internet di</div>
-  <div class="news-impact impact-pos">📈 NVDAに強気材料。AI・データセンター需要への追い風で株価上昇が期待されます。</div>
+  <span class="cat-pill">NVDA（NVIDIA）</span>
+  <a href="https://finance.yahoo.com/sectors/energy/articles/does-fluence-energy-flnc-nvidia-061038088.html?.tsrc=rss" target="_blank" class="news-ttl">Does Fluence Energy’s (FLNC) Nvidia-Siemens Blueprint Tie Its Future to AI Data Center Power Needs?</a>
+  <div class="news-body">In recent days, Siemens and Nvidia announced a three-way collaboration with Fluence Energy to create an AI data center reference architecture that integrates Fluence’s Smartstack battery platform to support power-intensive NVIDIA DSX Vera Rubin “AI factory” designs. While this blueprint does not represent firm orders, it places Fluence’s grid-scale storage at the center of how future AI data centers could manage grid constraints and reliability challenges. Next, we’ll examine how Fluence’s...</div>
+  <div class="news-imp imp-pos">📈 NVDAに強気材料。AI・データセンター需要への追い風で株価上昇が期待されます。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">KTOS（防衛）</span>
+  <a href="https://247wallst.com/investing/2026/06/02/top-5-stocks-that-will-profit-from-the-silicon-valley-defense-tech-surge/?.tsrc=rss" target="_blank" class="news-ttl">Top 5 Stocks That Will Profit From the Silicon Valley Defense Tech Surge</a>
+  <div class="news-body">Steve Eisman said on a recent podcast: “I’m sort of bewildered, given that there’s a war going on, why people would be selling defense stocks.” The reason that bewilderment matters to your portfolio is sitting on top of a wall of capital nobody is talking about. Peter Arment, on the same segment, laid out the ... Top 5 Stocks That Will Profit From the Silicon Valley Defense Tech Surge</div>
+  <div class="news-imp imp-pos">📈 防衛需要の拡大はKTOSに有利。ドローン・無人機分野での追い風です。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">KTOS（防衛）</span>
+  <a href="https://www.marketbeat.com/articles/drone-stocks-soar-as-pentagon-considers-funding-including-a-trump-linked-name/?utm_source=yahoofinance&utm_medium=yahoofinance&.tsrc=rss" target="_blank" class="news-ttl">Drone Stocks Soar As Pentagon Considers Funding, Including a Trump-Linked Name</a>
+  <div class="news-body">Drone stocks just caught a bid after investors reacted to a Wall Street Journal report that the Trump administration is in talks to fund multiple U.S. drone companies tied to the Pentagon’s “Drone Dominance” initiative. The report tied those talks to the Pentagon’s $1.1 billion Drone Dominance program, which is designed to accelerate the fielding of low-cost, one-way attack drones. Official program materials describe a goal of fielding hundreds of thousands of weaponized drones by 2027, while the Journal reported a 300,000-drone target. The news sent many drone stocks flying higher as the government signaled demand for drones and a potential willingness to help finance the projects. Unusual Machines (NYSE AMERICAN: UMAC) was the only publicly traded company directly named in the report, but the rally quickly spread to other drone-adjacent stocks. Companies with exposure to drone componen</div>
+  <div class="news-imp imp-pos">📈 防衛需要の拡大はKTOSに有利。ドローン・無人機分野での追い風です。</div>
   
-  <span class="news-src">Yahoo Finance</span>
+  <div class="t3 news-src">Yahoo Finance</div>
 </div>
 <div class="news-item">
-  <span class="news-cat">KTOS（防衛）</span>
-  <a href="https://247wallst.com/investing/2026/06/02/top-5-stocks-that-will-profit-from-the-silicon-valley-defense-tech-surge/?.tsrc=rss" target="_blank" class="news-title">Top 5 Stocks That Will Profit From the Silicon Valley Defense Tech Surge</a>
-  <div class="news-summary">Steve Eisman said on a recent podcast: “I’m sort of bewildered, given that there’s a war going on, why people would be selling defense stocks.” The reason that bewilderment matters to your portfolio is sitting on top of a wall of capital nobody is talking about. Peter Arment, on the same segment, laid out the ... Top 5 Stocks That Will Profit From the Silicon Valley Defense Tech Surge</div>
-  <div class="news-impact impact-pos">📈 防衛需要の拡大はKTOSに有利。ドローン・無人機分野での追い風です。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">Yahoo Finance</span>
+  <span class="cat-pill">KTOS（防衛）</span>
+  <a href="https://stocktwits.com/news-articles/markets/equity/onds-stock-millionaire-100-000-investment-a-year-ago-drone-defense-boom/cZ0gZ7XReuz?.tsrc=rss" target="_blank" class="news-ttl">ONDS Stock Could Have Made You A Millionaire If You Invested $100,000 A Year Ago, Thanks To Drone Defense Boom</a>
+  <div class="news-body">Ondas Holdings has emerged as one of the biggest winners in the defense sector, fueled by acquisitions, explosive revenue growth, and growing U.S. demand for autonomous military systems.</div>
+  <div class="news-imp imp-pos">📈 防衛需要の拡大はKTOSに有利。ドローン・無人機分野での追い風です。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
 </div>
 <div class="news-item">
-  <span class="news-cat">KTOS（防衛）</span>
-  <a href="https://www.marketbeat.com/articles/drone-stocks-soar-as-pentagon-considers-funding-including-a-trump-linked-name/?utm_source=yahoofinance&utm_medium=yahoofinance&.tsrc=rss" target="_blank" class="news-title">Drone Stocks Soar As Pentagon Considers Funding, Including a Trump-Linked Name</a>
-  <div class="news-summary">Drone stocks just caught a bid after investors reacted to a Wall Street Journal report that the Trump administration is in talks to fund multiple U.S. drone companies tied to the Pentagon’s “Drone Dominance” initiative. The report tied those talks to the Pentagon’s $1.1 billion Drone Dominance program, which is designed to accelerate the fielding of low-cost, one-way attack drones. Official program materials describe a goal of fielding hundreds of thousands of weaponized drones by 2027, while the Journal reported a 300,000-drone target. The news sent many drone stocks flying higher as the government signaled demand for drones and a potential willingness to help finance the projects. Unusual Machines (NYSE AMERICAN: UMAC) was the only publicly traded company directly named in the report, but the rally quickly spread to other drone-adjacent stocks. Companies with exposure to drone componen</div>
-  <div class="news-impact impact-pos">📈 防衛需要の拡大はKTOSに有利。ドローン・無人機分野での追い風です。</div>
+  <span class="cat-pill">UPST</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/3-growth-companies-high-insider-173558214.html?.tsrc=rss" target="_blank" class="news-ttl">3 Growth Companies With High Insider Ownership And Up To 114% Earnings Growth</a>
+  <div class="news-body">The United States market has shown robust performance, climbing 1.6% in the last 7 days and up 28% over the past year, with earnings forecasted to grow by 17% annually. In this thriving environment, growth companies with high insider ownership can be particularly appealing as they often signal strong confidence from those closest to the business and can offer significant potential for earnings growth.</div>
+  <div class="news-imp imp-pos">📈 UPSTのAI融資モデルに好材料。金利低下局面で特に恩恵を受けます。</div>
+  <div class="news-out">🔭 今後の見通し: 次の決算発表に注目。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">UPST</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/pgy-stock-buy-q1-results-141100571.html?.tsrc=rss" target="_blank" class="news-ttl">Is PGY Stock a Buy After Q1 Results and Higher 2026 Outlook?</a>
+  <div class="news-body">Pagaya Technologies PGY is leaning into a different narrative in 2026: scaling profits without loosening credit standards. The first quarter reinforced that shift, with another GAAP profit and clear evidence of operating leverage. Management also raised its full-year GAAP net income outlook, while pointing to fee generation, disciplined spending, and a more durable funding playbook as key supports. First-quarter 2026 adjusted earnings of 73 cents beat the Zacks Consensus Estimate of 48 cents, as profitability improved year over year. GAAP net income attributable to Pagaya rose to $24.7 million from $7.9 million in the prior-year quarter. Pagaya Technologies Ltd. price-consensus-eps-surprise-chart | Pagaya Technologies Ltd. Quote The setup was straightforward: total revenues and other income increased 9.6% year over year to $317.9 million, while total costs and operating expenses declined</div>
+  <div class="news-imp imp-pos">📈 UPSTのAI融資モデルに好材料。金利低下局面で特に恩恵を受けます。</div>
+  <div class="news-out">🔭 今後の見通し: 次の決算発表に注目。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">UPST</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/2-value-stocks-worth-attention-114923066.html?.tsrc=rss" target="_blank" class="news-ttl">2 Value Stocks Worth Your Attention and 1 We Find Risky</a>
+  <div class="news-body">Value stocks typically trade at discounts to the broader market, offering patient investors the opportunity to buy businesses when they’re out of favor. The key risk, however, is that these stocks are usually cheap for a reason — five cents for a piece of fruit may seem like a great deal until you find out it’s rotten.</div>
+  <div class="news-imp imp-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
   
-  <span class="news-src">Yahoo Finance</span>
+  <div class="t3 news-src">Yahoo Finance</div>
 </div>
 <div class="news-item">
-  <span class="news-cat">KTOS（防衛）</span>
-  <a href="https://stocktwits.com/news-articles/markets/equity/onds-stock-millionaire-100-000-investment-a-year-ago-drone-defense-boom/cZ0gZ7XReuz?.tsrc=rss" target="_blank" class="news-title">ONDS Stock Could Have Made You A Millionaire If You Invested $100,000 A Year Ago, Thanks To Drone Defense Boom</a>
-  <div class="news-summary">Ondas Holdings has emerged as one of the biggest winners in the defense sector, fueled by acquisitions, explosive revenue growth, and growing U.S. demand for autonomous military systems.</div>
-  <div class="news-impact impact-pos">📈 防衛需要の拡大はKTOSに有利。ドローン・無人機分野での追い風です。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">UPST</span>
-  <a href="https://finance.yahoo.com/markets/stocks/articles/3-growth-companies-high-insider-173558214.html?.tsrc=rss" target="_blank" class="news-title">3 Growth Companies With High Insider Ownership And Up To 114% Earnings Growth</a>
-  <div class="news-summary">The United States market has shown robust performance, climbing 1.6% in the last 7 days and up 28% over the past year, with earnings forecasted to grow by 17% annually. In this thriving environment, growth companies with high insider ownership can be particularly appealing as they often signal strong confidence from those closest to the business and can offer significant potential for earnings growth.</div>
-  <div class="news-impact impact-pos">📈 UPSTのAI融資モデルに好材料。金利低下局面で特に恩恵を受けます。</div>
-  <div class="news-outlook">🔭 今後の見通し: 次の決算発表に注目。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">UPST</span>
-  <a href="https://finance.yahoo.com/markets/stocks/articles/pgy-stock-buy-q1-results-141100571.html?.tsrc=rss" target="_blank" class="news-title">Is PGY Stock a Buy After Q1 Results and Higher 2026 Outlook?</a>
-  <div class="news-summary">Pagaya Technologies PGY is leaning into a different narrative in 2026: scaling profits without loosening credit standards. The first quarter reinforced that shift, with another GAAP profit and clear evidence of operating leverage. Management also raised its full-year GAAP net income outlook, while pointing to fee generation, disciplined spending, and a more durable funding playbook as key supports. First-quarter 2026 adjusted earnings of 73 cents beat the Zacks Consensus Estimate of 48 cents, as profitability improved year over year. GAAP net income attributable to Pagaya rose to $24.7 million from $7.9 million in the prior-year quarter. Pagaya Technologies Ltd. price-consensus-eps-surprise-chart | Pagaya Technologies Ltd. Quote The setup was straightforward: total revenues and other income increased 9.6% year over year to $317.9 million, while total costs and operating expenses declined</div>
-  <div class="news-impact impact-pos">📈 UPSTのAI融資モデルに好材料。金利低下局面で特に恩恵を受けます。</div>
-  <div class="news-outlook">🔭 今後の見通し: 次の決算発表に注目。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">UPST</span>
-  <a href="https://finance.yahoo.com/markets/stocks/articles/2-value-stocks-worth-attention-114923066.html?.tsrc=rss" target="_blank" class="news-title">2 Value Stocks Worth Your Attention and 1 We Find Risky</a>
-  <div class="news-summary">Value stocks typically trade at discounts to the broader market, offering patient investors the opportunity to buy businesses when they’re out of favor. The key risk, however, is that these stocks are usually cheap for a reason — five cents for a piece of fruit may seem like a great deal until you find out it’s rotten.</div>
-  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
+  <span class="cat-pill">UBER</span>
+  <a href="https://www.thestreet.com/latest-news/uber-lost-and-found-wacky-items-left-behind?.tsrc=rss" target="_blank" class="news-ttl">Uber riders are accidentally leaving some wacky items behind</a>
+  <div class="news-body">When living in densely populated cities like New York, you learn quickly that anything you forget or leave behind on a park bench, in a subway car, or in a taxi is probably gone forever. Yes, there are plenty of good Samaritans around, but they are far outnumbered by the people who live by the ...</div>
+  <div class="news-imp imp-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
   
-  <span class="news-src">Yahoo Finance</span>
+  <div class="t3 news-src">Yahoo Finance</div>
 </div>
 <div class="news-item">
-  <span class="news-cat">UBER</span>
-  <a href="https://finance.yahoo.com/sectors/technology/articles/squishmallows-dentures-heart-hot-dads-232520674.html?.tsrc=rss" target="_blank" class="news-title">Squishmallows, dentures, and an ‘I Heart Hot Dads’ bag: Uber has found thousands of items left in robotaxis</a>
-  <div class="news-summary">For the past 10 years, Uber’s annual Lost & Found Index has provided a rather quirky anthropological snapshot of its riders — and even a few insights into society. The annual catalogue of millions of forgotten items ranges from mundane modern-day tools such as smartphones and laptops, to more eyebrow-raising objects like live fish, an ankle monitor, a toboggan, a package of live butterflies, and a single Louboutin shoe. This year, Uber is using the report to highlight the same old problem of lost items with a new twist: robotaxis. Thousands of items (it’s a bit too new for millions) were left behind in robotaxis on Uber’s ride-hailing network in the past year, the company said Tuesday. There were the usual suspects of phones, keys, wallets, passports, and headphones, along with a few items that strayed into the who-is-this-rider category: a set of dentures, an “I Heart Hot Dads” bag, and</div>
-  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">Yahoo Finance</span>
+  <span class="cat-pill">UBER</span>
+  <a href="https://finance.yahoo.com/sectors/technology/articles/squishmallows-dentures-heart-hot-dads-232520674.html?.tsrc=rss" target="_blank" class="news-ttl">Squishmallows, dentures, and an ‘I Heart Hot Dads’ bag: Uber has found thousands of items left in robotaxis</a>
+  <div class="news-body">For the past 10 years, Uber’s annual Lost & Found Index has provided a rather quirky anthropological snapshot of its riders — and even a few insights into society. The annual catalogue of millions of forgotten items ranges from mundane modern-day tools such as smartphones and laptops, to more eyebrow-raising objects like live fish, an ankle monitor, a toboggan, a package of live butterflies, and a single Louboutin shoe. This year, Uber is using the report to highlight the same old problem of lost items with a new twist: robotaxis. Thousands of items (it’s a bit too new for millions) were left behind in robotaxis on Uber’s ride-hailing network in the past year, the company said Tuesday. There were the usual suspects of phones, keys, wallets, passports, and headphones, along with a few items that strayed into the who-is-this-rider category: a set of dentures, an “I Heart Hot Dads” bag, and</div>
+  <div class="news-imp imp-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
 </div>
 <div class="news-item">
-  <span class="news-cat">UBER</span>
-  <a href="https://stocktwits.com/news-articles/markets/equity/s-and-p-500-nasdaq-dow-rise-to-record-highs-as-strong-tech-gains-outpower-us-iran-war-uncertainty-msft-uber-mrvl-hpe-mstr-stocks-in-focus/cZ00XX8ReDS?.tsrc=rss" target="_blank" class="news-title">S&P 500, Nasdaq, Dow Rise To Record Highs As Strong Tech Gains Outpower US-Iran War Uncertainty — MSFT, UBER, MRVL, HPE, MSTR Stocks In Focus</a>
-  <div class="news-summary">President Donald Trump denied reports that communications between the United States and Iran had stalled, calling the claims “fake news.”</div>
-  <div class="news-impact impact-pos">📈 UBERのライドシェア・配達需要に好材料。成長継続が期待されます。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">Yahoo Finance</span>
+  <span class="cat-pill">UBER</span>
+  <a href="https://stocktwits.com/news-articles/markets/equity/s-and-p-500-nasdaq-dow-rise-to-record-highs-as-strong-tech-gains-outpower-us-iran-war-uncertainty-msft-uber-mrvl-hpe-mstr-stocks-in-focus/cZ00XX8ReDS?.tsrc=rss" target="_blank" class="news-ttl">S&P 500, Nasdaq, Dow Rise To Record Highs As Strong Tech Gains Outpower US-Iran War Uncertainty — MSFT, UBER, MRVL, HPE, MSTR Stocks In Focus</a>
+  <div class="news-body">President Donald Trump denied reports that communications between the United States and Iran had stalled, calling the claims “fake news.”</div>
+  <div class="news-imp imp-pos">📈 UBERのライドシェア・配達需要に好材料。成長継続が期待されます。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
 </div>
 <div class="news-item">
-  <span class="news-cat">UBER</span>
-  <a href="https://finance.yahoo.com/m/9ec5944f-a7f5-3b3e-bb3d-923fbb6e60c4/serve-robotics-expands-into.html?.tsrc=rss" target="_blank" class="news-title">Serve Robotics Expands Into Laundry Delivery</a>
-  <div class="news-summary">Serve Robotics, operator of a fleet of urban delivery robots, is expanding beyond food delivery to laundry delivery.</div>
-  <div class="news-impact impact-neg">📉 UBERに逆風。競争激化・規制リスクに注意。</div>
+  <span class="cat-pill">TMC（深海採掘）</span>
+  <a href="https://finance.yahoo.com/sectors/energy/articles/tmc-deep-sea-mining-scrutiny-220904237.html?.tsrc=rss" target="_blank" class="news-ttl">TMC Deep Sea Mining Scrutiny Reshapes Critical Minerals Investment Debate</a>
+  <div class="news-body">TMC the metals (NasdaqGS:TMC) is drawing fresh attention as its deep sea mineral extraction projects come under renewed regulatory scrutiny. Public debate around critical minerals supply chains and environmental risks linked to deep sea mining has intensified in recent weeks. Industry participants and stakeholders are reassessing TMC's role in future rare earth and battery metals sourcing as these discussions evolve. TMC the metals focuses on deep sea mineral extraction, positioning its...</div>
+  <div class="news-imp imp-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">TMC（深海採掘）</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/wall-street-analysts-believe-metals-135502489.html?.tsrc=rss" target="_blank" class="news-ttl">Wall Street Analysts Believe The Metals Company (TMC) Could Rally 63.52%: Here's is How to Trade</a>
+  <div class="news-body">The average of price targets set by Wall Street analysts indicates a potential upside of 63.5% in The Metals Company (TMC). While the effectiveness of this highly sought-after metric is questionable, the positive trend in earnings estimate revisions might translate into an upside in the stock.</div>
+  <div class="news-imp imp-pos">📈 深海採掘セクターへの追い風。TMCの事業拡大に期待が持てます。</div>
+  <div class="news-out">🔭 今後の見通し: 次の決算発表に注目。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">TMC（深海採掘）</span>
+  <a href="https://finance.yahoo.com/sectors/technology/articles/fleetzero-thoma-sea-glosten-announce-120700156.html?.tsrc=rss" target="_blank" class="news-ttl">Fleetzero, Thoma-Sea, and Glosten Announce Collaboration to Deliver Long-Duration Autonomous Vessels</a>
+  <div class="news-body">Fleetzero, a U.S.-based developer of marine technology, today announced a collaboration with Thoma-Sea Marine Constructors, a leading U.S. shipbuilder, and Glosten, a Seattle-based global naval architecture and marine engineering firm, to accelerate the development and deployment of integrated autonomous vessel solutions for commercial maritime, government, and defense customers.</div>
+  <div class="news-imp imp-pos">📈 深海採掘セクターへの追い風。TMCの事業拡大に期待が持てます。</div>
+  <div class="news-out">🔭 今後の見通し: 地政学リスクの動向が防衛株の行方を左右します。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">AVGO（Broadcom）</span>
+  <a href="https://stocktwits.com/news-articles/markets/equity/avgo-stock-s-big-2026-rally-hits-its-moment-of-truth-today-here-s-where-wall-street-and-retail-stand-ahead-of-q2-earnings/cZ0SvcbReDx?.tsrc=rss" target="_blank" class="news-ttl">AVGO Stock’s Big 2026 Rally Hits Its Moment Of Truth Today: Here's Where Wall Street And Retail Stand Ahead Of Q2 Earnings</a>
+  <div class="news-body">Analysts expect Broadcom’s revenue to grow at the highest pace in nine years, powered by custom chip deals with Meta and Google.</div>
+  <div class="news-imp imp-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
+  <div class="news-out">🔭 今後の見通し: 次の決算発表に注目。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">AVGO（Broadcom）</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/gary-black-says-broadcom-marvell-043646934.html?.tsrc=rss" target="_blank" class="news-ttl">Gary Black Says Broadcom, Marvell Are 'Big Winners' As Focus Shifts To Custom AI Chips As Nvidia CEO Jensen Huang Touts 'Next Trillion-Dollar Company'</a>
+  <div class="news-body">Wall Street's AI trade may be expanding beyond graphics processors, with investor Gary Black arguing that custom chipmakers Broadcom, Inc. (NASDAQ:AVGO) and Marvell Technology (NASDAQ:MRVL) are emerging as some of the biggest beneficiaries of rising demand for specialized AI infrastructure. Gary Black Says Wall Street Is Rewarding Custom AI Chip Leaders On Tuesday, Black said Broadcom and Marvell "seem to be the big winners in Wall Street's new appreciation for custom AI chips," pointing to grow</div>
+  <div class="news-imp imp-pos">📈 市場にとってポジティブな材料です。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">AVGO（Broadcom）</span>
+  <a href="https://stocktwits.com/news-articles/markets/equity/why-did-mrvl-avgo-hpe-stocks-climb-to-52-week-highs-today/cZ0SqgxReDY?.tsrc=rss" target="_blank" class="news-ttl">Why Did MRVL, AVGO, HPE Stocks Climb To 52-Week Highs Today?</a>
+  <div class="news-body">Marvell Technology, Broadcom, and Hewlett Packard Enterprise all soared on Tuesday, gaining from the ongoing AI rally.</div>
+  <div class="news-imp imp-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">MU（Micron）</span>
+  <a href="https://finance.yahoo.com/markets/stocks/articles/micron-mu-rises-higher-market-214503430.html?.tsrc=rss" target="_blank" class="news-ttl">Micron (MU) Rises Higher Than Market: Key Facts</a>
+  <div class="news-body">Micron (MU) ended the recent trading session at $1,064.10, demonstrating a +2.76% change from the preceding day's closing price. The stock's change was more than the S&P 500's daily gain of 0.13%. Elsewhere, the Dow gained 0.45%, while the tech-heavy Nasdaq added 0.03%. Prior to today's trading, shares of the chipmaker had gained 79.63% outpaced the Computer and Technology sector's gain of 11.37% and the S&P 500's gain of 5.25%. Analysts and investors alike will be keeping a close eye on the performance of Micron in its upcoming earnings disclosure. The company's earnings report is set to go public on June 24, 2026. In that report, analysts expect Micron to post earnings of $19.62 per share. This would mark year-over-year growth of 927.23%. Meanwhile, the Zacks Consensus Estimate for revenue is projecting net sales of $34.11 billion, up 266.7% from the year-ago period. For the annual per</div>
+  <div class="news-imp imp-pos">📈 市場にとってポジティブな材料です。</div>
+  <div class="news-out">🔭 今後の見通し: 次の決算発表に注目。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">MU（Micron）</span>
+  <a href="https://www.fool.com/investing/2026/06/02/meet-roundhill-etf-with-28-micron-technology-stock/?.tsrc=rss" target="_blank" class="news-ttl">Meet the New Roundhill ETF With 28% of Its Portfolio Parked in Micron Technology Stock</a>
+  <div class="news-body">Memory chips are critical hardware components for systems that run artificial intelligence (AI) workloads, whether that processing is done in data centers, on personal computers, or on smartphones. Demand for memory currently exceeds what can be supplied by the manufacturers, and that imbalance has fueled a substantial increase in the value of the world's top three suppliers: Micron Technology , SK Hynix , and Samsung Electronics . Those companies are the top three holdings in the Roundhill Memory ETF ( DRAM +2.31% ) , an exchange-traded fund that launched in early April. In the short period of time since its debut, it has already delivered a return of more than 127% for investors, but I think it's time to tread with caution. Graphics processing units ( GPUs ) are the primary chips used to handle the heavy data processing of AI training and inference workloads. High-bandwidth memory (HBM</div>
+  <div class="news-imp imp-pos">📈 市場にとってポジティブな材料です。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">MU（Micron）</span>
+  <a href="https://247wallst.com/technology-3/2026/06/02/the-hidden-beneficiary-of-nvidias-ai-dominance/?.tsrc=rss" target="_blank" class="news-ttl">The Hidden Beneficiary of Nvidia’s AI Dominance</a>
+  <div class="news-body">Introduction Artificial intelligence has become one of the strongest investment themes in technology history. Since the emergence of generative AI, investors have poured billions of dollars into companies positioned to benefit from the enormous infrastructure spending required to train and deploy increasingly sophisticated AI models. No company has benefited more directly than Nvidia (NVDA), whose ... The Hidden Beneficiary of Nvidia’s AI Dominance</div>
+  <div class="news-imp imp-pos">📈 市場にとってポジティブな材料です。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">Yahoo Finance</div>
+</div>
+<div class="news-item">
+  <span class="cat-pill">FRB・金利</span>
+  <a href="https://news.google.com/rss/articles/CBMipgFBVV95cUxNUnlFX3A5V2xBWWxKelM4cmExZDd0cnJyYkdITElQTzZxU04wR2hQUDZCOTY4R0FPQXBHLWJJTUhscWFjaU5zRVpOR0VmelZNVXRab1doQ29yZFR5azFqX3h0UWlZQk81VkU0Vm1pT0ZUc2FvRE5CaU13OHptSlh6dUE3SnhrUzZKUVFBTWNZRVVONGNNVWVvbW9WQlU3eDkxYnd5WXN3?oc=5" target="_blank" class="news-ttl">Fed's Hammack says rates may need to rise if rising inflation does not abate - Reuters</a>
+  <div class="news-body">Fed's Hammack says rates may need to rise if rising inflation does not abate Reuters</div>
+  <div class="news-imp imp-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
   
-  <span class="news-src">Yahoo Finance</span>
+  <div class="t3 news-src">Reuters</div>
 </div>
 <div class="news-item">
-  <span class="news-cat">TMC（深海採掘）</span>
-  <a href="https://finance.yahoo.com/sectors/energy/articles/tmc-deep-sea-mining-scrutiny-220904237.html?.tsrc=rss" target="_blank" class="news-title">TMC Deep Sea Mining Scrutiny Reshapes Critical Minerals Investment Debate</a>
-  <div class="news-summary">TMC the metals (NasdaqGS:TMC) is drawing fresh attention as its deep sea mineral extraction projects come under renewed regulatory scrutiny. Public debate around critical minerals supply chains and environmental risks linked to deep sea mining has intensified in recent weeks. Industry participants and stakeholders are reassessing TMC's role in future rare earth and battery metals sourcing as these discussions evolve. TMC the metals focuses on deep sea mineral extraction, positioning its...</div>
-  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">TMC（深海採掘）</span>
-  <a href="https://finance.yahoo.com/markets/stocks/articles/wall-street-analysts-believe-metals-135502489.html?.tsrc=rss" target="_blank" class="news-title">Wall Street Analysts Believe The Metals Company (TMC) Could Rally 63.52%: Here's is How to Trade</a>
-  <div class="news-summary">The average of price targets set by Wall Street analysts indicates a potential upside of 63.5% in The Metals Company (TMC). While the effectiveness of this highly sought-after metric is questionable, the positive trend in earnings estimate revisions might translate into an upside in the stock.</div>
-  <div class="news-impact impact-pos">📈 深海採掘セクターへの追い風。TMCの事業拡大に期待が持てます。</div>
-  <div class="news-outlook">🔭 今後の見通し: 次の決算発表に注目。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">TMC（深海採掘）</span>
-  <a href="https://finance.yahoo.com/sectors/technology/articles/fleetzero-thoma-sea-glosten-announce-120700156.html?.tsrc=rss" target="_blank" class="news-title">Fleetzero, Thoma-Sea, and Glosten Announce Collaboration to Deliver Long-Duration Autonomous Vessels</a>
-  <div class="news-summary">Fleetzero, a U.S.-based developer of marine technology, today announced a collaboration with Thoma-Sea Marine Constructors, a leading U.S. shipbuilder, and Glosten, a Seattle-based global naval architecture and marine engineering firm, to accelerate the development and deployment of integrated autonomous vessel solutions for commercial maritime, government, and defense customers.</div>
-  <div class="news-impact impact-pos">📈 深海採掘セクターへの追い風。TMCの事業拡大に期待が持てます。</div>
-  <div class="news-outlook">🔭 今後の見通し: 地政学リスクの動向が防衛株の行方を左右します。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">AVGO（Broadcom）</span>
-  <a href="https://www.fool.com/investing/2026/06/02/ai-computing-chip-showdown-is-nvidia-still-king-or/?.tsrc=rss" target="_blank" class="news-title">AI Computing Chip Showdown: Is Nvidia Still King or Is Broadcom the Better Pick?</a>
-  <div class="news-summary">Nvidia ( NVDA 0.75% ) has been the gold standard for artificial intelligence (AI) investing, specifically in the computing chip sector. Nvidia's GPUs are synonymous with the AI build-out, and it has ridden the wave of massive AI spending to become the world's largest company (at the time of this writing). However, there's a competitor that's looking to challenge that status. Broadcom ( AVGO +4.85% ) is a rising star, and its custom AI chip business could take off over the next few years, propelling Broadcom to new heights. But is this something Nvidia investors should be worried about? Or is this just background noise? Let's take a look and see which stock is the better investment moving forward. Nvidia's GPUs are fantastic for all sorts of computing applications. These units can perform multiple calculations in parallel, giving them incredible processing speeds for the world's most comp</div>
-  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">AVGO（Broadcom）</span>
-  <a href="https://www.fool.com/investing/2026/06/02/broadcom-stock-record-high-you-can-thank-nvidia-alphabet-and-marvell/?.tsrc=rss" target="_blank" class="news-title">Broadcom Stock Just Hit a Record High. You Can Thank Nvidia, Alphabet, and Marvell.</a>
-  <div class="news-summary">It isn't like that company needed any help. Broadcom ( AVGO +4.85% ) has been experiencing strong demand for its artificial intelligence (AI) solutions for much of the past three years. Since the advent of AI in early 2023, the stock had surged 723% through market close on Monday. Yet Tuesday saw the stock climb 5% to a record high, as a confluence of events in the AI space conspired to send the semiconductor and data center specialist to new heights. Based on today's catalysts, there could be more to come for Broadcom. After the market close on Monday, Alphabet ( GOOGL 3.96% ) ( GOOG 3.92% ) unveiled plans that made investors sit up and take notice. In a press release, the Google parent announced a proposed $80 billion equity capital raise "to expand AI infrastructure and compute." To that end, Alphabet reached an agreement with Berkshire Hathaway for a $10 billion private stock placeme</div>
-  <div class="news-impact impact-pos">📈 市場にとってポジティブな材料です。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">AVGO（Broadcom）</span>
-  <a href="https://finance.yahoo.com/sectors/technology/articles/samsung-electronics-deepens-ai-connectivity-230923607.html?.tsrc=rss" target="_blank" class="news-title">Samsung Electronics Deepens AI And Connectivity Role With New Partnerships</a>
-  <div class="news-summary">Samsung Electronics announced new collaborations with Cadence Design Systems and Synopsys on second and third generation 2nm process technology for advanced AI chips. The company is working with Broadcom on what it describes as the industry's first unified Wi-Fi 8 and 5G fixed wireless access platform for broadband equipment. Samsung also introduced the Galaxy Book6 Enterprise Edition, a laptop aimed at secure, AI-focused productivity for corporate users. For investors watching...</div>
-  <div class="news-impact impact-neg">📉 注意が必要なニュースです。ポートフォリオへの影響を確認しましょう。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">MU（Micron）</span>
-  <a href="https://finance.yahoo.com/markets/stocks/articles/micron-mu-rises-higher-market-214503430.html?.tsrc=rss" target="_blank" class="news-title">Micron (MU) Rises Higher Than Market: Key Facts</a>
-  <div class="news-summary">Micron (MU) ended the recent trading session at $1,064.10, demonstrating a +2.76% change from the preceding day's closing price. The stock's change was more than the S&P 500's daily gain of 0.13%. Elsewhere, the Dow gained 0.45%, while the tech-heavy Nasdaq added 0.03%. Prior to today's trading, shares of the chipmaker had gained 79.63% outpaced the Computer and Technology sector's gain of 11.37% and the S&P 500's gain of 5.25%. Analysts and investors alike will be keeping a close eye on the performance of Micron in its upcoming earnings disclosure. The company's earnings report is set to go public on June 24, 2026. In that report, analysts expect Micron to post earnings of $19.62 per share. This would mark year-over-year growth of 927.23%. Meanwhile, the Zacks Consensus Estimate for revenue is projecting net sales of $34.11 billion, up 266.7% from the year-ago period. For the annual per</div>
-  <div class="news-impact impact-pos">📈 市場にとってポジティブな材料です。</div>
-  <div class="news-outlook">🔭 今後の見通し: 次の決算発表に注目。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">MU（Micron）</span>
-  <a href="https://www.fool.com/investing/2026/06/02/meet-roundhill-etf-with-28-micron-technology-stock/?.tsrc=rss" target="_blank" class="news-title">Meet the New Roundhill ETF With 28% of Its Portfolio Parked in Micron Technology Stock</a>
-  <div class="news-summary">Memory chips are critical hardware components for systems that run artificial intelligence (AI) workloads, whether that processing is done in data centers, on personal computers, or on smartphones. Demand for memory currently exceeds what can be supplied by the manufacturers, and that imbalance has fueled a substantial increase in the value of the world's top three suppliers: Micron Technology , SK Hynix , and Samsung Electronics . Those companies are the top three holdings in the Roundhill Memory ETF ( DRAM +2.35% ) , an exchange-traded fund that launched in early April. In the short period of time since its debut, it has already delivered a return of more than 127% for investors, but I think it's time to tread with caution. Graphics processing units ( GPUs ) are the primary chips used to handle the heavy data processing of AI training and inference workloads. High-bandwidth memory (HBM</div>
-  <div class="news-impact impact-pos">📈 市場にとってポジティブな材料です。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">MU（Micron）</span>
-  <a href="https://247wallst.com/technology-3/2026/06/02/the-hidden-beneficiary-of-nvidias-ai-dominance/?.tsrc=rss" target="_blank" class="news-title">The Hidden Beneficiary of Nvidia’s AI Dominance</a>
-  <div class="news-summary">Introduction Artificial intelligence has become one of the strongest investment themes in technology history. Since the emergence of generative AI, investors have poured billions of dollars into companies positioned to benefit from the enormous infrastructure spending required to train and deploy increasingly sophisticated AI models. No company has benefited more directly than Nvidia (NVDA), whose ... The Hidden Beneficiary of Nvidia’s AI Dominance</div>
-  <div class="news-impact impact-pos">📈 市場にとってポジティブな材料です。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">Yahoo Finance</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">FRB・金利</span>
-  <a href="https://news.google.com/rss/articles/CBMipgFBVV95cUxNUnlFX3A5V2xBWWxKelM4cmExZDd0cnJyYkdITElQTzZxU04wR2hQUDZCOTY4R0FPQXBHLWJJTUhscWFjaU5zRVpOR0VmelZNVXRab1doQ29yZFR5azFqX3h0UWlZQk81VkU0Vm1pT0ZUc2FvRE5CaU13OHptSlh6dUE3SnhrUzZKUVFBTWNZRVVONGNNVWVvbW9WQlU3eDkxYnd5WXN3?oc=5" target="_blank" class="news-title">Fed's Hammack says rates may need to rise if rising inflation does not abate - Reuters</a>
-  <div class="news-summary">Fed's Hammack says rates may need to rise if rising inflation does not abate Reuters</div>
-  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
+  <span class="cat-pill">FRB・金利</span>
+  <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxQWnNBZURMdUJrZUtrdlRSeEVkUnhwLXAzOGhEbjdpWjlPQk5xRFhLZ3QxQnY3ZGZISE1tREt1ZEx5UWhjcS1yMjFCRk5ET2dVblc3ZDR4Zk1jRUZjWmpWTUxhXzVfV016Y3EwakxoTmlONENqYTlEam10N1ZEeWFFNUhwVEkzQ2N1d2FuQWV1cUVkaHYtZW1Xc1JPTzgwdVZTQkNQSw?oc=5" target="_blank" class="news-ttl">Central banks for the world's major economies meet to set rates this month - marketplace.org</a>
+  <div class="news-body">Central banks for the world's major economies meet to set rates this month marketplace.org</div>
+  <div class="news-imp imp-neg">📉 金利上昇はグロース株に不利。ポートフォリオ全体への下落圧力に注意。</div>
   
-  <span class="news-src">Reuters</span>
+  <div class="t3 news-src">marketplace.org</div>
 </div>
 <div class="news-item">
-  <span class="news-cat">FRB・金利</span>
-  <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxQWnNBZURMdUJrZUtrdlRSeEVkUnhwLXAzOGhEbjdpWjlPQk5xRFhLZ3QxQnY3ZGZISE1tREt1ZEx5UWhjcS1yMjFCRk5ET2dVblc3ZDR4Zk1jRUZjWmpWTUxhXzVfV016Y3EwakxoTmlONENqYTlEam10N1ZEeWFFNUhwVEkzQ2N1d2FuQWV1cUVkaHYtZW1Xc1JPTzgwdVZTQkNQSw?oc=5" target="_blank" class="news-title">Central banks for the world's major economies meet to set rates this month - marketplace.org</a>
-  <div class="news-summary">Central banks for the world's major economies meet to set rates this month marketplace.org</div>
-  <div class="news-impact impact-neg">📉 金利上昇はグロース株に不利。ポートフォリオ全体への下落圧力に注意。</div>
-  
-  <span class="news-src">marketplace.org</span>
+  <span class="cat-pill">日銀・円相場</span>
+  <a href="https://news.google.com/rss/articles/CBMiuwFBVV95cUxQaVUzcjRuOXdFeGJyRlZzTk9VTGVCalNuYmdldU12RDlfaW45UENwenpqUzBNT3J6UU5SS0kzZUJ5RTgxamFXeHAxX1hVeDh0d2FaVkZkZU1sOU11X05pTngtOW94dGM2Xzg2UlJGakJiUzA0cEwxQ1ZUSVp0NW5GNjhFSndPWHk0di1xLVR0ekxDTjQ5MHFPdWkxVE1jcDl4UFFpT05zbWRlb3hSOHE4S0RuTWtUaFJ5UTdV?oc=5" target="_blank" class="news-ttl">USD/JPY Price Forecast: Yen languishes amid growing BoJ rate hike uncertainty - FXStreet</a>
+  <div class="news-body">USD/JPY Price Forecast: Yen languishes amid growing BoJ rate hike uncertainty FXStreet</div>
+  <div class="news-imp imp-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
+  <div class="news-out">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
+  <div class="t3 news-src">FXStreet</div>
 </div>
 <div class="news-item">
-  <span class="news-cat">日銀・円相場</span>
-  <a href="https://news.google.com/rss/articles/CBMiuwFBVV95cUxQaVUzcjRuOXdFeGJyRlZzTk9VTGVCalNuYmdldU12RDlfaW45UENwenpqUzBNT3J6UU5SS0kzZUJ5RTgxamFXeHAxX1hVeDh0d2FaVkZkZU1sOU11X05pTngtOW94dGM2Xzg2UlJGakJiUzA0cEwxQ1ZUSVp0NW5GNjhFSndPWHk0di1xLVR0ekxDTjQ5MHFPdWkxVE1jcDl4UFFpT05zbWRlb3hSOHE4S0RuTWtUaFJ5UTdV?oc=5" target="_blank" class="news-title">USD/JPY Price Forecast: Yen languishes amid growing BoJ rate hike uncertainty - FXStreet</a>
-  <div class="news-summary">USD/JPY Price Forecast: Yen languishes amid growing BoJ rate hike uncertainty FXStreet</div>
-  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
-  <div class="news-outlook">🔭 今後の見通し: AI需要は2025-2026年も継続成長が見込まれます。</div>
-  <span class="news-src">FXStreet</span>
-</div>
-<div class="news-item">
-  <span class="news-cat">日銀・円相場</span>
-  <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxQcFp2NWlVdlVLU3VyZjl2ZVlRX3UtNkNxdHgyZVlmQjlNV0owSHRYY3dDemQ4SFRBNEpQQ3pvVW93ZWZvVHlRRUY5ZGJqOWJ6MzRCMWdoMzNrQ1lBS1JraTl5ZVFELW5Pa3hWQlZQQXY1MEdwNnZDbVpnNGNudXRTNHczeThFMkxsYlFVVS04ZG9LYURE0gGaAUFVX3lxTE5KRkozNjU4ZS05NjFzUUV4TXZMa0dIazY1M05VeU9ZMV9rT2NiNzRjYl9hUXU2TUotTE81OFJWMmo1TG0wQWxuTm5ibWtLWl8tdl9Yb2NIMkVMWkE5ZlF4ckNjOFVUcFNVcVl6NF9MWEVyS04tc3EwSTVxZmJFZzQzbzBrd0dmOHdwUWtrZVItVU5ISkJvQmpIN0E?oc=5" target="_blank" class="news-title">Japan may have fired its yen bazooka twice, but markets are testing Tokyo’s resolve - CNBC</a>
-  <div class="news-summary">Japan may have fired its yen bazooka twice, but markets are testing Tokyo’s resolve CNBC</div>
-  <div class="news-impact impact-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
-  <div class="news-outlook">🔭 今後の見通し: 日銀の政策変更がある場合は円相場に大きな動きが出る可能性。</div>
-  <span class="news-src">CNBC</span>
+  <span class="cat-pill">日銀・円相場</span>
+  <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxQcFp2NWlVdlVLU3VyZjl2ZVlRX3UtNkNxdHgyZVlmQjlNV0owSHRYY3dDemQ4SFRBNEpQQ3pvVW93ZWZvVHlRRUY5ZGJqOWJ6MzRCMWdoMzNrQ1lBS1JraTl5ZVFELW5Pa3hWQlZQQXY1MEdwNnZDbVpnNGNudXRTNHczeThFMkxsYlFVVS04ZG9LYURE0gGaAUFVX3lxTE5KRkozNjU4ZS05NjFzUUV4TXZMa0dIazY1M05VeU9ZMV9rT2NiNzRjYl9hUXU2TUotTE81OFJWMmo1TG0wQWxuTm5ibWtLWl8tdl9Yb2NIMkVMWkE5ZlF4ckNjOFVUcFNVcVl6NF9MWEVyS04tc3EwSTVxZmJFZzQzbzBrd0dmOHdwUWtrZVItVU5ISkJvQmpIN0E?oc=5" target="_blank" class="news-ttl">Japan may have fired its yen bazooka twice, but markets are testing Tokyo’s resolve - CNBC</a>
+  <div class="news-body">Japan may have fired its yen bazooka twice, but markets are testing Tokyo’s resolve CNBC</div>
+  <div class="news-imp imp-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
+  <div class="news-out">🔭 今後の見通し: 日銀の政策変更がある場合は円相場に大きな動きが出る可能性。</div>
+  <div class="t3 news-src">CNBC</div>
 </div></div>
 </div>
 
-<!-- ⑤ 新しい投資チャンス -->
-<div class="sec">
-  <div class="sec-ttl">⚡ 新しい投資チャンス</div>
-  <div class="sec-body">
+<!-- ⑤ 投資チャンス -->
+<div class="pg">
+  <div class="pg-ttl">⚡ 投資チャンス</div>
+
+  <div class="card">
+    <div class="seg-lbl">📅 重要スケジュール</div>
     
-<div class="opp-block">
-  <div class="opp-block-ttl">📅 重要スケジュール（カウントダウン）</div>
-  <div class="opp-dates">
-<div class="opp-date-chip opp-date-urgent">
-  <div class="opp-date-icon">📊</div>
-  <div class="opp-date-info">
-    <div class="opp-date-event">AVGO 決算発表（今夜！）</div>
-    <div class="opp-date-label">🔥 今日！ — 2026-06-03</div>
+<div class="date-row urg">
+  <div class="date-icon">📊</div>
+  <div>
+    <div class="date-event">AVGO 決算発表（今夜！）</div>
+    <div class="date-cd t3">🔥 今日！ — 2026-06-03</div>
   </div>
 </div>
-<div class="opp-date-chip ">
-  <div class="opp-date-icon">🚀</div>
-  <div class="opp-date-info">
-    <div class="opp-date-event">SpaceX IPO（SPCX上場予定）</div>
-    <div class="opp-date-label">9日後 — 2026-06-12</div>
+<div class="date-row">
+  <div class="date-icon">🚀</div>
+  <div>
+    <div class="date-event">SpaceX IPO（SPCX上場予定）</div>
+    <div class="date-cd t3">9日後 — 2026-06-12</div>
   </div>
 </div>
-<div class="opp-date-chip ">
-  <div class="opp-date-icon">📊</div>
-  <div class="opp-date-info">
-    <div class="opp-date-event">MU 決算発表</div>
-    <div class="opp-date-label">21日後 — 2026-06-24</div>
+<div class="date-row">
+  <div class="date-icon">📊</div>
+  <div>
+    <div class="date-event">MU 決算発表</div>
+    <div class="date-cd t3">21日後 — 2026-06-24</div>
   </div>
-</div></div>
 </div>
+  </div>
 
-<div class="opp-block">
-  <div class="opp-block-ttl">🛒 購入予定銘柄ウォッチ（現在値）</div>
-  <div class="fp-grid">
-<div class="fp-card">
-  <div class="fp-header">
-    <span class="ticker">AVGO</span>
-    <span class="company"> Broadcom Inc.</span>
-  </div>
-  <div class="fp-price">$481.57 <span class="positive">▲4.70%</span> <span class="muted" style="font-size:0.8em">目標: $485.72</span></div>
-  <div class="fp-reason">🎯 AI半導体・安定成長</div>
-  <div class="fp-timing">⏰ 購入予定: 今夜決算後</div>
-</div>
-<div class="fp-card">
-  <div class="fp-header">
-    <span class="ticker">MU</span>
-    <span class="company"> Micron Technology</span>
-  </div>
-  <div class="fp-price">$1,064.10 <span class="positive">▲2.76%</span> <span class="muted" style="font-size:0.8em">目標: $726.23</span></div>
-  <div class="fp-reason">🎯 AIメモリ・2倍狙いメイン</div>
-  <div class="fp-timing">⏰ 購入予定: 6月24日決算後</div>
-</div>
-<div class="fp-card">
-  <div class="fp-header">
-    <span class="ticker">8035.T</span>
-    <span class="company"> 東京エレクトロン</span>
-  </div>
-  <div class="fp-price">取得中…  </div>
-  <div class="fp-reason">🎯 円建て・AI半導体装置</div>
-  <div class="fp-timing">⏰ 購入予定: NISA本開設後</div>
-</div></div>
-</div>
-
-<div class="opp-block">
-  <div class="opp-block-ttl">⚡ 今日の急落チャンス（ウォッチリスト）</div>
-  
-<div class="opp-card opp-strong">
-  <div class="opp-ticker-row">
-    <span class="ticker">PLTR</span>
-    <span class="company"> Palantir</span>
-    <span class="negative opp-pct">-5.28%</span>
-    <span class="muted" style="font-size:0.82em">$152.17</span>
-  </div>
-  <div class="opp-msg">🔥 急落-5%以上！買いを強く検討するタイミングです。</div>
-</div>
-</div>
-
-<div class="opp-block">
-  <div class="opp-block-ttl">📅 今後の決算カレンダー（30日以内）</div>
-  <div class="earn-grid"><div class="earn-chip urgent"><strong>AVGO</strong><div class="earn-date">06/04 (明日)</div></div><div class="earn-chip "><strong>MU</strong><div class="earn-date">06/25 (22日後)</div></div></div>
-  <div class="muted" style="font-size:0.78em;margin-top:8px">※ 決算日は変更される場合があります。事前に確認してください。</div>
-</div>
-  </div>
-</div>
-
-<!-- ⑥ おすすめアクション -->
-<div class="sec">
-  <div class="sec-ttl">🎯 今日のおすすめアクション</div>
-  <div class="sec-body"><div class="act-item act-high">🔥 今日はAVGO 決算発表（今夜！）！決算後の動きを見てから購入判断をしましょう。急落なら買いチャンス、急騰なら少し様子見が賢明です。</div><div class="act-item act-info">📅 月初！毎月の積立（¥50,000）を実行しましょう。WISEでUSDに換金後、SBI証券で購入してください。</div></div>
-</div>
-
-<!-- ⑦ 学習コーナー -->
-<div class="sec">
-  <div class="sec-ttl">📚 学習コーナー</div>
-  <div class="sec-body">
+  <div class="card" style="margin-top:10px">
+    <div class="seg-lbl">🛒 購入予定銘柄ウォッチ</div>
     
-<div class="learn-card company">
-  <div class="learn-label">🚀 今日の注目企業</div>
+<div class="fp-row">
+  <div>
+    <div class="s-ticker" style="font-size:16px">AVGO</div>
+    <div class="s-name">Broadcom Inc.</div>
+    <div class="fp-timing">⏰ 今夜決算後</div>
+  </div>
+  <div style="text-align:right">
+    <div class="s-price" style="font-size:18px">$481.57</div>
+    <span class="pill pill-g" style="font-size:12px">▲4.70%</span><div class="t3" style="font-size:12px;margin-top:3px">目標 $485.72</div>
+  </div>
+</div>
+<div class="fp-row">
+  <div>
+    <div class="s-ticker" style="font-size:16px">MU</div>
+    <div class="s-name">Micron Technology</div>
+    <div class="fp-timing">⏰ 6月24日決算後</div>
+  </div>
+  <div style="text-align:right">
+    <div class="s-price" style="font-size:18px">$1,064.10</div>
+    <span class="pill pill-g" style="font-size:12px">▲2.76%</span><div class="t3" style="font-size:12px;margin-top:3px">目標 $726.23</div>
+  </div>
+</div>
+<div class="fp-row">
+  <div>
+    <div class="s-ticker" style="font-size:16px">8035.T</div>
+    <div class="s-name">東京エレクトロン</div>
+    <div class="fp-timing">⏰ NISA本開設後</div>
+  </div>
+  <div style="text-align:right">
+    <div class="s-price" style="font-size:18px">取得中…</div>
+    
+  </div>
+</div>
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="seg-lbl">⚡ 今日の急落チャンス</div>
+    
+<div class="dip-row dip-strong">
+  <div class="s-left">
+    <div class="s-ticker" style="font-size:16px">PLTR</div>
+    <div class="s-name">Palantir $152.17</div>
+  </div>
+  <div style="text-align:right">
+    <div class="tr" style="font-size:18px;font-weight:600">-5.28%</div>
+    <div class="t3" style="font-size:12px;margin-top:2px">🔥 急落-5%超！強い買い検討タイミング</div>
+  </div>
+</div>
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="seg-lbl">📅 決算カレンダー（30日以内）</div>
+    <div class="earn-scroll"><div class="earn-chip earn-urg"><div style="font-weight:600">AVGO</div><div class="earn-d">06/04 明日</div></div><div class="earn-chip"><div style="font-weight:600">MU</div><div class="earn-d">06/25 22日後</div></div></div>
+    <div class="t3" style="padding:0 16px 12px;font-size:11px">※ 決算日は変更される場合があります</div>
+  </div>
+</div>
+
+<!-- ⑥ アクション -->
+<div class="pg">
+  <div class="pg-ttl">🎯 今日のアクション</div>
+  <div class="card">
+<div class="act-row">
+  <div class="act-icon">🔥</div>
+  <div class="act-text tr">今日はAVGO 決算発表（今夜！）！決算後の動きを見てから購入判断をしましょう。急落なら買いチャンス、急騰なら少し様子見が賢明です。</div>
+  <div class="act-chev t3">›</div>
+</div>
+<div class="act-row">
+  <div class="act-icon">📅</div>
+  <div class="act-text t2">月初！毎月の積立（¥50,000）を実行しましょう。WISEでUSDに換金後、SBI証券で購入してください。</div>
+  <div class="act-chev t3">›</div>
+</div></div>
+</div>
+
+<!-- ⑦ 学習 -->
+<div class="pg">
+  <div class="pg-ttl">📚 学習コーナー</div>
+  <div class="card">
+<div class="learn-item">
+  <div class="learn-lbl lc">🚀 今日の注目企業</div>
   <div class="learn-ttl">🚀 SpaceX（スペースX）</div>
-  <div class="learn-status">非上場（IPO: SPCX 6月12日予定） | 創業者: イーロン・マスク</div>
+  <div class="learn-meta">非上場（IPO: SPCX 6月12日予定） | 創業者: イーロン・マスク</div>
   <div class="learn-body"><strong>事業内容：</strong>世界最先端の民間宇宙企業。Starshipロケット・Starlink衛星インターネット・NASAの月探査契約を保有。打ち上げコストを従来比90%削減し宇宙産業を革命中。<br><br>
   <strong>今なぜ注目？：</strong>6月12日にSPCXとしてIPO予定！評価額は約2,000億ドル超。上場直後の値動きに注目。<br><br>
   <strong>あなたのポートフォリオとの関係：</strong>KTOSが手がける無人機・宇宙通信システムとは補完関係。宇宙産業全体への注目度が上がるとKTOSにも追い風。</div>
 </div>
 
-<div class="learn-card trend">
-  <div class="learn-label">🔥 業界トレンド解説</div>
+<div class="learn-item">
+  <div class="learn-lbl lt">🔥 業界トレンド</div>
   <div class="learn-ttl">🤖 AI半導体戦争：NVIDIA vs AMD vs カスタムチップ</div>
   <div class="learn-body">NVIDIAがH100/H200/Blackwellで市場の80%以上を独占する中、AMDのMI300X、GoogleのTPU、AmazonのTrainium、MetaのMTIAなどカスタムチップが追い上げ中。Broadcom（AVGO）はカスタムAIチップ設計でGoogleとMeta向けに急成長。この競争が続くほどHBMメモリ（MUの主力）の需要は拡大し続けます。</div>
   <div class="learn-impact">📊 あなたの保有株への影響：NVDA ↑ 購入予定：AVGO・MU ↑</div>
 </div>
 
-<div class="learn-card term">
-  <div class="learn-label">💡 今日の投資用語</div>
+<div class="learn-item">
+  <div class="learn-lbl lk">💡 投資用語</div>
   <div class="learn-ttl">配当株 vs 成長株</div>
   <div class="learn-body">配当株：毎年・毎四半期に配当金を支払う株（例：JPモルガン・コカコーラ）。成長株：配当なしで利益を事業拡大に再投資（例：NVDA・UPST・UBER）。あなたのポートフォリオは全て成長株なので、配当収入はなく値上がり益を狙う戦略です。</div>
 </div>
 
-<div class="learn-card wise">
-  <div class="learn-label">💳 WISE活用法</div>
+<div class="learn-item">
+  <div class="learn-lbl lw">💳 WISE活用法</div>
   <div class="learn-ttl">WISEのデビットカードで海外ショッピング</div>
   <div class="learn-body">WISEカード（デビット）を使うと海外での支払いもリアルタイムで最安レートで決済されます。クレジットカードの外貨手数料（1.6〜3%）と比べて圧倒的に安い。米国株の配当金を受け取るUSD口座としても活用可能です（SBI証券と組み合わせ）。</div>
-</div>
-  </div>
+</div></div>
 </div>
 
 <div class="footer">
-  データソース: Yahoo Finance（株価・指数）/ Frankfurter API（為替）/ Yahoo Finance RSS + Google News（ニュース）<br>
-  ※このダッシュボードは情報提供のみです。投資判断は自己責任でお願いします。<br>
-  最終更新: 2026年06月03日（水曜日）10:55 JST
+  Yahoo Finance・Frankfurter API・Google News<br>
+  ※ 情報提供のみ。投資判断は自己責任でお願いします。<br>
+  最終更新: 2026年06月03日（水曜日）15:44 JST
 </div>
 
-<script>setTimeout(() => location.reload(), 10 * 60 * 1000);</script>
+<script>setTimeout(()=>location.reload(),10*60*1000);</script>
 </body>
 </html>

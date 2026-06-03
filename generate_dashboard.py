@@ -1007,18 +1007,18 @@ def _learning_html(learning):
     if learning.get("urgent"):
         u = learning["urgent"]
         parts.append(f"""
-<div class="learn-card urgent">
-  <div class="learn-label">⚠️ 本日の注意</div>
+<div class="learn-item">
+  <div class="learn-lbl lu">⚠️ 本日の注意</div>
   <div class="learn-ttl">{u['title']}</div>
   <div class="learn-body">{u['content']}</div>
 </div>""")
 
     c = learning["company"]
     parts.append(f"""
-<div class="learn-card company">
-  <div class="learn-label">🚀 今日の注目企業</div>
+<div class="learn-item">
+  <div class="learn-lbl lc">🚀 今日の注目企業</div>
   <div class="learn-ttl">{c['name']}</div>
-  <div class="learn-status">{c['status']}</div>
+  <div class="learn-meta">{c['status']}</div>
   <div class="learn-body"><strong>事業内容：</strong>{c['what']}<br><br>
   <strong>今なぜ注目？：</strong>{c['why_now']}<br><br>
   <strong>あなたのポートフォリオとの関係：</strong>{c['relation']}</div>
@@ -1026,8 +1026,8 @@ def _learning_html(learning):
 
     t = learning["trend"]
     parts.append(f"""
-<div class="learn-card trend">
-  <div class="learn-label">🔥 業界トレンド解説</div>
+<div class="learn-item">
+  <div class="learn-lbl lt">🔥 業界トレンド</div>
   <div class="learn-ttl">{t['title']}</div>
   <div class="learn-body">{t['content']}</div>
   <div class="learn-impact">📊 {t['impact']}</div>
@@ -1035,16 +1035,16 @@ def _learning_html(learning):
 
     tm = learning["term"]
     parts.append(f"""
-<div class="learn-card term">
-  <div class="learn-label">💡 今日の投資用語</div>
+<div class="learn-item">
+  <div class="learn-lbl lk">💡 投資用語</div>
   <div class="learn-ttl">{tm['term']}</div>
   <div class="learn-body">{tm['explain']}</div>
 </div>""")
 
     w = learning["wise"]
     parts.append(f"""
-<div class="learn-card wise">
-  <div class="learn-label">💳 WISE活用法</div>
+<div class="learn-item">
+  <div class="learn-lbl lw">💳 WISE活用法</div>
   <div class="learn-ttl">{w['title']}</div>
   <div class="learn-body">{w['content']}</div>
 </div>""")
@@ -1157,6 +1157,15 @@ def _opportunities_html(dates_countdown, watchlist_data, opportunities, earnings
 # HTML Generation
 # ============================================================
 
+def _act_icon(msg):
+    """Extract leading emoji as action icon."""
+    icons = ["🔴","🟡","🚨","💱","🏆","📅","🔥","⏰","✅","⚡"]
+    for ic in icons:
+        if msg.startswith(ic):
+            return ic, msg[len(ic):].lstrip()
+    return "•", msg
+
+
 def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table,
                   earnings, watchlist_data, opportunities, dates_countdown):
     jst      = pytz.timezone("Asia/Tokyo")
@@ -1175,406 +1184,507 @@ def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table,
     def fmt_jpy(v):
         return f"¥{v:,}" if v >= 0 else f"-¥{abs(v):,}"
 
-    # -------- Section 1: Stocks with inline P&L --------
-    stocks_html = ""
-    for ticker, d in stocks.items():
-        if d.get("price") is None:
-            stocks_html += (f'<div class="stock-card neutral-border">'
-                            f'<span class="ticker">{ticker}</span> '
-                            f'<span class="company">{d["name"]}</span> '
-                            f'<span class="neutral">— データ取得中</span></div>')
-            continue
+    # ══════════════════════════════════════════════
+    # Build HTML blocks — iOS Stocks / Minna Bank style
+    # ══════════════════════════════════════════════
 
-        sym   = "¥" if d["is_jpy"] else "$"
-        pct   = d["change_pct"]
-        col   = _sign_color(pct)
-        arr   = _arrow(pct)
-
-        # Analyst target
-        t_html = ""
-        if d["target_price"] and d["target_dist"] is not None:
-            tc = "positive" if d["target_dist"] > 0 else "negative"
-            t_html = (f'<div class="stock-meta">アナリスト目標: {sym}{d["target_price"]:,} '
-                      f'<span class="{tc}">({d["target_dist"]:+.1f}%)</span></div>')
-
-        # Inline P&L
-        pnl_d = pnl.get("per_stock", {}).get(ticker)
-        pnl_html = ""
-        if pnl_d:
-            pcol = _sign_color(pnl_d["pnl_pct"])
-            parr = _arrow(pnl_d["pnl_pct"])
-            pnl_html = (f'<div class="stock-pnl">'
-                        f'<span class="muted">取得: {sym}{pnl_d["buy_price"]:,.2f}</span>'
-                        f'<span class="muted pnl-arrow">→</span>'
-                        f'<span>現在: {sym}{pnl_d["cur_price"]:,.2f}</span>'
-                        f'<span class="{pcol} pnl-inline">{parr} {fmt_jpy(pnl_d["pnl_jpy"])} '
-                        f'({pnl_d["pnl_pct"]:+.2f}%)</span>'
-                        f'</div>')
-
-        # Alert
-        alert = ""
-        if pct <= -10: alert = '<div class="alert buy-alert">🔴 -10%以上の急落！予備資金での買い増しシグナル！</div>'
-        elif pct <= -5: alert = '<div class="alert watch-alert">🟡 -5%以上の下落。-10%で買い増し検討。</div>'
-
-        stocks_html += f"""
-<div class="stock-card {col}-border">
-  <div class="stock-header">
-    <div><span class="ticker">{ticker}</span><span class="company"> {d['name']}</span></div>
-    <div class="stock-price {col}">{sym}{d['price']:,.2f} <span class="change">{arr}{abs(d['change']):.2f}（{pct:+.2f}%）</span></div>
-  </div>
-  {t_html}
-  {pnl_html}
-  {alert}
-</div>"""
-
-    # P&L total bar
     total_col = _sign_color(total_pnl_pct)
     total_arr = _arrow(total_pnl_pct)
-    pnl_total_html = f"""
-<div class="pnl-total {total_col}-border">
-  <div class="pnl-total-row"><span>投資総額</span><span>¥{total_invested:,}</span></div>
-  <div class="pnl-total-row"><span>現在の評価額</span><span>¥{pnl.get('total_current',0):,}</span></div>
-  <div class="pnl-total-row big {total_col}">
-    <span>損益合計</span>
-    <span>{total_arr} {fmt_jpy(total_pnl)} ({total_pnl_pct:+.2f}%)</span>
+    pnl_cls   = "pos" if total_pnl_pct > 0 else ("neg" if total_pnl_pct < 0 else "neu")
+
+    # ── Section 1: Stock rows (iOS Stocks style) ──
+    stock_rows = ""
+    for ticker, d in stocks.items():
+        sym   = "¥" if d["is_jpy"] else "$"
+        if d.get("price") is None:
+            stock_rows += f"""
+<div class="s-row">
+  <div class="s-left"><div class="s-ticker">{ticker}</div><div class="s-name">{d['name']}</div></div>
+  <div class="s-right"><div class="s-price t2">取得中…</div></div>
+</div>"""
+            continue
+        pct   = d["change_pct"]
+        pill  = "pill-g" if pct > 0 else ("pill-r" if pct < 0 else "pill-n")
+        pnl_d = pnl.get("per_stock", {}).get(ticker)
+
+        tgt = ""
+        if d.get("target_price") and d.get("target_dist") is not None:
+            tc = "g" if d["target_dist"] > 0 else "r"
+            tgt = f'<span class="t3"> 目標{sym}{d["target_price"]:,}（{d["target_dist"]:+.1f}%）</span>'
+
+        pnl_sub = ""
+        if pnl_d:
+            pp    = pnl_d["pnl_pct"]
+            pp_cl = "tg" if pp > 0 else ("tr" if pp < 0 else "t2")
+            pp_ar = "▲" if pp > 0 else ("▼" if pp < 0 else "－")
+            pnl_sub = (f'<div class="s-sub">'
+                       f'取得 {sym}{pnl_d["buy_price"]:,.2f} → 現在 {sym}{pnl_d["cur_price"]:,.2f}'
+                       f'　<span class="{pp_cl}">{pp_ar} {fmt_jpy(pnl_d["pnl_jpy"])} ({pp:+.2f}%)</span>'
+                       f'{tgt}</div>')
+
+        alert = ""
+        if pct <= -10: alert = '<div class="alert-stripe alert-buy">🔴 -10%以上急落！買い増しシグナル</div>'
+        elif pct <= -5: alert = '<div class="alert-stripe alert-watch">🟡 -5%以上の下落。様子見を継続</div>'
+
+        stock_rows += f"""
+<div class="s-row">
+  <div class="s-left">
+    <div class="s-ticker">{ticker}</div>
+    <div class="s-name">{d['name']}</div>
+  </div>
+  <div class="s-right">
+    <div class="s-price">{sym}{d['price']:,.2f}</div>
+    <div class="pill {pill}">{_arrow(pct)}{abs(pct):.2f}%</div>
+  </div>
+</div>{pnl_sub}{alert}"""
+
+    pnl_summary = f"""
+<div class="pnl-block">
+  <div class="pnl-row"><span class="t2">投資総額</span><span>¥{total_invested:,}</span></div>
+  <div class="pnl-row"><span class="t2">現在の評価額</span><span>¥{pnl.get('total_current',0):,}</span></div>
+  <div class="pnl-row pnl-big">
+    <span class="t2">損益合計</span>
+    <span class="{'tg' if total_pnl_pct>0 else 'tr' if total_pnl_pct<0 else 't2'}">{total_arr} {fmt_jpy(total_pnl)} ({total_pnl_pct:+.2f}%)</span>
   </div>
 </div>"""
 
-    # -------- Section 2: Indices --------
-    idx_html = ""
-    for ticker, d in indices.items():
+    # ── Section 2: Market indices ──
+    idx_chips = ""
+    for t, d in indices.items():
         if d.get("value") is None:
-            idx_html += (f'<div class="index-card neutral-border">'
-                         f'<div class="index-name">{d["name"]}</div><div class="neutral">－</div></div>')
+            idx_chips += f'<div class="idx-chip"><div class="idx-name">{d["name"]}</div><div class="t2">－</div></div>'
             continue
-        pct     = d["change_pct"]
-        col     = _sign_color(pct)
-        arr     = _arrow(pct)
-        vix_cls = ""
-        if ticker == "^VIX":
-            vix_cls = "vix-danger" if d["value"] > 30 else ("vix-warn" if d["value"] > 20 else "vix-calm")
-        idx_html += f"""
-<div class="index-card {col}-border {vix_cls}">
-  <div class="index-name">{d['name']}</div>
-  <div class="index-value {col}">{d['value']:,.2f}</div>
-  <div class="index-change {col}">{arr} {abs(pct):.2f}%</div>
+        pct    = d["change_pct"]
+        vcls   = "tg" if pct > 0 else ("tr" if pct < 0 else "t2")
+        arr    = _arrow(pct)
+        vxcls  = ""
+        if t == "^VIX":
+            vxcls = " vx-d" if d["value"] > 30 else (" vx-w" if d["value"] > 20 else " vx-c")
+        idx_chips += f"""
+<div class="idx-chip{vxcls}">
+  <div class="idx-name">{d['name']}</div>
+  <div class="idx-val {vcls}">{d['value']:,.2f}</div>
+  <div class="idx-chg {vcls}">{arr} {abs(pct):.2f}%</div>
 </div>"""
-    mkt_html = "".join(f'<div class="mkt-exp">{e}</div>' for e in mkt_exps)
 
-    # -------- Section 3: Currencies --------
-    fx_html = ""
+    mkt_notes = "".join(f'<div class="mkt-note">{e}</div>' for e in mkt_exps)
+
+    # ── Section 3: Currencies ──
+    fx_rows = ""
     for key, d in currencies.items():
         if d.get("rate") is None:
-            fx_html += f'<div class="fx-card"><div class="fx-pair">{key}</div><div class="neutral">－</div></div>'
+            fx_rows += f'<div class="fx-row"><div><div class="fx-pair">{key}</div></div><div class="t2">－</div></div>'
             continue
-        rate  = d["rate"]
-        wk    = d.get("week_change_pct") or 0
-        dc    = d.get("day_change_pct")  or 0
-        col   = _sign_color(wk)
-        arr   = _arrow(wk)
-        adv   = currency_advice(key, rate, dc, wk)
+        rate   = d["rate"]
+        wk     = d.get("week_change_pct") or 0
+        dc     = d.get("day_change_pct")  or 0
+        wcls   = "tg" if wk > 0 else ("tr" if wk < 0 else "t2")
+        pill   = "pill-g" if wk > 0 else ("pill-r" if wk < 0 else "pill-n")
         rate_s = f"{rate:,.2f}" if rate >= 10 else f"{rate:,.4f}"
-        hl_html = ""
+        hl     = ""
         if d.get("month_high") and d.get("month_low"):
             mh = d["month_high"]; ml = d["month_low"]
             mh_s = f"{mh:,.2f}" if mh >= 10 else f"{mh:,.4f}"
             ml_s = f"{ml:,.2f}" if ml >= 10 else f"{ml:,.4f}"
-            hl_html = f'<div class="fx-hl">1ヶ月: 高値{mh_s} / 安値{ml_s}</div>'
-        big_alert = (f'<div class="fx-alert">⚠️ 本日大きく動いています（{dc:+.2f}%）！</div>'
-                     if abs(dc) > 2 else "")
-        fx_html += f"""
-<div class="fx-card">
-  <div class="fx-pair">{key}</div>
-  <div class="fx-rate">{rate_s}</div>
-  <div class="fx-change {col}">{arr} 週間 {wk:+.2f}%　|　本日 {dc:+.2f}%</div>
-  {hl_html}
-  {big_alert}
-  <div class="fx-advice">💡 {adv}</div>
-</div>"""
+            hl = f'<div class="fx-hl">1ヶ月: 高値 {mh_s} ／ 安値 {ml_s}</div>'
+        adv = currency_advice(key, rate, dc, wk)
+        big_mv = f'<div class="fx-big-move">⚠️ 本日大きく動いています（{dc:+.2f}%）</div>' if abs(dc) > 2 else ""
+        fx_rows += f"""
+<div class="fx-row">
+  <div>
+    <div class="fx-pair">{key}</div>
+    <div class="fx-chg {wcls}">週間 {wk:+.2f}%　本日 {dc:+.2f}%</div>
+    {hl}
+  </div>
+  <div class="fx-right">
+    <div class="fx-rate-big">{rate_s}</div>
+    <div class="pill {pill} fx-pill">{_arrow(wk)}{abs(wk):.2f}%</div>
+  </div>
+</div>
+<div class="fx-advice-row">💡 {adv}{big_mv}</div>"""
 
-    best_html = (f'<div class="best-fx">🏆 今週WISEで最も強い通貨: <strong>{best_c}</strong>（対円 +{bwk:.1f}%）</div>'
-                 if (best_c and bwk and bwk > 1) else "")
+    best_banner = ""
+    if best_c and bwk and bwk > 1:
+        best_banner = f'<div class="best-banner">🏆 今週WISEで最も強い通貨: <strong>{best_c}</strong>（対円 +{bwk:.1f}%）</div>'
 
-    # JPY Conversion Table
     jpy_conv_html = ""
     if jpy_table:
         amounts = [10000, 30000, 50000, 100000]
-        headers = "".join(f"<th>¥{a:,}</th>" for a in amounts)
-        rows    = ""
+        hdr_cells = "".join(f"<th>¥{a:,}</th>" for a in amounts)
+        t_rows = ""
         for curr, info in jpy_table.items():
-            cells = "".join(f'<td>{info["conversions"][a]:,.2f} {curr}</td>' for a in amounts)
-            rows += f"<tr><td class='curr-name'>{curr}</td>{cells}</tr>"
+            cells = "".join(f'<td>{info["conversions"][a]:,.2f}</td>' for a in amounts)
+            t_rows += f"<tr><td class='conv-curr'>{curr}</td>{cells}</tr>"
         jpy_conv_html = f"""
-<div class="jpy-conv">
-  <div class="jpy-conv-title">💴 日本円換金シミュレーター（今すぐ両替すると）</div>
-  <div class="table-wrap">
-    <table class="conv-table">
-      <thead><tr><th>通貨</th>{headers}</tr></thead>
-      <tbody>{rows}</tbody>
+<div class="conv-wrap">
+  <div class="conv-ttl">💴 換金シミュレーター</div>
+  <div class="table-scroll">
+    <table class="conv-tbl">
+      <thead><tr><th>通貨</th>{hdr_cells}</tr></thead>
+      <tbody>{t_rows}</tbody>
     </table>
   </div>
-  <div class="muted" style="font-size:0.78em;margin-top:6px">※ Frankfurter API（欧州中央銀行レート）に基づく参考値。WISEの実際のレートとは若干異なる場合があります。</div>
+  <div class="t3 conv-note">※ 欧州中央銀行レート基準。WISEの実際のレートとは若干異なります。</div>
 </div>"""
 
-    # -------- Section 4: News --------
-    news_html = ""
+    # ── Section 4: News ──
+    news_rows = ""
     for item in news:
-        summary_html = f'<div class="news-summary">{item["summary"]}</div>' if item.get("summary") else ""
-        impact       = item.get("impact", {})
-        impact_html  = ""
-        outlook_html = ""
-        if impact:
-            sent        = impact.get("sentiment", "neutral")
-            cls         = {"positive":"impact-pos","negative":"impact-neg"}.get(sent,"impact-neu")
-            impact_html  = f'<div class="news-impact {cls}">{impact.get("impact","")}</div>'
-            if impact.get("outlook"):
-                outlook_html = f'<div class="news-outlook">{impact["outlook"]}</div>'
-        news_html += f"""
+        impact = item.get("impact", {})
+        sent   = impact.get("sentiment", "neutral")
+        imp_cls = {"positive": "imp-pos", "negative": "imp-neg"}.get(sent, "imp-neu")
+        imp_txt = impact.get("impact", "")
+        out_txt = impact.get("outlook", "")
+        summary = item.get("summary", "")
+        news_rows += f"""
 <div class="news-item">
-  <span class="news-cat">{item['category']}</span>
-  <a href="{item['link']}" target="_blank" class="news-title">{item['title']}</a>
-  {summary_html}
-  {impact_html}
-  {outlook_html}
-  <span class="news-src">{item['source']}</span>
+  <span class="cat-pill">{item['category']}</span>
+  <a href="{item['link']}" target="_blank" class="news-ttl">{item['title']}</a>
+  {'<div class="news-body">' + summary + '</div>' if summary else ''}
+  {'<div class="news-imp ' + imp_cls + '">' + imp_txt + '</div>' if imp_txt else ''}
+  {'<div class="news-out">' + out_txt + '</div>' if out_txt else ''}
+  <div class="t3 news-src">{item['source']}</div>
 </div>"""
-    if not news_html:
-        news_html = '<div class="muted" style="padding:10px">ニュースを取得できませんでした。</div>'
+    if not news_rows:
+        news_rows = '<div class="t2" style="padding:16px">ニュースを取得できませんでした。</div>'
 
-    # -------- Section 5: Opportunities --------
-    opps_html = _opportunities_html(dates_countdown, watchlist_data, opportunities, earnings, FUTURE_PURCHASES)
+    # ── Section 5: Opportunities ──
+    # Dates countdown
+    date_rows = ""
+    for d in dates_countdown:
+        ic    = {"earnings": "📊", "ipo": "🚀", "nisa": "🏦"}.get(d["type"], "📅")
+        ucls  = " urg" if d["urgent"] else ""
+        date_rows += f"""
+<div class="date-row{ucls}">
+  <div class="date-icon">{ic}</div>
+  <div>
+    <div class="date-event">{d['event']}</div>
+    <div class="date-cd t3">{d['label']} — {d['date']}</div>
+  </div>
+</div>"""
 
-    # -------- Section 6: Actions --------
-    pri_cls    = {"HIGH":"act-high","MEDIUM":"act-med","INFO":"act-info"}
-    action_html = ""
+    # Future purchases watch
+    fp_rows = ""
+    for fp in FUTURE_PURCHASES:
+        wd    = watchlist_data.get(fp["ticker"], {})
+        price = wd.get("price")
+        pct_w = wd.get("change_pct")
+        tgt_w = wd.get("target")
+        ps    = f'${price:,.2f}' if price else '取得中…'
+        pp    = ""
+        if pct_w is not None:
+            pp_cl = "pill-g" if pct_w > 0 else ("pill-r" if pct_w < 0 else "pill-n")
+            pp = f'<span class="pill {pp_cl}" style="font-size:12px">{_arrow(pct_w)}{abs(pct_w):.2f}%</span>'
+        tgt_s = f'<div class="t3" style="font-size:12px;margin-top:3px">目標 ${tgt_w:,.2f}</div>' if tgt_w else ""
+        fp_rows += f"""
+<div class="fp-row">
+  <div>
+    <div class="s-ticker" style="font-size:16px">{fp['ticker']}</div>
+    <div class="s-name">{fp['name']}</div>
+    <div class="fp-timing">⏰ {fp['timing']}</div>
+  </div>
+  <div style="text-align:right">
+    <div class="s-price" style="font-size:18px">{ps}</div>
+    {pp}{tgt_s}
+  </div>
+</div>"""
+
+    # Dip opportunities
+    dip_rows = ""
+    if opportunities:
+        for o in opportunities:
+            lcls = "dip-strong" if o["level"] == "strong" else "dip-mod"
+            ic2  = "🔥" if o["level"] == "strong" else "👀"
+            msg  = "急落-5%超！強い買い検討タイミング" if o["level"] == "strong" else "3%以上下落。-5%で買いを検討"
+            ps2  = f'${o["price"]:,.2f}' if o.get("price") else ""
+            dip_rows += f"""
+<div class="dip-row {lcls}">
+  <div class="s-left">
+    <div class="s-ticker" style="font-size:16px">{o['ticker']}</div>
+    <div class="s-name">{o['name']} {ps2}</div>
+  </div>
+  <div style="text-align:right">
+    <div class="tr" style="font-size:18px;font-weight:600">{o['change_pct']:+.2f}%</div>
+    <div class="t3" style="font-size:12px;margin-top:2px">{ic2} {msg}</div>
+  </div>
+</div>"""
+    else:
+        dip_rows = '<div class="t3" style="padding:14px 16px;font-size:14px">今日は大きな急落なし。引き続き定期確認を。</div>'
+
+    # Earnings calendar
+    earn_chips = ""
+    for e in earnings:
+        ecls = " earn-urg" if e["urgent"] else ""
+        earn_chips += f'<div class="earn-chip{ecls}"><div style="font-weight:600">{e["ticker"]}</div><div class="earn-d">{e["date"]} {e["label"]}</div></div>'
+    earn_section = f'<div class="earn-scroll">{earn_chips}</div>' if earn_chips else '<div class="t3" style="padding:0 16px 12px;font-size:13px">今後30日以内の決算なし</div>'
+
+    # ── Section 6: Actions (Minna Bank list style) ──
+    act_rows = ""
+    pri_map  = {"HIGH": "act-h", "MEDIUM": "act-m", "INFO": "act-i"}
     for pri, msg in actions:
-        action_html += f'<div class="act-item {pri_cls.get(pri,"act-info")}">{msg}</div>'
+        icon, text = _act_icon(msg)
+        tcls = {"HIGH": "tr", "MEDIUM": "to", "INFO": "t2"}.get(pri, "t2")
+        act_rows += f"""
+<div class="act-row">
+  <div class="act-icon">{icon}</div>
+  <div class="act-text {tcls}">{text}</div>
+  <div class="act-chev t3">›</div>
+</div>"""
 
-    # -------- Full HTML --------
+    # ── Section 7: Learning ──
+    learning = get_learning_content(indices, currencies, stocks)
+    learn_html = _learning_html(learning)
+
+    # ══════════════════════════════════════════════
+    # Full HTML  (iOS-inspired dark design)
+    # ══════════════════════════════════════════════
+    month_s = now.strftime("%-m月%-d日")
+    time_s  = now.strftime("%H:%M")
+
     return f"""<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📊 投資ダッシュボード {now.strftime('%m/%d')}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>投資ダッシュボード {now.strftime('%m/%d')}</title>
 <style>
 :root{{
-  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--border:#30363d;
-  --txt:#e6edf3;--muted:#8b949e;--dim:#6e7681;
-  --blue:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#d29922;
-  --purple:#bc8cff;--orange:#ffa657;
+  --bg:#000;--c1:#1c1c1e;--c2:#2c2c2e;--c3:#3a3a3c;
+  --sep:rgba(255,255,255,.1);
+  --t1:#fff;--t2:rgba(235,235,245,.75);--t3:rgba(235,235,245,.40);
+  --g:#30d158;--r:#ff453a;--b:#0a84ff;--o:#ff9f0a;--y:#ffd60a;--p:#bf5af2;--teal:#5ac8fa;
 }}
-*{{box-sizing:border-box;margin:0;padding:0}}
-body{{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;background:var(--bg);color:var(--txt);line-height:1.6;padding:12px;font-size:15px}}
-a{{color:var(--blue)}}
-.hdr{{text-align:center;padding:18px 0 14px;border-bottom:1px solid var(--border);margin-bottom:18px}}
-.hdr h1{{font-size:1.6em;color:var(--blue)}}
-.hdr .dt{{color:var(--muted);font-size:0.85em;margin-top:4px}}
-.hdr .sub{{color:var(--dim);font-size:0.8em;margin-top:2px}}
-.hdr .pnl-badge{{display:inline-block;margin-top:8px;padding:4px 14px;border-radius:20px;font-size:0.9em;font-weight:bold}}
-.pnl-badge.positive{{background:rgba(63,185,80,.15);color:var(--green);border:1px solid rgba(63,185,80,.3)}}
-.pnl-badge.negative{{background:rgba(248,81,73,.15);color:var(--red);border:1px solid rgba(248,81,73,.3)}}
-.pnl-badge.neutral{{background:rgba(139,148,158,.1);color:var(--muted);border:1px solid var(--border)}}
-.sec{{margin-bottom:20px}}
-.sec-ttl{{font-size:1.05em;font-weight:bold;padding:9px 14px;background:var(--bg2);border-radius:8px 8px 0 0;border-left:4px solid var(--blue)}}
-.sec-body{{background:var(--bg2);border-radius:0 0 8px 8px;padding:12px;border:1px solid var(--border);border-top:none}}
+*{{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}}
+html{{background:var(--bg)}}
+body{{
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;
+  background:var(--bg);color:var(--t1);font-size:16px;
+  -webkit-font-smoothing:antialiased;
+  max-width:430px;margin:0 auto;padding-bottom:48px;
+}}
+a{{color:var(--b);text-decoration:none}}
+.t2{{color:var(--t2)}}.t3{{color:var(--t3)}}
+.tg{{color:var(--g)}}.tr{{color:var(--r)}}.to{{color:var(--o)}}
 
-/* Stocks */
-.stock-card{{background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:8px;border-left:4px solid var(--border)}}
-.positive-border{{border-left-color:var(--green)}}
-.negative-border{{border-left-color:var(--red)}}
-.neutral-border{{border-left-color:var(--border)}}
-.stock-header{{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px}}
-.ticker{{font-weight:bold;font-size:1.05em;color:var(--blue)}}
-.company{{color:var(--muted);font-size:0.85em}}
-.stock-price{{font-size:1.1em;font-weight:bold}}.change{{font-size:0.82em;margin-left:6px}}
-.stock-meta{{font-size:0.8em;color:var(--muted);margin-top:4px}}
-.stock-pnl{{display:flex;flex-wrap:wrap;gap:8px;font-size:0.84em;margin-top:6px;padding:6px 8px;background:var(--bg2);border-radius:5px;align-items:center}}
-.pnl-arrow{{color:var(--dim)}}
-.pnl-inline{{font-weight:bold}}
-.muted{{color:var(--muted)}}
-.alert{{margin-top:8px;padding:7px 10px;border-radius:6px;font-size:0.88em}}
-.buy-alert{{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.3)}}
-.watch-alert{{background:rgba(210,153,34,.12);color:var(--yellow);border:1px solid rgba(210,153,34,.3)}}
-.positive{{color:var(--green)}}.negative{{color:var(--red)}}.neutral{{color:var(--muted)}}
+/* ── Header ── */
+.hdr{{padding:56px 20px 20px;border-bottom:.5px solid var(--sep)}}
+.hdr-lbl{{font-size:13px;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}}
+.hdr-title{{font-size:36px;font-weight:700;letter-spacing:-.5px;line-height:1.1}}
+.hdr-time{{font-size:14px;color:var(--t2);margin-top:6px}}
+.hdr-pnl{{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:7px 16px;border-radius:22px;font-size:16px;font-weight:600}}
+.hdr-pnl.pos{{background:rgba(48,209,88,.15);color:var(--g)}}
+.hdr-pnl.neg{{background:rgba(255,69,58,.15);color:var(--r)}}
+.hdr-pnl.neu{{background:var(--c1);color:var(--t2)}}
 
-/* P&L Total */
-.pnl-total{{border-radius:8px;padding:12px;border-left:4px solid var(--border);background:var(--bg3);margin-top:10px}}
-.pnl-total-row{{display:flex;justify-content:space-between;padding:4px 0;font-size:0.9em;border-bottom:1px solid var(--border)}}
-.pnl-total-row:last-child{{border-bottom:none}}
-.pnl-total-row.big{{font-size:1.05em;font-weight:bold;padding-top:8px}}
+/* ── Section wrapper ── */
+.pg{{padding:32px 20px 0}}
+.pg-ttl{{font-size:24px;font-weight:700;letter-spacing:-.3px;margin-bottom:14px}}
+.card{{background:var(--c1);border-radius:14px;overflow:hidden}}
+.card+.card{{margin-top:10px}}
 
-/* Indices */
-.idx-grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px}}
-.index-card{{background:var(--bg3);border-radius:8px;padding:11px;text-align:center;border-left:3px solid var(--border)}}
-.index-name{{font-size:0.78em;color:var(--muted);margin-bottom:3px}}
-.index-value{{font-size:1.15em;font-weight:bold}}.index-change{{font-size:0.82em}}
-.vix-danger{{background:rgba(248,81,73,.08)}}.vix-warn{{background:rgba(210,153,34,.08)}}.vix-calm{{background:rgba(63,185,80,.05)}}
-.mkt-exp{{padding:9px 12px;margin-bottom:7px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--blue);font-size:0.9em}}
-.mkt-exps{{margin-top:12px}}
+/* ── Stock rows (iOS Stocks) ── */
+.s-row{{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--sep)}}
+.s-row:last-of-type{{border-bottom:none}}
+.s-left{{flex:1;min-width:0;padding-right:12px}}
+.s-right{{text-align:right;flex-shrink:0}}
+.s-ticker{{font-size:17px;font-weight:600}}
+.s-name{{font-size:13px;color:var(--t2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.s-price{{font-size:17px;font-weight:500}}
+.s-sub{{padding:5px 16px 9px;font-size:12px;color:var(--t3);background:rgba(255,255,255,.03);border-bottom:.5px solid var(--sep);line-height:1.6}}
 
-/* Currencies */
-.fx-grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}}
-.fx-card{{background:var(--bg3);border-radius:8px;padding:12px}}
-.fx-pair{{font-weight:bold;color:var(--blue);font-size:0.95em}}
-.fx-rate{{font-size:1.25em;font-weight:bold;margin:3px 0}}
-.fx-change{{font-size:0.82em}}.fx-hl{{font-size:0.78em;color:var(--dim);margin-top:3px}}
-.fx-alert{{margin-top:5px;padding:4px 8px;background:rgba(210,153,34,.15);color:var(--yellow);border-radius:4px;font-size:0.8em}}
-.fx-advice{{margin-top:7px;font-size:0.82em;color:var(--muted);line-height:1.45}}
-.best-fx{{padding:10px 12px;margin-bottom:10px;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);border-radius:8px;font-size:0.9em}}
-.jpy-conv{{margin-top:14px;background:var(--bg3);border-radius:8px;padding:12px}}
-.jpy-conv-title{{font-weight:bold;color:var(--blue);margin-bottom:8px;font-size:0.95em}}
-.table-wrap{{overflow-x:auto}}
-.conv-table{{width:100%;border-collapse:collapse;font-size:0.85em}}
-.conv-table th{{background:var(--bg2);padding:7px 10px;text-align:right;color:var(--muted);font-weight:normal;border-bottom:1px solid var(--border)}}
-.conv-table th:first-child{{text-align:left}}
-.conv-table td{{padding:7px 10px;text-align:right;border-bottom:1px solid var(--border)}}
-.conv-table td:first-child{{text-align:left}}
-.conv-table tr:last-child td{{border-bottom:none}}
-.curr-name{{font-weight:bold;color:var(--blue)}}
+/* ── Pills ── */
+.pill{{display:inline-block;padding:4px 9px;border-radius:7px;font-size:13px;font-weight:600;margin-top:4px;letter-spacing:-.1px}}
+.pill-g{{background:var(--g);color:#000}}
+.pill-r{{background:var(--r);color:#fff}}
+.pill-n{{background:var(--c2);color:var(--t2)}}
 
-/* News */
-.news-item{{padding:12px 0;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:4px}}
+/* ── Alert stripes ── */
+.alert-stripe{{padding:8px 16px;font-size:13px;font-weight:500;border-bottom:.5px solid var(--sep)}}
+.alert-buy{{background:rgba(255,69,58,.12);color:var(--r)}}
+.alert-watch{{background:rgba(255,159,10,.1);color:var(--o)}}
+
+/* ── P&L block ── */
+.pnl-block{{background:var(--c1);border-radius:14px;padding:4px 0;margin-top:10px}}
+.pnl-row{{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:.5px solid var(--sep);font-size:15px}}
+.pnl-row:last-child{{border-bottom:none}}
+.pnl-big{{font-size:17px;font-weight:600;padding:14px 16px}}
+
+/* ── Index chips (horizontal scroll) ── */
+.idx-scroll{{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}}
+.idx-scroll::-webkit-scrollbar{{display:none}}
+.idx-chip{{background:var(--c1);border-radius:14px;padding:13px 14px;min-width:108px;flex-shrink:0;text-align:center}}
+.idx-chip.vx-d{{background:rgba(255,69,58,.1)}}
+.idx-chip.vx-w{{background:rgba(255,159,10,.08)}}
+.idx-chip.vx-c{{background:rgba(48,209,88,.06)}}
+.idx-name{{font-size:12px;color:var(--t2);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.idx-val{{font-size:19px;font-weight:600}}
+.idx-chg{{font-size:13px;margin-top:3px}}
+.mkt-note{{background:var(--c1);border-radius:12px;padding:11px 14px;font-size:14px;color:var(--t2);margin-top:8px;line-height:1.6;border-left:3px solid var(--b)}}
+.mkt-note+.mkt-note{{margin-top:6px}}
+
+/* ── FX rows ── */
+.fx-row{{display:flex;align-items:flex-start;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--sep)}}
+.fx-pair{{font-size:17px;font-weight:600}}
+.fx-chg{{font-size:13px;margin-top:3px}}
+.fx-hl{{font-size:12px;color:var(--t3);margin-top:3px}}
+.fx-right{{text-align:right;flex-shrink:0;padding-left:12px}}
+.fx-rate-big{{font-size:20px;font-weight:500}}
+.fx-pill{{margin-top:4px;display:inline-block}}
+.fx-advice-row{{padding:7px 16px 10px;font-size:12px;color:var(--t3);background:rgba(255,255,255,.025);border-bottom:.5px solid var(--sep)}}
+.fx-big-move{{color:var(--o);margin-top:3px}}
+.best-banner{{background:rgba(10,132,255,.1);border:.5px solid rgba(10,132,255,.3);border-radius:12px;padding:11px 14px;font-size:14px;color:var(--b);margin-bottom:10px}}
+
+/* ── JPY converter ── */
+.conv-wrap{{background:var(--c1);border-radius:14px;margin-top:10px;overflow:hidden}}
+.conv-ttl{{padding:13px 16px;font-size:15px;font-weight:600;border-bottom:.5px solid var(--sep)}}
+.table-scroll{{overflow-x:auto;-webkit-overflow-scrolling:touch}}
+.conv-tbl{{width:100%;border-collapse:collapse;font-size:13px}}
+.conv-tbl th{{padding:8px 11px;text-align:right;color:var(--t2);font-weight:500;font-size:12px;background:rgba(255,255,255,.03);border-bottom:.5px solid var(--sep)}}
+.conv-tbl th:first-child{{text-align:left}}
+.conv-tbl td{{padding:9px 11px;text-align:right;border-top:.5px solid var(--sep)}}
+.conv-tbl td:first-child{{text-align:left}}
+.conv-curr{{font-weight:700;color:var(--b)}}
+.conv-note{{padding:8px 14px 12px;font-size:11px}}
+
+/* ── News ── */
+.news-item{{padding:14px 16px;border-bottom:.5px solid var(--sep)}}
 .news-item:last-child{{border-bottom:none}}
-.news-cat{{font-size:0.72em;background:rgba(88,166,255,.15);color:var(--blue);padding:2px 8px;border-radius:10px;width:fit-content}}
-.news-title{{color:var(--txt);text-decoration:none;font-size:0.92em;line-height:1.4;font-weight:500}}
-.news-title:hover{{color:var(--blue);text-decoration:underline}}
-.news-summary{{font-size:0.85em;color:#c9d1d9;line-height:1.6;margin-top:3px}}
-.news-impact{{margin-top:6px;padding:7px 10px;border-radius:6px;font-size:0.84em;line-height:1.5}}
-.news-outlook{{margin-top:4px;padding:5px 10px;border-radius:6px;font-size:0.8em;color:var(--muted);background:rgba(88,166,255,.05);border-left:2px solid rgba(88,166,255,.3)}}
-.impact-pos{{background:rgba(63,185,80,.1);color:#3fb950;border-left:3px solid rgba(63,185,80,.4)}}
-.impact-neg{{background:rgba(248,81,73,.1);color:#f85149;border-left:3px solid rgba(248,81,73,.4)}}
-.impact-neu{{background:rgba(139,148,158,.08);color:var(--muted);border-left:3px solid rgba(139,148,158,.3)}}
-.news-src{{font-size:0.72em;color:var(--dim)}}
+.cat-pill{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;background:rgba(10,132,255,.15);color:var(--b);margin-bottom:6px}}
+.news-ttl{{font-size:15px;font-weight:500;line-height:1.45;color:var(--t1);display:block;margin-bottom:5px}}
+.news-ttl:hover{{color:var(--b)}}
+.news-body{{font-size:13px;color:var(--t2);line-height:1.65;margin-bottom:7px}}
+.news-imp{{font-size:13px;padding:7px 10px;border-radius:8px;margin-bottom:5px;line-height:1.5}}
+.imp-pos{{background:rgba(48,209,88,.1);color:var(--g)}}
+.imp-neg{{background:rgba(255,69,58,.1);color:var(--r)}}
+.imp-neu{{background:rgba(255,255,255,.05);color:var(--t2)}}
+.news-out{{font-size:12px;color:var(--t3);padding-left:10px;border-left:2px solid rgba(10,132,255,.3);margin-bottom:5px}}
+.news-src{{font-size:11px}}
 
-/* Opportunities Section 5 */
-.opp-block{{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)}}
-.opp-block:last-child{{border-bottom:none;margin-bottom:0;padding-bottom:0}}
-.opp-block-ttl{{font-size:0.88em;font-weight:bold;color:var(--muted);margin-bottom:8px;letter-spacing:.03em}}
-.opp-dates{{display:flex;flex-direction:column;gap:7px}}
-.opp-date-chip{{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--border)}}
-.opp-date-chip.opp-date-urgent{{border-left-color:var(--orange);background:rgba(255,166,87,.06)}}
-.opp-date-icon{{font-size:1.2em}}
-.opp-date-event{{font-size:0.92em;font-weight:bold}}
-.opp-date-label{{font-size:0.78em;color:var(--muted);margin-top:1px}}
-.fp-grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}}
-.fp-card{{background:var(--bg3);border-radius:8px;padding:11px;border-left:3px solid var(--purple)}}
-.fp-header{{margin-bottom:4px}}
-.fp-price{{font-size:1em;font-weight:bold;margin-bottom:4px}}
-.fp-reason{{font-size:0.8em;color:var(--muted);margin-bottom:2px}}
-.fp-timing{{font-size:0.8em;color:var(--orange)}}
-.opp-card{{background:var(--bg3);border-radius:8px;padding:11px;margin-bottom:7px}}
-.opp-strong{{border-left:3px solid var(--red);background:rgba(248,81,73,.05)}}
-.opp-mod{{border-left:3px solid var(--yellow);background:rgba(210,153,34,.05)}}
-.opp-ticker-row{{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}}
-.opp-pct{{font-weight:bold;font-size:0.95em}}
-.opp-msg{{font-size:0.84em;color:var(--muted)}}
-.earn-grid{{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}}
-.earn-chip{{padding:5px 10px;border-radius:6px;font-size:0.82em;background:var(--bg2);border:1px solid var(--border)}}
-.earn-chip.urgent{{border-color:var(--red);color:var(--red)}}
-.earn-date{{font-size:0.75em;color:var(--muted)}}
+/* ── Opportunities ── */
+.seg-lbl{{font-size:12px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:14px 16px 7px}}
+.date-row{{display:flex;align-items:center;gap:13px;padding:13px 16px;border-bottom:.5px solid var(--sep)}}
+.date-row:last-child{{border-bottom:none}}
+.date-row.urg .date-event{{color:var(--o)}}
+.date-icon{{font-size:22px;width:34px;text-align:center;flex-shrink:0}}
+.date-event{{font-size:15px;font-weight:500}}
+.date-cd{{font-size:13px;margin-top:2px}}
+.fp-row{{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--sep)}}
+.fp-row:last-child{{border-bottom:none}}
+.fp-timing{{font-size:12px;color:var(--o);margin-top:4px}}
+.dip-row{{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--sep)}}
+.dip-row:last-child{{border-bottom:none}}
+.dip-strong{{background:rgba(255,69,58,.06)}}
+.dip-mod{{background:rgba(255,159,10,.04)}}
+.earn-scroll{{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;-webkit-overflow-scrolling:touch;scrollbar-width:none}}
+.earn-scroll::-webkit-scrollbar{{display:none}}
+.earn-chip{{background:var(--c2);border-radius:10px;padding:9px 13px;flex-shrink:0;font-size:14px;font-weight:600;text-align:center;min-width:68px}}
+.earn-chip.earn-urg{{background:rgba(255,69,58,.2);color:var(--r)}}
+.earn-d{{font-size:11px;color:var(--t2);font-weight:400;margin-top:3px}}
 
-/* Actions */
-.act-item{{padding:11px 13px;border-radius:8px;margin-bottom:7px;font-size:0.92em}}
-.act-high{{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);color:var(--red)}}
-.act-med{{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);color:var(--yellow)}}
-.act-info{{background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.2);color:var(--muted)}}
+/* ── Actions (Minna Bank style) ── */
+.act-row{{display:flex;align-items:center;gap:14px;padding:15px 16px;border-bottom:.5px solid var(--sep)}}
+.act-row:last-child{{border-bottom:none}}
+.act-icon{{font-size:22px;width:34px;text-align:center;flex-shrink:0}}
+.act-text{{flex:1;font-size:15px;line-height:1.5}}
+.act-chev{{font-size:20px;flex-shrink:0}}
 
-/* Learning */
-.learn-card{{background:var(--bg3);border-radius:8px;padding:14px;margin-bottom:10px;border-left:4px solid var(--blue)}}
-.learn-card.urgent{{border-left-color:var(--yellow);background:rgba(210,153,34,.06)}}
-.learn-card.company{{border-left-color:var(--purple)}}
-.learn-card.trend{{border-left-color:var(--green)}}
-.learn-card.term{{border-left-color:var(--blue)}}
-.learn-card.wise{{border-left-color:#79c0ff}}
-.learn-label{{font-size:0.72em;font-weight:bold;letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;color:var(--muted)}}
-.learn-ttl{{font-weight:bold;font-size:1em;margin-bottom:7px;color:var(--txt)}}
-.learn-body{{font-size:0.87em;line-height:1.7;color:#c9d1d9}}
-.learn-impact{{margin-top:8px;font-size:0.82em;padding:5px 9px;background:rgba(63,185,80,.1);color:#3fb950;border-radius:5px}}
-.learn-status{{font-size:0.78em;color:var(--dim);margin-bottom:5px}}
+/* ── Learning ── */
+.learn-item{{padding:15px 16px;border-bottom:.5px solid var(--sep)}}
+.learn-item:last-child{{border-bottom:none}}
+.learn-lbl{{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}}
+.learn-lbl.lc{{color:var(--p)}}.learn-lbl.lt{{color:var(--g)}}.learn-lbl.lk{{color:var(--b)}}.learn-lbl.lw{{color:var(--teal)}}.learn-lbl.lu{{color:var(--y)}}
+.learn-ttl{{font-size:16px;font-weight:600;margin-bottom:8px}}
+.learn-meta{{font-size:12px;color:var(--t3);margin-bottom:6px}}
+.learn-body{{font-size:14px;color:var(--t2);line-height:1.7}}
+.learn-impact{{font-size:12px;margin-top:9px;padding:5px 10px;background:rgba(48,209,88,.1);color:var(--g);border-radius:6px}}
 
-.footer{{text-align:center;padding:16px;color:var(--dim);font-size:0.75em;border-top:1px solid var(--border);margin-top:20px;line-height:1.8}}
-@media(max-width:480px){{
-  .idx-grid{{grid-template-columns:repeat(2,1fr)}}
-  .fx-grid{{grid-template-columns:1fr}}
-  .fp-grid{{grid-template-columns:1fr}}
-  .stock-price{{font-size:1em}}
-  .stock-pnl{{gap:5px}}
-}}
+/* ── Footer ── */
+.footer{{padding:28px 20px;font-size:11px;color:var(--t3);line-height:1.9;border-top:.5px solid var(--sep);margin-top:32px;text-align:center}}
 </style>
 </head>
 <body>
 
+<!-- Header -->
 <div class="hdr">
-  <h1>📊 毎朝の投資ダッシュボード</h1>
-  <div class="dt">{date_str}</div>
-  <div class="sub">投資額: ¥{total_invested:,} | 毎月積立: ¥50,000（6月〜）| NVDA・KTOS・UPST・UBER・TMC</div>
-  <div class="pnl-badge {_sign_color(total_pnl_pct)}">{_arrow(total_pnl_pct)} 損益合計: {fmt_jpy(total_pnl)} ({total_pnl_pct:+.2f}%)</div>
+  <div class="hdr-lbl">投資ダッシュボード</div>
+  <div class="hdr-title">{month_s}</div>
+  <div class="hdr-time">{weekdays[now.weekday()]}　{time_s} JST 更新</div>
+  <div class="hdr-pnl {pnl_cls}">{total_arr}&nbsp;{fmt_jpy(total_pnl)}&nbsp;({total_pnl_pct:+.2f}%)</div>
 </div>
 
-<!-- ① 保有株の損益・株価・アラート -->
-<div class="sec">
-  <div class="sec-ttl">📊 保有株の損益・株価・アラート</div>
-  <div class="sec-body">
-    {stocks_html}
-    {pnl_total_html}
-  </div>
+<!-- ① 保有株 -->
+<div class="pg">
+  <div class="pg-ttl">📊 保有株</div>
+  <div class="card">{stock_rows}</div>
+  {pnl_summary}
 </div>
 
-<!-- ② 市場状況 -->
-<div class="sec">
-  <div class="sec-ttl">🌏 市場状況（なぜ動いたか日本語解説）</div>
-  <div class="sec-body">
-    <div class="idx-grid">{idx_html}</div>
-    <div class="mkt-exps">{mkt_html}</div>
-  </div>
+<!-- ② 市場 -->
+<div class="pg">
+  <div class="pg-ttl">🌏 市場状況</div>
+  <div class="idx-scroll">{idx_chips}</div>
+  {mkt_notes}
 </div>
 
-<!-- ③ 為替ダッシュボード -->
-<div class="sec">
-  <div class="sec-ttl">💱 為替ダッシュボード（WISE対応）</div>
-  <div class="sec-body">
-    {best_html}
-    <div class="fx-grid">{fx_html}</div>
-    {jpy_conv_html}
-  </div>
+<!-- ③ 為替 -->
+<div class="pg">
+  <div class="pg-ttl">💱 為替（WISE）</div>
+  {best_banner}
+  <div class="card">{fx_rows}</div>
+  {jpy_conv_html}
 </div>
 
 <!-- ④ ニュース -->
-<div class="sec">
-  <div class="sec-ttl">📰 ニュース全文（要約・現状・今後・影響）</div>
-  <div class="sec-body">{news_html}</div>
+<div class="pg">
+  <div class="pg-ttl">📰 ニュース</div>
+  <div class="card">{news_rows}</div>
 </div>
 
-<!-- ⑤ 新しい投資チャンス -->
-<div class="sec">
-  <div class="sec-ttl">⚡ 新しい投資チャンス</div>
-  <div class="sec-body">
-    {opps_html}
+<!-- ⑤ 投資チャンス -->
+<div class="pg">
+  <div class="pg-ttl">⚡ 投資チャンス</div>
+
+  <div class="card">
+    <div class="seg-lbl">📅 重要スケジュール</div>
+    {date_rows if date_rows else '<div class="t3" style="padding:0 16px 14px;font-size:14px">今後の重要日程なし</div>'}
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="seg-lbl">🛒 購入予定銘柄ウォッチ</div>
+    {fp_rows}
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="seg-lbl">⚡ 今日の急落チャンス</div>
+    {dip_rows}
+  </div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="seg-lbl">📅 決算カレンダー（30日以内）</div>
+    {earn_section}
+    <div class="t3" style="padding:0 16px 12px;font-size:11px">※ 決算日は変更される場合があります</div>
   </div>
 </div>
 
-<!-- ⑥ おすすめアクション -->
-<div class="sec">
-  <div class="sec-ttl">🎯 今日のおすすめアクション</div>
-  <div class="sec-body">{action_html}</div>
+<!-- ⑥ アクション -->
+<div class="pg">
+  <div class="pg-ttl">🎯 今日のアクション</div>
+  <div class="card">{act_rows}</div>
 </div>
 
-<!-- ⑦ 学習コーナー -->
-<div class="sec">
-  <div class="sec-ttl">📚 学習コーナー</div>
-  <div class="sec-body">
-    {_learning_html(learning)}
-  </div>
+<!-- ⑦ 学習 -->
+<div class="pg">
+  <div class="pg-ttl">📚 学習コーナー</div>
+  <div class="card">{learn_html}</div>
 </div>
 
 <div class="footer">
-  データソース: Yahoo Finance（株価・指数）/ Frankfurter API（為替）/ Yahoo Finance RSS + Google News（ニュース）<br>
-  ※このダッシュボードは情報提供のみです。投資判断は自己責任でお願いします。<br>
+  Yahoo Finance・Frankfurter API・Google News<br>
+  ※ 情報提供のみ。投資判断は自己責任でお願いします。<br>
   最終更新: {date_str}
 </div>
 
-<script>setTimeout(() => location.reload(), 10 * 60 * 1000);</script>
+<script>setTimeout(()=>location.reload(),10*60*1000);</script>
 </body>
 </html>"""
 
