@@ -1,41 +1,41 @@
 {
   "purchase_info": {
-    "MU": {
-      "price": 933.01,
-      "shares": 0.436893,
-      "invested_jpy": 65000,
-      "date": "2026-05-28",
-      "is_jpy": false
-    },
-    "AVGO": {
-      "price": 419.92,
-      "shares": 0.224013,
-      "invested_jpy": 15000,
-      "date": "2026-05-28",
-      "is_jpy": false
-    },
-    "8035.T": {
-      "price": 52320.0,
-      "shares": 0.095566,
-      "invested_jpy": 5000,
-      "date": "2026-05-28",
-      "is_jpy": true
-    },
-    "UPST": {
-      "price": 31.29,
-      "shares": 1.002104,
-      "invested_jpy": 5000,
-      "date": "2026-05-28",
+    "NVDA": {
+      "price": 215.87,
+      "shares": 1.0,
+      "invested_jpy": 34415,
+      "date": "2026-05-29",
       "is_jpy": false
     },
     "KTOS": {
-      "price": 65.5,
-      "shares": 0.95743,
-      "invested_jpy": 10000,
-      "date": "2026-05-28",
+      "price": 66.55,
+      "shares": 2.0,
+      "invested_jpy": 21225,
+      "date": "2026-05-29",
+      "is_jpy": false
+    },
+    "UPST": {
+      "price": 33.92,
+      "shares": 2.0,
+      "invested_jpy": 10820,
+      "date": "2026-05-29",
+      "is_jpy": false
+    },
+    "UBER": {
+      "price": 71.62,
+      "shares": 1.0,
+      "invested_jpy": 11416,
+      "date": "2026-05-29",
+      "is_jpy": false
+    },
+    "TMC": {
+      "price": 6.00,
+      "shares": 5.0,
+      "invested_jpy": 4784,
+      "date": "2026-06-03",
       "is_jpy": false
     }
   },
   "usd_jpy_at_purchase": 159.46,
-  "created": "2026-05-28"
+  "created": "2026-05-29"
 }
