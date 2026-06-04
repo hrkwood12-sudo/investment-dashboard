@@ -7,6 +7,13 @@
       "date": "2026-05-29",
       "is_jpy": false
     },
+    "AVGO": {
+      "price": 500.64,
+      "shares": 1.0,
+      "invested_jpy": 72592,
+      "date": "2026-06-05",
+      "is_jpy": false
+    },
     "KTOS": {
       "price": 66.55,
       "shares": 2.0,

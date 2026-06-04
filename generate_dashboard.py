@@ -28,6 +28,7 @@ except ImportError:
 
 PORTFOLIO = {
     "NVDA":  {"name": "NVIDIA Corp.",       "invested_jpy": 34415, "monthly_jpy": 0},
+    "AVGO":  {"name": "Broadcom Inc.",      "invested_jpy": 72592, "monthly_jpy": 0},
     "KTOS":  {"name": "Kratos Defense",     "invested_jpy": 21225, "monthly_jpy": 0},
     "UPST":  {"name": "Upstart Holdings",   "invested_jpy": 10820, "monthly_jpy": 0},
     "UBER":  {"name": "Uber Technologies",  "invested_jpy": 11416, "monthly_jpy": 0},
@@ -36,16 +37,16 @@ PORTFOLIO = {
 
 # Future planned purchases (not yet held, watching for right entry)
 FUTURE_PURCHASES = [
-    {"ticker": "AVGO",   "name": "Broadcom Inc.",     "reason": "AI半導体・安定成長",       "timing": "今夜決算後"},
     {"ticker": "MU",     "name": "Micron Technology", "reason": "AIメモリ・2倍狙いメイン", "timing": "6月24日決算後"},
     {"ticker": "8035.T", "name": "東京エレクトロン", "reason": "円建て・AI半導体装置",     "timing": "NISA本開設後"},
 ]
 
 # Important upcoming dates (manually maintained)
 IMPORTANT_DATES = [
-    {"date": "2026-06-03", "event": "AVGO 決算発表（今夜！）",    "ticker": "AVGO", "type": "earnings"},
-    {"date": "2026-06-12", "event": "SpaceX IPO（SPCX上場予定）", "ticker": None,   "type": "ipo"},
-    {"date": "2026-06-24", "event": "MU 決算発表",                "ticker": "MU",   "type": "earnings"},
+    {"date": "2026-06-12", "event": "SpaceX IPO（SPCX上場予定）",  "ticker": None,   "type": "ipo"},
+    {"date": "2026-06-22", "event": "AVGO 配当権利確定日",          "ticker": "AVGO", "type": "dividend"},
+    {"date": "2026-06-24", "event": "MU 決算発表→購入判断",         "ticker": "MU",   "type": "earnings"},
+    {"date": "2026-06-30", "event": "AVGO 配当入金（約104円）",     "ticker": "AVGO", "type": "dividend"},
 ]
 
 # Watchlist for dip-opportunity scanning (not yet held)
@@ -82,6 +83,7 @@ CURRENCY_PAIRS = [
 # 1-year growth estimates when no analyst target available
 SECTOR_GROWTH_1Y = {
     "NVDA":  0.35,
+    "AVGO":  0.25,
     "KTOS":  0.22,
     "UPST":  0.40,
     "UBER":  0.20,
@@ -467,8 +469,8 @@ def analyze_news_impact(title, description, category):
         ("UBER",            "negative"): "UBERに逆風。競争激化・規制リスクに注意。",
         ("TMC",             "positive"): "深海採掘セクターへの追い風。TMCの事業拡大に期待が持てます。",
         ("TMC",             "negative"): "TMCに下落圧力。投機的銘柄のためリスク管理に注意。",
-        ("AI・半導体",      "positive"): "半導体セクター全体に追い風。NVDAの株価上昇が期待されます。",
-        ("AI・半導体",      "negative"): "半導体セクター全体に下押し圧力。NVDA・購入予定のAVGO・MUの動向を注視。",
+        ("AI・半導体",      "positive"): "半導体セクター全体に追い風。NVDA・AVGO（保有中）の株価上昇が期待されます。",
+        ("AI・半導体",      "negative"): "半導体セクター全体に下押し圧力。NVDA・AVGO（保有中）と購入予定のMUの動向を注視。",
         ("FRB・金利",       "positive"): "金利低下はグロース株に有利。NVDA・UPST・UBERへの追い風になります。",
         ("FRB・金利",       "negative"): "金利上昇はグロース株に不利。ポートフォリオ全体への下落圧力に注意。",
         ("日銀・円相場",    "positive"): "円安継続。ドル建て米国株の円換算価値が上がります。",
@@ -856,16 +858,23 @@ def action_recommendations(stocks, indices, currencies):
         days_away = (dt.date() - today.date()).days
         if days_away == 0:
             if item["type"] == "earnings":
-                ticker = item["ticker"] or ""
                 actions.append(("HIGH",
                     f"🔥 今日は{item['event']}！決算後の動きを見てから購入判断をしましょう。"
                     f"急落なら買いチャンス、急騰なら少し様子見が賢明です。"))
             elif item["type"] == "ipo":
                 actions.append(("HIGH", f"🚀 今日は{item['event']}！上場後の初値・値動きに注目。"))
+            elif item["type"] == "dividend":
+                actions.append(("HIGH", f"💰 今日は{item['event']}！忘れずに確認してください。"))
         elif days_away == 1:
-            actions.append(("MEDIUM", f"⏰ 明日は{item['event']}！今日中に情報収集しておきましょう。"))
+            if item["type"] == "dividend":
+                actions.append(("MEDIUM", f"💰 明日は{item['event']}！今日中に保有確認を。"))
+            else:
+                actions.append(("MEDIUM", f"⏰ 明日は{item['event']}！今日中に情報収集しておきましょう。"))
         elif 2 <= days_away <= 3:
-            actions.append(("INFO", f"📅 {days_away}日後に{item['event']}があります。事前確認を。"))
+            if item["type"] == "dividend":
+                actions.append(("INFO", f"💰 {days_away}日後に{item['event']}。保有継続で自動的に権利取得できます。"))
+            else:
+                actions.append(("INFO", f"📅 {days_away}日後に{item['event']}があります。事前確認を。"))
 
     # Stock drop alerts
     for ticker, d in stocks.items():
@@ -1204,7 +1213,7 @@ def _opportunities_html(dates_countdown, watchlist_data, opportunities, earnings
         chips = ""
         for d in dates_countdown:
             urgcls = "opp-date-urgent" if d["urgent"] else ""
-            icon   = {"earnings": "📊", "ipo": "🚀", "nisa": "🏦"}.get(d["type"], "📅")
+            icon   = {"earnings": "📊", "ipo": "🚀", "nisa": "🏦", "dividend": "💰"}.get(d["type"], "📅")
             chips += f"""
 <div class="opp-date-chip {urgcls}">
   <div class="opp-date-icon">{icon}</div>
@@ -1559,7 +1568,7 @@ def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table,
     # Dates countdown
     date_rows = ""
     for d in dates_countdown:
-        ic    = {"earnings": "📊", "ipo": "🚀", "nisa": "🏦"}.get(d["type"], "📅")
+        ic    = {"earnings": "📊", "ipo": "🚀", "nisa": "🏦", "dividend": "💰"}.get(d["type"], "📅")
         ucls  = " urg" if d["urgent"] else ""
         date_rows += f"""
 <div class="date-row{ucls}">
