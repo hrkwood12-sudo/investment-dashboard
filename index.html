@@ -161,6 +161,22 @@ a{color:var(--b);text-decoration:none}
 .sum-line{font-size:14px;color:var(--t2);line-height:1.55;padding:5px 0;border-bottom:.5px solid var(--sep)}
 .sum-line:last-child{border-bottom:none}
 
+/* ── WISE Trip card ── */
+.trip-card{overflow:visible}
+.trip-header{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 16px;border-bottom:.5px solid var(--sep)}
+.trip-title{font-size:17px;font-weight:700}
+.trip-date{font-size:13px;margin-top:4px}
+.trip-rec{padding:11px 14px;font-size:14px;font-weight:500;line-height:1.5;border-bottom:.5px solid var(--sep)}
+.trip-pos{padding:9px 14px;font-size:13px;color:var(--t2);border-bottom:.5px solid var(--sep)}
+.trip-range{padding:10px 16px;border-bottom:.5px solid var(--sep)}
+.trip-range-lbl{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}
+.trip-bar-bg{position:relative;height:6px;background:var(--c3);border-radius:3px;margin:0 2px}
+.trip-bar-fill{position:absolute;top:-3px;width:12px;height:12px;background:var(--b);border-radius:50%;transform:translateX(-50%);box-shadow:0 0 6px rgba(10,132,255,.6)}
+.trip-sim-wrap{padding:12px 16px}
+.trip-sim-ttl{font-size:12px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px}
+.trip-sim-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:.5px solid var(--sep);font-size:15px}
+.trip-sim-row:last-child{border-bottom:none}
+
 /* ── Footer ── */
 .footer{padding:28px 20px;font-size:11px;color:var(--t3);line-height:1.9;border-top:.5px solid var(--sep);margin-top:32px;text-align:center}
 </style>
@@ -171,7 +187,7 @@ a{color:var(--b);text-decoration:none}
 <div class="hdr">
   <div class="hdr-lbl">投資ダッシュボード</div>
   <div class="hdr-title">6月4日</div>
-  <div class="hdr-time">木曜日　10:20 JST 更新</div>
+  <div class="hdr-time">木曜日　10:35 JST 更新</div>
   <div class="hdr-pnl neg">▼&nbsp;-¥3,612&nbsp;(-4.37%)</div>
 </div>
 
@@ -261,15 +277,15 @@ a{color:var(--b);text-decoration:none}
 </div>
 <div class="idx-chip">
   <div class="idx-name">日経225</div>
-  <div class="idx-val tg">67,274.26</div>
-  <div class="idx-chg tg">▲ 0.81%</div>
+  <div class="idx-val tg">67,209.66</div>
+  <div class="idx-chg tg">▲ 0.71%</div>
 </div>
 <div class="idx-chip vx-c">
   <div class="idx-name">VIX恐怖指数</div>
   <div class="idx-val tg">16.06</div>
   <div class="idx-chg tg">▲ 1.84%</div>
 </div></div>
-  <div class="mkt-note">📉 NASDAQが0.9%下落しました。NVDA・UPST・UBERへの下落圧力に注意。</div><div class="mkt-note">🔵 半導体指数(SOX)が1.4%上昇。NVDAと購入予定のAVGO・MUに直接影響します。</div><div class="mkt-note">🗾 日経225が0.8%上昇。購入予定の東京エレクトロンの動向に注目。</div><div class="mkt-note">✅ VIX恐怖指数は16.1と落ち着いています。市場は比較的安定中です。</div>
+  <div class="mkt-note">📉 NASDAQが0.9%下落しました。NVDA・UPST・UBERへの下落圧力に注意。</div><div class="mkt-note">🔵 半導体指数(SOX)が1.4%上昇。NVDAと購入予定のAVGO・MUに直接影響します。</div><div class="mkt-note">🗾 日経225が0.7%上昇。購入予定の東京エレクトロンの動向に注目。</div><div class="mkt-note">✅ VIX恐怖指数は16.1と落ち着いています。市場は比較的安定中です。</div>
 </div>
 
 <!-- ③ 為替 -->
@@ -362,6 +378,7 @@ a{color:var(--b);text-decoration:none}
 </div>
 <div class="fx-advice-row">💡 比較的安定（週間+0.1%）。</div></div>
   
+  
 <div class="conv-wrap">
   <div class="conv-ttl">💴 換金シミュレーター</div>
   <div class="table-scroll">
@@ -391,16 +408,16 @@ a{color:var(--b);text-decoration:none}
 </div>
 <div class="news-item">
   <span class="cat-pill">NVDA（NVIDIA）</span>
-  <a href="https://finance.yahoo.com/sectors/technology/articles/cooler-master-spingence-launch-global-010000866.html?.tsrc=rss" target="_blank" class="news-ttl">Cooler Master and Spingence Launch Global AI Manufacturing Initiative: Implementing NVIDIA Three-Computer Architecture to Create a Multinational "Digital Brain"</a>
-  <div class="news-body">Cooler Master, a global leader in thermal solutions, and Spingence, a premier Taiwanese AI architecture developer, jointly announced their global AI manufacturing transformation achievements at NVIDIA GTC Taipei 2026. Th…</div>
+  <a href="https://www.fool.com/investing/2026/06/03/nvidia-wants-to-reinvent-the-pc-heres-what-that-me/?.tsrc=rss" target="_blank" class="news-ttl">Nvidia Wants to Reinvent the PC. Here's What That Means for Intel, AMD, and Qualcomm.</a>
+  <div class="news-body">Nvidia ( NVDA 3.58% ) has spent the past three years becoming the world's most valuable company on the back of one business: selling the chips that power artificial intelligence (AI) data centers. Now it wants the device…</div>
   <div class="news-imp imp-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
   <div class="t3 news-src">Yahoo Finance</div>
 </div>
 <div class="news-item">
   <span class="cat-pill">NVDA（NVIDIA）</span>
-  <a href="https://finance.yahoo.com/m/7e49d267-c4ae-3aaf-9986-51411f97003f/quantinuum-prices-ipo-at-%2460.html?.tsrc=rss" target="_blank" class="news-ttl">Quantinuum Prices IPO at $60 a Share. It’s Slated to Go Public Thursday.</a>
-  <div class="news-body">Quantinuum raised $1.68 billion in its upsized initial public offering late Wednesday, setting the stage for one of the most anticipated tech listings of the year. The quantum computing company priced its upsized IPO of …</div>
-  <div class="news-imp imp-pos">📈 NVDAに強気材料。AI・データセンター需要への追い風で株価上昇が期待されます。</div>
+  <a href="https://finance.yahoo.com/sectors/technology/articles/cooler-master-spingence-launch-global-010000866.html?.tsrc=rss" target="_blank" class="news-ttl">Cooler Master and Spingence Launch Global AI Manufacturing Initiative: Implementing NVIDIA Three-Computer Architecture to Create a Multinational "Digital Brain"</a>
+  <div class="news-body">Cooler Master, a global leader in thermal solutions, and Spingence, a premier Taiwanese AI architecture developer, jointly announced their global AI manufacturing transformation achievements at NVIDIA GTC Taipei 2026. Th…</div>
+  <div class="news-imp imp-neu">📊 中立的なニュースです。現時点では大きな影響は限定的です。</div>
   <div class="t3 news-src">Yahoo Finance</div>
 </div>
 <div class="news-item">
@@ -814,7 +831,7 @@ a{color:var(--b);text-decoration:none}
 <div class="footer">
   Yahoo Finance・Frankfurter API・Google News<br>
   ※ 情報提供のみ。投資判断は自己責任でお願いします。<br>
-  最終更新: 2026年06月04日（木曜日）10:20 JST
+  最終更新: 2026年06月04日（木曜日）10:35 JST
 </div>
 
 <script>setTimeout(()=>location.reload(),10*60*1000);</script>

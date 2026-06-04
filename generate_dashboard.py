@@ -633,6 +633,94 @@ def currency_advice(pair, rate, day_change, week_change):
         return f"比較的安定（週間{wc:+.1f}%）。"
 
 
+def get_wise_myr_advice(currencies, trip_date_str):
+    """
+    Analyse MYR/JPY rates and give a WISE transfer timing recommendation
+    for an upcoming Malaysia trip.  Returns None if no trip date is set or
+    the trip has already passed.
+    """
+    if not trip_date_str:
+        return None
+    jst = pytz.timezone("Asia/Tokyo")
+    now = datetime.now(jst)
+    try:
+        trip_dt = jst.localize(datetime.strptime(trip_date_str, "%Y-%m-%d"))
+    except ValueError:
+        return None
+    days_until = (trip_dt.date() - now.date()).days
+    if days_until < 0:
+        return None  # trip already passed
+
+    myr_jpy   = currencies.get("MYR/JPY", {})
+    rate      = myr_jpy.get("rate")
+    wk_chg    = myr_jpy.get("week_change_pct") or 0
+    day_chg   = myr_jpy.get("day_change_pct")  or 0
+    month_hi  = myr_jpy.get("month_high")
+    month_lo  = myr_jpy.get("month_low")
+
+    # ── Urgency level ──────────────────────────────────────────
+    if days_until <= 3:
+        urgency = "urgent"
+        rec     = "🚨 旅行まで3日以内！今すぐWISEで換金してください。"
+    elif days_until <= 7:
+        urgency = "urgent"
+        rec     = "⏰ 旅行まで1週間以内。今日中にWISEで換金しましょう。"
+    elif days_until <= 14:
+        if wk_chg <= -1.5:
+            urgency = "good"
+            rec     = f"✅ 旅行まで{days_until}日。今週円高MYR安（{wk_chg:+.1f}%）＝絶好の換金タイミング！今すぐ換金推奨。"
+        elif wk_chg >= 2:
+            urgency = "wait"
+            rec     = f"🟡 旅行まで{days_until}日。MYR高め（{wk_chg:+.1f}%）。もう少し待って円高を狙えますが、旅行が近いので遅くとも1週間前までに換金を。"
+        else:
+            urgency = "ok"
+            rec     = f"📊 旅行まで{days_until}日。為替は安定中（週間{wk_chg:+.1f}%）。今換金するか、あと数日様子を見るか判断しましょう。"
+    else:
+        # 15日以上先
+        if wk_chg <= -2:
+            urgency = "good"
+            rec     = f"✅ 今週は円高MYR安（{wk_chg:+.1f}%）。旅行まで{days_until}日ありますが、このタイミングで換金するのはアリです。"
+        elif wk_chg >= 2.5:
+            urgency = "wait"
+            rec     = f"⏳ MYR高トレンド中（{wk_chg:+.1f}%）。旅行まで{days_until}日あるので円高になるまで待ちましょう。"
+        else:
+            urgency = "watch"
+            rec     = f"👀 旅行まで{days_until}日。為替は安定中（週間{wk_chg:+.1f}%）。円高トレンドを確認してから換金がベストです。"
+
+    # ── Rate position vs 1-month range ─────────────────────────
+    position_text = ""
+    if rate and month_hi and month_lo:
+        span = month_hi - month_lo
+        if span > 0:
+            pos_pct = (rate - month_lo) / span * 100
+            if pos_pct < 25:
+                position_text = f"📉 現在レートは1ヶ月の安値圏（下位{pos_pct:.0f}%）。換金に有利！"
+            elif pos_pct > 75:
+                position_text = f"📈 現在レートは1ヶ月の高値圏（上位{100-pos_pct:.0f}%）。もう少し待つと有利になる可能性あり。"
+            else:
+                position_text = f"📊 現在レートは1ヶ月の中間付近（位置{pos_pct:.0f}%）。標準的なタイミングです。"
+
+    # ── JPY→MYR simulation ─────────────────────────────────────
+    sims = {}
+    if rate:
+        for amt in [5000, 10000, 30000, 50000]:
+            sims[amt] = round(amt / rate, 2)
+
+    return {
+        "trip_date":    trip_date_str,
+        "days_until":   days_until,
+        "urgency":      urgency,
+        "rate":         rate,
+        "week_change":  wk_chg,
+        "day_change":   day_chg,
+        "month_high":   month_hi,
+        "month_low":    month_lo,
+        "recommendation": rec,
+        "position_text":  position_text,
+        "sims":           sims,
+    }
+
+
 def best_currency_to_hold(currencies):
     results = [(d["from"], d["week_change_pct"])
                for d in currencies.values()
@@ -1223,7 +1311,8 @@ def _act_icon(msg):
 
 
 def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table,
-                  earnings, watchlist_data, opportunities, dates_countdown):
+                  earnings, watchlist_data, opportunities, dates_countdown,
+                  myr_advice=None):
     jst      = pytz.timezone("Asia/Tokyo")
     now      = datetime.now(jst)
     weekdays = ["月曜日","火曜日","水曜日","木曜日","金曜日","土曜日","日曜日"]
@@ -1324,6 +1413,64 @@ def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table,
 </div>"""
 
     mkt_notes = "".join(f'<div class="mkt-note">{e}</div>' for e in mkt_exps)
+
+    # ── WISE Malaysia trip card ──
+    wise_trip_html = ""
+    if myr_advice:
+        ma       = myr_advice
+        urg      = ma["urgency"]
+        rate_s   = f"{ma['rate']:,.4f}" if ma.get("rate") else "取得中…"
+        wk_s     = f"{ma['week_change']:+.2f}%" if ma.get("week_change") is not None else "—"
+        # Urgency colour
+        urg_col  = {"urgent": "var(--r)", "good": "var(--g)", "ok": "var(--b)",
+                    "wait": "var(--o)", "watch": "var(--t2)"}.get(urg, "var(--t2)")
+        urg_bg   = {"urgent": "rgba(255,69,58,.12)", "good": "rgba(48,209,88,.10)",
+                    "ok": "rgba(10,132,255,.10)", "wait": "rgba(255,159,10,.10)",
+                    "watch": "rgba(255,255,255,.05)"}.get(urg, "rgba(255,255,255,.05)")
+        # Countdown badge
+        if ma["days_until"] == 0:
+            cd_badge = '<span style="color:var(--r);font-weight:700">🚀 今日！</span>'
+        elif ma["days_until"] == 1:
+            cd_badge = '<span style="color:var(--o);font-weight:700">明日</span>'
+        else:
+            cd_badge = f'<span style="color:var(--t2)">{ma["days_until"]}日後</span>'
+        # Sim rows
+        sim_rows = ""
+        for jpy_amt, myr_amt in ma["sims"].items():
+            sim_rows += f'<div class="trip-sim-row"><span class="t2">¥{jpy_amt:,}</span><span><strong>{myr_amt:,.2f} MYR</strong></span></div>'
+        # Month range bar
+        range_bar = ""
+        if ma.get("month_high") and ma.get("month_low") and ma.get("rate"):
+            span = ma["month_high"] - ma["month_low"]
+            pos  = (ma["rate"] - ma["month_low"]) / span * 100 if span > 0 else 50
+            hi_s = f"{ma['month_high']:,.4f}"; lo_s = f"{ma['month_low']:,.4f}"
+            range_bar = f"""
+<div class="trip-range">
+  <div class="trip-range-lbl"><span class="t3">安値 {lo_s}</span><span class="t3">高値 {hi_s}</span></div>
+  <div class="trip-bar-bg"><div class="trip-bar-fill" style="left:{pos:.1f}%"></div></div>
+  <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:4px">▲ 現在 {rate_s}</div>
+</div>"""
+        wise_trip_html = f"""
+<div class="card trip-card" style="margin-top:10px">
+  <div class="trip-header">
+    <div>
+      <div class="trip-title">✈️ マレーシア旅行</div>
+      <div class="trip-date t2">{ma['trip_date']} まで {cd_badge}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:22px;font-weight:600">1 MYR</div>
+      <div style="font-size:18px;color:var(--t2)">{rate_s} 円</div>
+      <div style="font-size:13px;color:var(--t2)">週間 {wk_s}</div>
+    </div>
+  </div>
+  <div class="trip-rec" style="background:{urg_bg};color:{urg_col}">{ma['recommendation']}</div>
+  {f'<div class="trip-pos">{ma["position_text"]}</div>' if ma.get("position_text") else ""}
+  {range_bar}
+  <div class="trip-sim-wrap">
+    <div class="trip-sim-ttl">💴 換金シミュレーター（JPY → MYR）</div>
+    {sim_rows}
+  </div>
+</div>"""
 
     # ── Section 3: Currencies ──
     fx_rows = ""
@@ -1688,6 +1835,22 @@ a{{color:var(--b);text-decoration:none}}
 .sum-line{{font-size:14px;color:var(--t2);line-height:1.55;padding:5px 0;border-bottom:.5px solid var(--sep)}}
 .sum-line:last-child{{border-bottom:none}}
 
+/* ── WISE Trip card ── */
+.trip-card{{overflow:visible}}
+.trip-header{{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 16px;border-bottom:.5px solid var(--sep)}}
+.trip-title{{font-size:17px;font-weight:700}}
+.trip-date{{font-size:13px;margin-top:4px}}
+.trip-rec{{padding:11px 14px;font-size:14px;font-weight:500;line-height:1.5;border-bottom:.5px solid var(--sep)}}
+.trip-pos{{padding:9px 14px;font-size:13px;color:var(--t2);border-bottom:.5px solid var(--sep)}}
+.trip-range{{padding:10px 16px;border-bottom:.5px solid var(--sep)}}
+.trip-range-lbl{{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}}
+.trip-bar-bg{{position:relative;height:6px;background:var(--c3);border-radius:3px;margin:0 2px}}
+.trip-bar-fill{{position:absolute;top:-3px;width:12px;height:12px;background:var(--b);border-radius:50%;transform:translateX(-50%);box-shadow:0 0 6px rgba(10,132,255,.6)}}
+.trip-sim-wrap{{padding:12px 16px}}
+.trip-sim-ttl{{font-size:12px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px}}
+.trip-sim-row{{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:.5px solid var(--sep);font-size:15px}}
+.trip-sim-row:last-child{{border-bottom:none}}
+
 /* ── Footer ── */
 .footer{{padding:28px 20px;font-size:11px;color:var(--t3);line-height:1.9;border-top:.5px solid var(--sep);margin-top:32px;text-align:center}}
 </style>
@@ -1721,6 +1884,7 @@ a{{color:var(--b);text-decoration:none}}
   <div class="pg-ttl">💱 為替（WISE）</div>
   {best_banner}
   <div class="card">{fx_rows}</div>
+  {wise_trip_html}
   {jpy_conv_html}
 </div>
 
@@ -1821,10 +1985,19 @@ def main():
     print("  ⑩ アクション・アドバイス生成中...")
     actions = action_recommendations(stocks, indices, currencies)
 
-    print("  ⑪ HTML生成中...")
+    print("  ⑪ WISE旅行タイミング計算中...")
+    trip_date_str = config.get("malaysia_trip_date", "")
+    myr_advice    = get_wise_myr_advice(currencies, trip_date_str)
+    if myr_advice:
+        print(f"     ✈️ マレーシア旅行まで {myr_advice['days_until']}日 / 推奨: {myr_advice['urgency']}")
+    else:
+        print("     ℹ️ malaysia_trip_date が未設定（portfolio_config.json で設定可能）")
+
+    print("  ⑫ HTML生成中...")
     html = generate_html(
         stocks, indices, currencies, news, actions, pnl, jpy_table,
-        earnings, watchlist_data, opportunities, dates_countdown
+        earnings, watchlist_data, opportunities, dates_countdown,
+        myr_advice=myr_advice
     )
 
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
