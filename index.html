@@ -161,6 +161,25 @@ a{color:var(--b);text-decoration:none}
 .sum-line{font-size:14px;color:var(--t2);line-height:1.55;padding:5px 0;border-bottom:.5px solid var(--sep)}
 .sum-line:last-child{border-bottom:none}
 
+/* ── Analyst info (tiny sub-row) ── */
+.analyst-row{padding:4px 16px 8px;font-size:11px;color:var(--t3);display:flex;gap:8px;flex-wrap:wrap;background:rgba(255,255,255,.02);border-bottom:.5px solid var(--sep)}
+.analyst-row:last-child{border-bottom:none}
+.rec-buy{color:var(--g)}.rec-hold{color:var(--o)}.rec-sell{color:var(--r)}
+
+/* ── Exit strategy card ── */
+.exit-card{background:var(--c1);border-radius:14px;overflow:hidden;margin-top:10px}
+.exit-row{display:flex;gap:12px;padding:11px 16px;border-bottom:.5px solid var(--sep);align-items:flex-start}
+.exit-row:last-child{border-bottom:none}
+.exit-ticker{font-size:14px;font-weight:700;width:44px;flex-shrink:0;padding-top:1px}
+.exit-body{flex:1;font-size:12px;color:var(--t2);line-height:1.6}
+.exit-target{color:var(--g);font-weight:500}
+.exit-stop{color:var(--r)}
+.exit-sig{color:var(--t3);font-size:11px;margin-top:2px}
+
+/* ── Bilingual term ── */
+.en-term{font-size:14px;font-weight:600;color:var(--b);margin-bottom:3px;letter-spacing:-.1px}
+.en-short{font-size:12px;color:rgba(10,132,255,.75);line-height:1.55;margin-bottom:7px;padding:5px 8px;background:rgba(10,132,255,.07);border-radius:6px}
+
 /* ── WISE Trip card ── */
 .trip-card{overflow:visible}
 .trip-header{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 16px;border-bottom:.5px solid var(--sep)}
@@ -187,7 +206,7 @@ a{color:var(--b);text-decoration:none}
 <div class="hdr">
   <div class="hdr-lbl">投資ダッシュボード</div>
   <div class="hdr-title">6月5日</div>
-  <div class="hdr-time">金曜日　08:29 JST 更新</div>
+  <div class="hdr-time">金曜日　08:33 JST 更新</div>
   <div class="hdr-pnl neg">▼&nbsp;-¥6,467&nbsp;(-4.17%)</div>
 </div>
 
@@ -204,7 +223,7 @@ a{color:var(--b);text-decoration:none}
     <div class="s-price">$218.66</div>
     <div class="pill pill-g">▲1.82%</div>
   </div>
-</div><div class="s-sub">取得 $215.87 → 現在 $218.66　<span class="tg">▲ ¥527 (+1.29%)</span><span class="t3"> 目標$298.07（+36.3%）</span></div>
+</div><div class="s-sub">取得 $215.87 → 現在 $218.66　<span class="tg">▲ ¥527 (+1.29%)</span><span class="t3"> 目標$298.07（+36.3%）</span></div><div class="analyst-row">👥 アナリスト 58人　·　推奨: <span class="rec-buy">強気買い</span>　·　目標 $180〜$500</div>
 <div class="s-row">
   <div class="s-left">
     <div class="s-ticker">AVGO</div>
@@ -214,7 +233,7 @@ a{color:var(--b);text-decoration:none}
     <div class="s-price">$418.91</div>
     <div class="pill pill-r">▼12.59%</div>
   </div>
-</div><div class="s-sub">取得 $500.64 → 現在 $418.91　<span class="tr">▼ -¥5,650 (-16.33%)</span><span class="t3"> 目標$486.85（+16.2%）</span></div><div class="alert-stripe alert-buy">🔴 -10%以上急落！買い増しシグナル</div>
+</div><div class="s-sub">取得 $500.64 → 現在 $418.91　<span class="tr">▼ -¥5,650 (-16.33%)</span><span class="t3"> 目標$486.85（+16.2%）</span></div><div class="analyst-row">👥 アナリスト 44人　·　推奨: <span class="rec-buy">強気買い</span>　·　目標 $216〜$630</div><div class="alert-stripe alert-buy">🔴 -10%以上急落！買い増しシグナル</div>
 <div class="s-row">
   <div class="s-left">
     <div class="s-ticker">KTOS</div>
@@ -224,7 +243,7 @@ a{color:var(--b);text-decoration:none}
     <div class="s-price">$63.40</div>
     <div class="pill pill-g">▲8.51%</div>
   </div>
-</div><div class="s-sub">取得 $66.55 → 現在 $63.40　<span class="tr">▼ -¥962 (-4.73%)</span><span class="t3"> 目標$113.05（+78.3%）</span></div>
+</div><div class="s-sub">取得 $66.55 → 現在 $63.40　<span class="tr">▼ -¥962 (-4.73%)</span><span class="t3"> 目標$113.05（+78.3%）</span></div><div class="analyst-row">👥 アナリスト 20人　·　推奨: <span class="rec-hold">none</span>　·　目標 $75〜$150</div>
 <div class="s-row">
   <div class="s-left">
     <div class="s-ticker">UPST</div>
@@ -234,7 +253,7 @@ a{color:var(--b);text-decoration:none}
     <div class="s-price">$32.27</div>
     <div class="pill pill-g">▲6.54%</div>
   </div>
-</div><div class="s-sub">取得 $33.92 → 現在 $32.27　<span class="tr">▼ -¥507 (-4.86%)</span><span class="t3"> 目標$40.2（+24.6%）</span></div>
+</div><div class="s-sub">取得 $33.92 → 現在 $32.27　<span class="tr">▼ -¥507 (-4.86%)</span><span class="t3"> 目標$40.2（+24.6%）</span></div><div class="analyst-row">👥 アナリスト 15人　·　推奨: <span class="rec-buy">買い</span>　·　目標 $20〜$80</div>
 <div class="s-row">
   <div class="s-left">
     <div class="s-ticker">UBER</div>
@@ -244,7 +263,7 @@ a{color:var(--b);text-decoration:none}
     <div class="s-price">$72.21</div>
     <div class="pill pill-g">▲0.73%</div>
   </div>
-</div><div class="s-sub">取得 $71.62 → 現在 $72.21　<span class="tg">▲ ¥123 (+0.82%)</span><span class="t3"> 目標$104.43（+44.6%）</span></div>
+</div><div class="s-sub">取得 $71.62 → 現在 $72.21　<span class="tg">▲ ¥123 (+0.82%)</span><span class="t3"> 目標$104.43（+44.6%）</span></div><div class="analyst-row">👥 アナリスト 50人　·　推奨: <span class="rec-buy">強気買い</span>　·　目標 $70〜$150</div>
 <div class="s-row">
   <div class="s-left">
     <div class="s-ticker">TMC</div>
@@ -254,7 +273,7 @@ a{color:var(--b);text-decoration:none}
     <div class="s-price">$5.99</div>
     <div class="pill pill-r">▼2.12%</div>
   </div>
-</div><div class="s-sub">取得 $6.00 → 現在 $5.99　<span class="tr">▼ ¥2 (-0.17%)</span><span class="t3"> 目標$11.0（+83.6%）</span></div></div>
+</div><div class="s-sub">取得 $6.00 → 現在 $5.99　<span class="tr">▼ ¥2 (-0.17%)</span><span class="t3"> 目標$11.0（+83.6%）</span></div><div class="analyst-row">👥 アナリスト 5人　·　推奨: <span class="rec-buy">強気買い</span>　·　目標 $9〜$12</div></div>
   
 <div class="pnl-block">
   <div class="pnl-row"><span class="t2">投資総額</span><span>¥155,252</span></div>
@@ -264,6 +283,62 @@ a{color:var(--b);text-decoration:none}
     <span class="tr">▼ -¥6,467 (-4.17%)</span>
   </div>
 </div>
+  <div class="seg-lbl" style="padding:14px 0 7px;font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">🎯 いつ売る？ 利確・損切りの目安</div>
+  <div class="exit-card">
+<div class="exit-row">
+  <div class="exit-ticker">NVDA</div>
+  <div class="exit-body">
+    <span class="exit-target">↑ +50〜100%（$325〜$430）で段階的に利確</span><br>
+    <span class="exit-stop">↓ -20%（$173以下）で損切り検討</span><br>
+    <span class="exit-sig">⚠️ 売りシグナル: 決算EPSが大幅ミス　/　中国輸出規制の拡大　/　AI需要失速の兆候</span><br>
+    <span class="t3">⏱ 保有目安: 2〜3年</span>
+  </div>
+</div>
+<div class="exit-row">
+  <div class="exit-ticker">AVGO</div>
+  <div class="exit-body">
+    <span class="exit-target">↑ +30〜60%（$650〜$800）で段階的に利確</span><br>
+    <span class="exit-stop">↓ -20%（$400以下）で損切り検討</span><br>
+    <span class="exit-sig">⚠️ 売りシグナル: AI向け受注減少　/　カスタムチップ競合増加　/　配当カット</span><br>
+    <span class="t3">⏱ 保有目安: 2〜3年（配当再投資で長期保有も〇）</span>
+  </div>
+</div>
+<div class="exit-row">
+  <div class="exit-ticker">KTOS</div>
+  <div class="exit-body">
+    <span class="exit-target">↑ +50〜100%（$100〜$133）で段階的に利確</span><br>
+    <span class="exit-stop">↓ -25%（$50以下）で損切り検討</span><br>
+    <span class="exit-sig">⚠️ 売りシグナル: 防衛予算の大幅削減　/　大型契約の連続失注　/　継続赤字</span><br>
+    <span class="t3">⏱ 保有目安: 2〜3年</span>
+  </div>
+</div>
+<div class="exit-row">
+  <div class="exit-ticker">UPST</div>
+  <div class="exit-body">
+    <span class="exit-target">↑ +100〜200%（$68〜$102）で段階的に利確</span><br>
+    <span class="exit-stop">↓ -30%（$24以下）で損切り検討</span><br>
+    <span class="exit-sig">⚠️ 売りシグナル: FRB利上げ再開　/　銀行パートナー離脱　/　デフォルト率急上昇</span><br>
+    <span class="t3">⏱ 保有目安: 1〜2年（金利動向次第）</span>
+  </div>
+</div>
+<div class="exit-row">
+  <div class="exit-ticker">UBER</div>
+  <div class="exit-body">
+    <span class="exit-target">↑ +40〜70%（$100〜$122）で段階的に利確</span><br>
+    <span class="exit-stop">↓ -20%（$57以下）で損切り検討</span><br>
+    <span class="exit-sig">⚠️ 売りシグナル: 自律走行で競合激化　/　規制強化　/　業績悪化</span><br>
+    <span class="t3">⏱ 保有目安: 2〜3年</span>
+  </div>
+</div>
+<div class="exit-row">
+  <div class="exit-ticker">TMC</div>
+  <div class="exit-body">
+    <span class="exit-target">↑ +200〜500%（$18〜$30）で段階的に利確</span><br>
+    <span class="exit-stop">↓ -50%（$3以下）で損切り検討</span><br>
+    <span class="exit-sig">⚠️ 売りシグナル: 深海採掘の永続的規制　/　採掘承認の却下　/　EV需要急落</span><br>
+    <span class="t3">⏱ 保有目安: 3〜5年（投機枠・長期）</span>
+  </div>
+</div></div>
 </div>
 
 <!-- ② 市場 -->
@@ -426,7 +501,7 @@ a{color:var(--b);text-decoration:none}
 <div class="news-item">
   <span class="cat-pill">NVDA（NVIDIA）</span>
   <a href="https://www.fool.com/investing/2026/06/04/poet-technologies-rose-today-despite-pressures-for/?.tsrc=rss" target="_blank" class="news-ttl">Poet Technologies Rose Today Despite Pressures for AI Stocks -- Is It a Buy Right Now?</a>
-  <div class="news-body">Poet Technologies ( POET +1.14% ) managed to post a modest gain on Thursday despite bearish trading for optics and networking technologies stocks. The company's share price closed out the day up roughly 0.6%. Poet stock …</div>
+  <div class="news-body">Poet Technologies ( POET +0.62% ) managed to post a modest gain on Thursday despite bearish trading for optics and networking technologies stocks. The company's share price closed out the day up roughly 0.6%. Poet stock …</div>
   <div class="news-imp imp-neg">📉 NVDAに注意。ポートフォリオ最大銘柄のため影響大。動向を注視してください。</div>
   <div class="t3 news-src">Yahoo Finance</div>
 </div>
@@ -586,10 +661,10 @@ a{color:var(--b);text-decoration:none}
 </div>
 <div class="news-item">
   <span class="cat-pill">防衛・宇宙</span>
-  <a href="https://news.google.com/rss/articles/CBMid0FVX3lxTE1QekR5UE5HVWV6dUJFY3Jkbks5MWxKaEpGclVjUHBfbHpiellGSTRsUWgteFpMTlhFUEZvSHVJTUhOX1cwckRSeWF6Mkp1TXltR3I1NjFfNlJLZ3V1X2QyTWJyZ0JadndQVzdFUzgweFJrcGNYVWpr?oc=5" target="_blank" class="news-ttl">7 Best Drone Stocks to Buy in 2026 | Investing - U.S. News - Money</a>
-  <div class="news-body">7 Best Drone Stocks to Buy in 2026 | Investing U.S. News - Money</div>
+  <a href="https://news.google.com/rss/articles/CBMinAFBVV95cUxQZ2xUTFdKS1dybjBVNGloTW1ackxjNmYzaXo3bUxrM2FoemJWTG9yQUJJTVdOck1BS0tPc2Q1QXczZ0lvMzdibkFEaXRMRlh5SWZCUEwzTU50TFk1TEk1Tk4xUEZ3OFBxMWdDQnoyY3dWNmUtd3hDUjhzbFpKYU51LXFIM2pvcUx0UzVyclVfaENLNnROSUcyeXpjQXg?oc=5" target="_blank" class="news-ttl">DOD moves to make its largest-ever investment in drones and anti-drone weapons - DefenseScoop</a>
+  <div class="news-body">DOD moves to make its largest-ever investment in drones and anti-drone weapons DefenseScoop</div>
   <div class="news-imp imp-pos">📈 防衛・宇宙産業への追い風。KTOSに直接恩恵。</div>
-  <div class="t3 news-src">U.S. News - Money</div>
+  <div class="t3 news-src">DefenseScoop</div>
 </div>
 <div class="news-item">
   <span class="cat-pill">宇宙・SpaceX</span>
@@ -818,9 +893,10 @@ a{color:var(--b);text-decoration:none}
 </div>
 
 <div class="learn-item">
-  <div class="learn-lbl lk">💡 投資用語</div>
+  <div class="learn-lbl lk">💡 投資用語（英語＆日本語）</div>
   <div class="learn-ttl">P/E ratio（株価収益率・PER）</div>
-  <div class="learn-body">株価 ÷ 1株当たり純利益（EPS）で計算。例えばPER30倍なら「今の利益の30年分の価格がついている」という意味。一般的にPER15〜25が適正、30以上は割高、10以下は割安とされますが、成長株は高PERが普通です。NVIDIAはPER50〜60倍でも「成長を先取りしている」と評価されています。</div>
+  <div class="en-term">Price-to-Earnings Ratio (P/E)</div><div class="en-short">Stock price ÷ earnings per share. A P/E of 30 means you pay $30 for every $1 the company earns. Growth stocks like NVDA often trade at high P/Es.</div>
+  <div class="learn-body">株価 ÷ 1株当たり純利益（EPS）で計算。例えばPER30倍なら「今の利益の30年分の価格がついている」という意味。一般的にPER15〜25が適正、30以上は割高、10以下は割安とされますが、成長株は高PERが普通です。</div>
 </div>
 
 <div class="learn-item">
@@ -833,7 +909,7 @@ a{color:var(--b);text-decoration:none}
 <div class="footer">
   Yahoo Finance・Frankfurter API・Google News<br>
   ※ 情報提供のみ。投資判断は自己責任でお願いします。<br>
-  最終更新: 2026年06月05日（金曜日）08:29 JST
+  最終更新: 2026年06月05日（金曜日）08:33 JST
 </div>
 
 <script>setTimeout(()=>location.reload(),10*60*1000);</script>

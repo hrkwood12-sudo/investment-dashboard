@@ -90,6 +90,46 @@ SECTOR_GROWTH_1Y = {
     "TMC":   0.50,
 }
 
+# When / how to sell each holding (manually maintained)
+EXIT_STRATEGY = {
+    "NVDA": {
+        "target":  "+50〜100%（$325〜$430）で段階的に利確",
+        "stop":    "-20%（$173以下）で損切り検討",
+        "signals": ["決算EPSが大幅ミス", "中国輸出規制の拡大", "AI需要失速の兆候"],
+        "horizon": "2〜3年",
+    },
+    "AVGO": {
+        "target":  "+30〜60%（$650〜$800）で段階的に利確",
+        "stop":    "-20%（$400以下）で損切り検討",
+        "signals": ["AI向け受注減少", "カスタムチップ競合増加", "配当カット"],
+        "horizon": "2〜3年（配当再投資で長期保有も〇）",
+    },
+    "KTOS": {
+        "target":  "+50〜100%（$100〜$133）で段階的に利確",
+        "stop":    "-25%（$50以下）で損切り検討",
+        "signals": ["防衛予算の大幅削減", "大型契約の連続失注", "継続赤字"],
+        "horizon": "2〜3年",
+    },
+    "UPST": {
+        "target":  "+100〜200%（$68〜$102）で段階的に利確",
+        "stop":    "-30%（$24以下）で損切り検討",
+        "signals": ["FRB利上げ再開", "銀行パートナー離脱", "デフォルト率急上昇"],
+        "horizon": "1〜2年（金利動向次第）",
+    },
+    "UBER": {
+        "target":  "+40〜70%（$100〜$122）で段階的に利確",
+        "stop":    "-20%（$57以下）で損切り検討",
+        "signals": ["自律走行で競合激化", "規制強化", "業績悪化"],
+        "horizon": "2〜3年",
+    },
+    "TMC": {
+        "target":  "+200〜500%（$18〜$30）で段階的に利確",
+        "stop":    "-50%（$3以下）で損切り検討",
+        "signals": ["深海採掘の永続的規制", "採掘承認の却下", "EV需要急落"],
+        "horizon": "3〜5年（投機枠・長期）",
+    },
+}
+
 # ============================================================
 # Data Fetching
 # ============================================================
@@ -117,16 +157,24 @@ def get_stock_data():
             target     = info.get("targetMeanPrice")
             target_dist = ((float(target) - current) / current * 100) if target else None
 
+            rec_raw = (info.get("recommendationKey") or "").lower()
+            rec_map = {"strong_buy": "強気買い", "buy": "買い", "hold": "中立",
+                       "underperform": "弱気", "sell": "売り"}
             stocks[ticker] = {
-                "name":         meta["name"],
-                "price":        round(current, 2),
-                "change":       round(change, 2),
-                "change_pct":   round(change_pct, 2),
-                "target_price": round(float(target), 2) if target else None,
-                "target_dist":  round(target_dist, 1) if target_dist is not None else None,
-                "invested_jpy": meta["invested_jpy"],
-                "monthly_jpy":  meta["monthly_jpy"],
-                "is_jpy":       ".T" in ticker,
+                "name":           meta["name"],
+                "price":          round(current, 2),
+                "change":         round(change, 2),
+                "change_pct":     round(change_pct, 2),
+                "target_price":   round(float(target), 2) if target else None,
+                "target_dist":    round(target_dist, 1) if target_dist is not None else None,
+                "target_high":    round(float(info["targetHighPrice"]), 2) if info.get("targetHighPrice") else None,
+                "target_low":     round(float(info["targetLowPrice"]),  2) if info.get("targetLowPrice")  else None,
+                "analyst_count":  info.get("numberOfAnalystOpinions"),
+                "recommendation": rec_map.get(rec_raw, rec_raw) if rec_raw else None,
+                "rec_raw":        rec_raw,
+                "invested_jpy":   meta["invested_jpy"],
+                "monthly_jpy":    meta["monthly_jpy"],
+                "is_jpy":         ".T" in ticker,
             }
         except Exception as e:
             stocks[ticker] = {
@@ -1086,31 +1134,57 @@ INDUSTRY_TRENDS = [
 
 INVESTMENT_TERMS = [
     {"term": "P/E ratio（株価収益率・PER）",
-     "explain": "株価 ÷ 1株当たり純利益（EPS）で計算。例えばPER30倍なら「今の利益の30年分の価格がついている」という意味。一般的にPER15〜25が適正、30以上は割高、10以下は割安とされますが、成長株は高PERが普通です。NVIDIAはPER50〜60倍でも「成長を先取りしている」と評価されています。"},
+     "en_term": "Price-to-Earnings Ratio (P/E)",
+     "en_short": "Stock price ÷ earnings per share. A P/E of 30 means you pay $30 for every $1 the company earns. Growth stocks like NVDA often trade at high P/Es.",
+     "explain": "株価 ÷ 1株当たり純利益（EPS）で計算。例えばPER30倍なら「今の利益の30年分の価格がついている」という意味。一般的にPER15〜25が適正、30以上は割高、10以下は割安とされますが、成長株は高PERが普通です。"},
     {"term": "EPS（一株当たり利益）",
-     "explain": "会社の純利益 ÷ 発行済み株式数。例えばEPS $5.00 なら1株につき$5の利益を生み出しているという意味。決算発表では「アナリスト予想EPS」と「実際のEPS」を比較し、上回れば株価上昇・下回れば下落するのが一般的です。"},
+     "en_term": "Earnings Per Share (EPS)",
+     "en_short": "Net profit ÷ total shares. If EPS is $5.00, the company earns $5 per share. Markets react sharply when actual EPS beats or misses analyst estimates.",
+     "explain": "会社の純利益 ÷ 発行済み株式数。例えばEPS $5.00 なら1株につき$5の利益を生み出しているという意味。決算発表では「アナリスト予想EPS」と「実際のEPS」を比較します。"},
     {"term": "時価総額（Market Cap）",
-     "explain": "株価 × 発行済み株式総数。会社の「市場での評価額」です。NVIDIAはMega cap（超大型株）約3兆ドル。時価総額が小さい株は大きく動きやすく、大きい株は安定しやすい傾向があります。"},
+     "en_term": "Market Capitalization",
+     "en_short": "Share price × total shares outstanding. NVDA is a mega-cap (~$3 trillion). Smaller caps move more violently; larger caps are generally more stable.",
+     "explain": "株価 × 発行済み株式総数。会社の「市場での評価額」です。NVIDIAはMega cap（超大型株）約3兆ドル。時価総額が小さい株は大きく動きやすい傾向があります。"},
     {"term": "52週高値・安値",
+     "en_term": "52-Week High / Low",
+     "en_short": "The highest and lowest prices over the past year. Near the 52-week high = strong momentum. Near the low = possibly undervalued or in trouble.",
      "explain": "過去1年間（52週）の最高値と最安値のこと。現在の株価が52週高値に近い場合は「勢いがある」、52週安値に近い場合は「割安の可能性」と見ることができます。"},
     {"term": "RSI（相対力指数）",
-     "explain": "0〜100の数値で株の「買われすぎ」「売られすぎ」を示す指標。一般的にRSI70以上 = 買われすぎ（売りシグナル）、RSI30以下 = 売られすぎ（買いシグナル）とされています。"},
+     "en_term": "Relative Strength Index (RSI)",
+     "en_short": "A 0–100 momentum indicator. RSI > 70 = overbought (possible sell signal). RSI < 30 = oversold (possible buy signal).",
+     "explain": "0〜100の数値で株の「買われすぎ」「売られすぎ」を示す指標。RSI70以上 = 買われすぎ（売りシグナル）、RSI30以下 = 売られすぎ（買いシグナル）とされています。"},
     {"term": "ボラティリティ（価格変動率）",
-     "explain": "株価がどれだけ大きく動くかを示す指標。NVDAはボラティリティが高い部類で、短期間で±20%動くことも珍しくありません。TMCはさらに高ボラティリティ（投機的銘柄）のため、長期保有が基本です。"},
+     "en_term": "Volatility",
+     "en_short": "How much a stock's price swings. High volatility = bigger potential gains AND bigger potential losses. TMC is highly volatile; AVGO is more stable.",
+     "explain": "株価がどれだけ大きく動くかを示す指標。NVDAはボラティリティが高く、短期間で±20%動くことも珍しくありません。TMCはさらに高ボラティリティ（投機的銘柄）のため長期保有が基本です。"},
     {"term": "ETF（上場投資信託）",
+     "en_term": "Exchange-Traded Fund (ETF)",
+     "en_short": "A basket of stocks traded like a single share. QQQ tracks NASDAQ-100; SOXX tracks semiconductors. Great for diversification with one purchase.",
      "explain": "複数の株をまとめて一つの商品にしたもの。QQQ（NASDAQ100）・SOXX（半導体指数）・XAR（宇宙・防衛）などが代表例。個別株が難しい場合はETFから始めると分散投資の効果が得られます。"},
     {"term": "空売り（ショート）とロング",
+     "en_term": "Long vs. Short Selling",
+     "en_short": "Long = buy and hold, hoping the price rises. Short = borrow shares, sell them, then buy back cheaper. Individual investors mostly go long.",
      "explain": "ロング = 株を買って値上がりを期待する通常の投資。空売り（ショート）= 株を借りて売り、値下がりしてから買い戻す手法。個人投資家は基本的にロングだけで十分です。"},
     {"term": "決算（Earnings）の見方",
-     "explain": "四半期ごとに発表される会社の成績表。重要ポイント：① 売上高が予想を上回ったか ② EPS（利益）が予想を上回ったか ③ 次四半期のガイダンス（見通し）が強いか。今夜のAVGO決算でこの3点を確認しましょう。"},
+     "en_term": "How to Read Earnings Reports",
+     "en_short": "Check ① Revenue vs. estimate, ② EPS vs. estimate, ③ Forward guidance. Guidance often matters more than the actual result — a strong beat can still drop if guidance disappoints.",
+     "explain": "四半期ごとに発表される会社の成績表。重要ポイント：① 売上高が予想を上回ったか ② EPSが予想を上回ったか ③ 次四半期のガイダンス（見通し）が強いか。"},
     {"term": "ガイダンス（業績見通し）",
-     "explain": "決算発表時に会社が示す「次の四半期・年間の売上・利益の見通し」。市場はしばしば実績より「ガイダンス」に反応します。良い決算でも「次の見通しが弱い」と言った瞬間に株価が急落することがあります。今夜のAVGO・来月のMU決算後は特にガイダンスに注目。"},
+     "en_term": "Forward Guidance",
+     "en_short": "Management's forecast for the next quarter or year. Markets often react MORE to guidance than actual results. Even a great quarter can crash the stock if guidance is weak.",
+     "explain": "決算発表時に会社が示す「次の四半期・年間の売上・利益の見通し」。市場はしばしば実績より「ガイダンス」に反応します。良い決算でも見通しが弱いと株価が急落することがあります。"},
     {"term": "WISE vs 銀行の為替手数料比較",
-     "explain": "銀行でドルを買う際の手数料：三菱UFJ銀行の場合、TTSレートで1ドルあたり約1円（約0.6%）の手数料がかかります。¥50,000を両替すると約¥300〜¥500のコスト。WISEは0.4〜0.6%程度の手数料で、毎月¥50,000を両替するだけで年間数千円の節約になります。"},
+     "en_term": "WISE vs. Bank FX Fees",
+     "en_short": "Japanese banks charge ~¥1/$ (0.6%) to convert JPY→USD. WISE charges ~0.4–0.5%. On ¥50,000/month that saves thousands of yen per year.",
+     "explain": "銀行でドルを買う際の手数料：三菱UFJ銀行の場合、1ドルあたり約1円の手数料がかかります。¥50,000を両替すると約¥300〜¥500のコスト。WISEは0.4〜0.6%程度です。"},
     {"term": "配当株 vs 成長株",
-     "explain": "配当株：毎年・毎四半期に配当金を支払う株（例：JPモルガン・コカコーラ）。成長株：配当なしで利益を事業拡大に再投資（例：NVDA・UPST・UBER）。あなたのポートフォリオは全て成長株なので、配当収入はなく値上がり益を狙う戦略です。"},
+     "en_term": "Dividend Stocks vs. Growth Stocks",
+     "en_short": "Dividend stocks pay regular income (e.g., AVGO pays quarterly). Growth stocks reinvest profits to expand (e.g., UPST, UBER). Your portfolio is mostly growth, with AVGO as a hybrid.",
+     "explain": "配当株：毎年・毎四半期に配当金を支払う株（例：AVGO・JPモルガン）。成長株：配当なしで利益を事業拡大に再投資（例：UPST・UBER）。あなたのポートフォリオはAVGOが配当＋成長の両方を兼ねています。"},
     {"term": "機関投資家と個人投資家の違い",
-     "explain": "機関投資家 = 年金基金・投資信託・ヘッジファンドなど大口投資家。市場取引の70〜80%を占め、株価を動かす力があります。13F提出書類（四半期ごとに開示）でウォーレン・バフェットなどの有名投資家が何を買っているか確認できます。"},
+     "en_term": "Institutional vs. Retail Investors",
+     "en_short": "Institutions (pension funds, hedge funds) make up 70–80% of market volume and can move prices. Retail investors (like you) follow their moves via 13F filings quarterly.",
+     "explain": "機関投資家 = 年金基金・投資信託・ヘッジファンドなど大口投資家。市場取引の70〜80%を占め、株価を動かす力があります。13F提出書類でウォーレン・バフェットなどの有名投資家が何を買っているか確認できます。"},
 ]
 
 WISE_TIPS = [
@@ -1187,10 +1261,16 @@ def _learning_html(learning):
 </div>""")
 
     tm = learning["term"]
+    en_block = ""
+    if tm.get("en_term"):
+        en_block = f'<div class="en-term">{tm["en_term"]}</div>'
+    if tm.get("en_short"):
+        en_block += f'<div class="en-short">{tm["en_short"]}</div>'
     parts.append(f"""
 <div class="learn-item">
-  <div class="learn-lbl lk">💡 投資用語</div>
+  <div class="learn-lbl lk">💡 投資用語（英語＆日本語）</div>
   <div class="learn-ttl">{tm['term']}</div>
+  {en_block}
   <div class="learn-body">{tm['explain']}</div>
 </div>""")
 
@@ -1380,6 +1460,18 @@ def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table,
         if pct <= -10: alert = '<div class="alert-stripe alert-buy">🔴 -10%以上急落！買い増しシグナル</div>'
         elif pct <= -5: alert = '<div class="alert-stripe alert-watch">🟡 -5%以上の下落。様子見を継続</div>'
 
+        # Analyst info (tiny row)
+        an_parts = []
+        if d.get("analyst_count"):
+            an_parts.append(f"👥 アナリスト {d['analyst_count']}人")
+        if d.get("recommendation"):
+            rec_cls = "rec-buy" if d["rec_raw"] in ("buy","strong_buy") else \
+                      ("rec-sell" if d["rec_raw"] in ("sell","underperform") else "rec-hold")
+            an_parts.append(f'推奨: <span class="{rec_cls}">{d["recommendation"]}</span>')
+        if d.get("target_low") and d.get("target_high"):
+            an_parts.append(f'目標 {sym}{d["target_low"]:,.0f}〜{sym}{d["target_high"]:,.0f}')
+        analyst_row = f'<div class="analyst-row">{"　·　".join(an_parts)}</div>' if an_parts else ""
+
         stock_rows += f"""
 <div class="s-row">
   <div class="s-left">
@@ -1390,7 +1482,7 @@ def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table,
     <div class="s-price">{sym}{d['price']:,.2f}</div>
     <div class="pill {pill}">{_arrow(pct)}{abs(pct):.2f}%</div>
   </div>
-</div>{pnl_sub}{alert}"""
+</div>{pnl_sub}{analyst_row}{alert}"""
 
     pnl_summary = f"""
 <div class="pnl-block">
@@ -1401,6 +1493,25 @@ def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table,
     <span class="{'tg' if total_pnl_pct>0 else 'tr' if total_pnl_pct<0 else 't2'}">{total_arr} {fmt_jpy(total_pnl)} ({total_pnl_pct:+.2f}%)</span>
   </div>
 </div>"""
+
+    # ── Exit strategy card ──
+    exit_rows = ""
+    for ticker in PORTFOLIO:
+        es = EXIT_STRATEGY.get(ticker)
+        if not es:
+            continue
+        sigs = "　/　".join(es["signals"])
+        exit_rows += f"""
+<div class="exit-row">
+  <div class="exit-ticker">{ticker}</div>
+  <div class="exit-body">
+    <span class="exit-target">↑ {es['target']}</span><br>
+    <span class="exit-stop">↓ {es['stop']}</span><br>
+    <span class="exit-sig">⚠️ 売りシグナル: {sigs}</span><br>
+    <span class="t3">⏱ 保有目安: {es['horizon']}</span>
+  </div>
+</div>"""
+    exit_card_html = f'<div class="exit-card">{exit_rows}</div>' if exit_rows else ""
 
     # ── Section 2: Market indices ──
     idx_chips = ""
@@ -1844,6 +1955,25 @@ a{{color:var(--b);text-decoration:none}}
 .sum-line{{font-size:14px;color:var(--t2);line-height:1.55;padding:5px 0;border-bottom:.5px solid var(--sep)}}
 .sum-line:last-child{{border-bottom:none}}
 
+/* ── Analyst info (tiny sub-row) ── */
+.analyst-row{{padding:4px 16px 8px;font-size:11px;color:var(--t3);display:flex;gap:8px;flex-wrap:wrap;background:rgba(255,255,255,.02);border-bottom:.5px solid var(--sep)}}
+.analyst-row:last-child{{border-bottom:none}}
+.rec-buy{{color:var(--g)}}.rec-hold{{color:var(--o)}}.rec-sell{{color:var(--r)}}
+
+/* ── Exit strategy card ── */
+.exit-card{{background:var(--c1);border-radius:14px;overflow:hidden;margin-top:10px}}
+.exit-row{{display:flex;gap:12px;padding:11px 16px;border-bottom:.5px solid var(--sep);align-items:flex-start}}
+.exit-row:last-child{{border-bottom:none}}
+.exit-ticker{{font-size:14px;font-weight:700;width:44px;flex-shrink:0;padding-top:1px}}
+.exit-body{{flex:1;font-size:12px;color:var(--t2);line-height:1.6}}
+.exit-target{{color:var(--g);font-weight:500}}
+.exit-stop{{color:var(--r)}}
+.exit-sig{{color:var(--t3);font-size:11px;margin-top:2px}}
+
+/* ── Bilingual term ── */
+.en-term{{font-size:14px;font-weight:600;color:var(--b);margin-bottom:3px;letter-spacing:-.1px}}
+.en-short{{font-size:12px;color:rgba(10,132,255,.75);line-height:1.55;margin-bottom:7px;padding:5px 8px;background:rgba(10,132,255,.07);border-radius:6px}}
+
 /* ── WISE Trip card ── */
 .trip-card{{overflow:visible}}
 .trip-header{{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 16px;border-bottom:.5px solid var(--sep)}}
@@ -1879,6 +2009,8 @@ a{{color:var(--b);text-decoration:none}}
   <div class="pg-ttl">📊 保有株</div>
   <div class="card">{stock_rows}</div>
   {pnl_summary}
+  <div class="seg-lbl" style="padding:14px 0 7px;font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">🎯 いつ売る？ 利確・損切りの目安</div>
+  {exit_card_html}
 </div>
 
 <!-- ② 市場 -->
