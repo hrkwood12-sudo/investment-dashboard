@@ -523,16 +523,16 @@ def get_news():
     for ticker, url, category in stock_feeds:
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:3]:
+            for entry in feed.entries[:2]:
                 title = entry.get("title", "").strip()
                 if not title or title in seen:
                     continue
                 seen.add(title)
-                rss_desc     = clean_text(entry.get("description") or entry.get("summary") or "")
+                rss_desc     = clean_text(entry.get("description") or entry.get("summary") or "", limit=280)
                 article_link = entry.get("link", "")
                 full_text    = rss_desc
-                if len(rss_desc) < 200 and article_link:
-                    fetched = fetch_article_excerpt(article_link)
+                if len(rss_desc) < 120 and article_link:
+                    fetched = fetch_article_excerpt(article_link, max_chars=280)
                     if fetched:
                         full_text = fetched
                 impact = analyze_news_impact(title, full_text, category)
@@ -562,16 +562,16 @@ def get_news():
             encoded = requests.utils.quote(query)
             feed    = feedparser.parse(
                 f"https://news.google.com/rss/search?q={encoded}&hl=en&gl=US&ceid=US:en")
-            for entry in feed.entries[:2]:
+            for entry in feed.entries[:1]:
                 title = entry.get("title", "").strip()
                 if not title or title in seen:
                     continue
                 seen.add(title)
-                rss_desc     = clean_text(entry.get("description") or entry.get("summary") or "")
+                rss_desc     = clean_text(entry.get("description") or entry.get("summary") or "", limit=280)
                 article_link = entry.get("link", "")
                 full_text    = rss_desc
-                if len(rss_desc) < 150 and article_link:
-                    fetched = fetch_article_excerpt(article_link)
+                if len(rss_desc) < 100 and article_link:
+                    fetched = fetch_article_excerpt(article_link, max_chars=280)
                     if fetched:
                         full_text = fetched
                 impact = analyze_news_impact(title, full_text, category)
@@ -586,7 +586,7 @@ def get_news():
         except Exception as e:
             print(f"  Macro news error ({category}): {e}")
 
-    return items[:25]
+    return items[:12]
 
 # ============================================================
 # Currency Tools
@@ -653,6 +653,62 @@ def _sign_color(val):
 def _arrow(val):
     if val is None: return "－"
     return "▲" if val > 0 else ("▼" if val < 0 else "－")
+
+
+def generate_overall_summary(stocks, indices, currencies):
+    """Return 3-5 plain-Japanese bullet points summarising today at a glance."""
+    lines = []
+    nasdaq  = indices.get("^IXIC", {})
+    sox     = indices.get("^SOX",  {})
+    vix     = indices.get("^VIX",  {})
+    usd_jpy = currencies.get("USD/JPY", {})
+
+    nq  = nasdaq.get("change_pct") or 0
+    sx  = sox.get("change_pct")    or 0
+    vx  = vix.get("value")         or 0
+    uj  = usd_jpy.get("rate")      or 0
+    uj_wk = usd_jpy.get("week_change_pct") or 0
+
+    # ── 市場全体 ──
+    if nq >= 1:
+        lines.append(f"📈 市場は強気。NASDAQが{nq:+.1f}%上昇し、グロース株全般に追い風。")
+    elif nq <= -1:
+        lines.append(f"📉 市場は軟調。NASDAQが{nq:+.1f}%下落。保有株の動向を注視して。")
+    else:
+        lines.append(f"📊 市場は横ばい（NASDAQ {nq:+.1f}%）。大きな動きはなし。")
+
+    if sx >= 1.5:
+        lines.append(f"🔵 半導体(SOX)が{sx:+.1f}%上昇。NVDAと購入予定のAVGO・MUに追い風。")
+    elif sx <= -1.5:
+        lines.append(f"🔴 半導体(SOX)が{sx:+.1f}%下落。NVDA・AVGO・MUへの影響に注意。")
+
+    # ── VIX ──
+    if vx > 25:
+        lines.append(f"⚠️ VIX {vx:.1f}（高め）。市場に緊張感あり。急いで買わないこと。")
+    elif vx <= 15:
+        lines.append(f"✅ VIX {vx:.1f}（低め）。市場は落ち着いており安定した状況。")
+
+    # ── 保有株の注目動き ──
+    movers = [(t, d) for t, d in stocks.items()
+              if d.get("change_pct") is not None and abs(d["change_pct"]) >= 2]
+    movers.sort(key=lambda x: abs(x[1]["change_pct"]), reverse=True)
+    for t, d in movers[:2]:
+        pct = d["change_pct"]
+        em  = "📈" if pct > 0 else "📉"
+        dir_s = "上昇" if pct > 0 else "下落"
+        lines.append(f"{em} {t}が{pct:+.1f}%{dir_s}。本日の保有株で最も大きな動き。")
+
+    # ── 為替 ──
+    if uj > 0:
+        if uj_wk > 2:
+            lines.append(f"💱 円安進行中（USD/JPY {uj:.2f}円）。新規購入コストが上がっているため急ぎは禁物。")
+        elif uj_wk < -2:
+            lines.append(f"💱 円高チャンス（USD/JPY {uj:.2f}円）。WISEでJPY→USD換金を検討！")
+
+    if not lines:
+        lines.append("📊 今日は大きな動きなし。市場は安定しており、普段通りのウォッチを継続。")
+
+    return lines
 
 
 def market_explanations(indices, currencies):
@@ -1327,22 +1383,26 @@ def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table,
   <div class="t3 conv-note">※ 欧州中央銀行レート基準。WISEの実際のレートとは若干異なります。</div>
 </div>"""
 
+    # ── Overall summary ──
+    summary_lines = generate_overall_summary(stocks, indices, currencies)
+    overall_html  = "".join(f'<div class="sum-line">{l}</div>' for l in summary_lines)
+
     # ── Section 4: News ──
     news_rows = ""
     for item in news:
-        impact = item.get("impact", {})
-        sent   = impact.get("sentiment", "neutral")
+        impact  = item.get("impact", {})
+        sent    = impact.get("sentiment", "neutral")
         imp_cls = {"positive": "imp-pos", "negative": "imp-neg"}.get(sent, "imp-neu")
         imp_txt = impact.get("impact", "")
-        out_txt = impact.get("outlook", "")
-        summary = item.get("summary", "")
+        summary = (item.get("summary") or "")[:220]
+        if len(item.get("summary") or "") > 220:
+            summary += "…"
         news_rows += f"""
 <div class="news-item">
   <span class="cat-pill">{item['category']}</span>
   <a href="{item['link']}" target="_blank" class="news-ttl">{item['title']}</a>
   {'<div class="news-body">' + summary + '</div>' if summary else ''}
   {'<div class="news-imp ' + imp_cls + '">' + imp_txt + '</div>' if imp_txt else ''}
-  {'<div class="news-out">' + out_txt + '</div>' if out_txt else ''}
   <div class="t3 news-src">{item['source']}</div>
 </div>"""
     if not news_rows:
@@ -1393,19 +1453,22 @@ def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table,
     dip_rows = ""
     if opportunities:
         for o in opportunities:
-            lcls = "dip-strong" if o["level"] == "strong" else "dip-mod"
-            ic2  = "🔥" if o["level"] == "strong" else "👀"
-            msg  = "急落-5%超！強い買い検討タイミング" if o["level"] == "strong" else "3%以上下落。-5%で買いを検討"
-            ps2  = f'${o["price"]:,.2f}' if o.get("price") else ""
+            lcls     = "dip-strong" if o["level"] == "strong" else "dip-mod"
+            ic2      = "🔥" if o["level"] == "strong" else "👀"
+            pill_cls = "pill-r"
+            msg      = "急落-5%超！買い検討タイミング" if o["level"] == "strong" else "-3%以上の下落。-5%で買いを検討"
+            ps2      = f'${o["price"]:,.2f}' if o.get("price") else "—"
             dip_rows += f"""
 <div class="dip-row {lcls}">
   <div class="s-left">
-    <div class="s-ticker" style="font-size:16px">{o['ticker']}</div>
-    <div class="s-name">{o['name']} {ps2}</div>
+    <div class="s-ticker" style="font-size:17px">{o['ticker']}</div>
+    <div class="s-name">{o['name']}</div>
+    <div style="font-size:12px;color:var(--t3);margin-top:3px">{ic2} {msg}</div>
   </div>
   <div style="text-align:right">
-    <div class="tr" style="font-size:18px;font-weight:600">{o['change_pct']:+.2f}%</div>
-    <div class="t3" style="font-size:12px;margin-top:2px">{ic2} {msg}</div>
+    <div style="font-size:22px;font-weight:700;color:var(--r)">{o['change_pct']:+.2f}%</div>
+    <div style="font-size:16px;font-weight:500;margin-top:2px">{ps2}</div>
+    <div class="pill {pill_cls}" style="margin-top:4px;font-size:12px">急落中</div>
   </div>
 </div>"""
     else:
@@ -1598,6 +1661,12 @@ a{{color:var(--b);text-decoration:none}}
 .learn-body{{font-size:14px;color:var(--t2);line-height:1.7}}
 .learn-impact{{font-size:12px;margin-top:9px;padding:5px 10px;background:rgba(48,209,88,.1);color:var(--g);border-radius:6px}}
 
+/* ── Overall summary ── */
+.sum-block{{background:var(--c1);border-radius:14px;padding:14px 16px;margin-bottom:10px}}
+.sum-ttl{{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px}}
+.sum-line{{font-size:14px;color:var(--t2);line-height:1.55;padding:5px 0;border-bottom:.5px solid var(--sep)}}
+.sum-line:last-child{{border-bottom:none}}
+
 /* ── Footer ── */
 .footer{{padding:28px 20px;font-size:11px;color:var(--t3);line-height:1.9;border-top:.5px solid var(--sep);margin-top:32px;text-align:center}}
 </style>
@@ -1637,6 +1706,10 @@ a{{color:var(--b);text-decoration:none}}
 <!-- ④ ニュース -->
 <div class="pg">
   <div class="pg-ttl">📰 ニュース</div>
+  <div class="sum-block">
+    <div class="sum-ttl">今日の概要</div>
+    {overall_html}
+  </div>
   <div class="card">{news_rows}</div>
 </div>
 
