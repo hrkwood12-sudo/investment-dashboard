@@ -523,7 +523,7 @@ def get_news():
     for ticker, url, category in stock_feeds:
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:2]:
+            for entry in feed.entries[:3]:
                 title = entry.get("title", "").strip()
                 if not title or title in seen:
                     continue
@@ -586,7 +586,7 @@ def get_news():
         except Exception as e:
             print(f"  Macro news error ({category}): {e}")
 
-    return items[:12]
+    return items[:28]
 
 # ============================================================
 # Currency Tools
@@ -1449,30 +1449,51 @@ def generate_html(stocks, indices, currencies, news, actions, pnl, jpy_table,
   </div>
 </div>"""
 
-    # Dip opportunities
+    # Watchlist — show ALL stocks, highlight dips
+    # Build quick lookup of opportunity tickers
+    opp_set = {o["ticker"]: o for o in opportunities}
     dip_rows = ""
-    if opportunities:
-        for o in opportunities:
-            lcls     = "dip-strong" if o["level"] == "strong" else "dip-mod"
-            ic2      = "🔥" if o["level"] == "strong" else "👀"
-            pill_cls = "pill-r"
-            msg      = "急落-5%超！買い検討タイミング" if o["level"] == "strong" else "-3%以上の下落。-5%で買いを検討"
-            ps2      = f'${o["price"]:,.2f}' if o.get("price") else "—"
-            dip_rows += f"""
-<div class="dip-row {lcls}">
+    for wt, wname in OPPORTUNITY_WATCHLIST:
+        wd    = watchlist_data.get(wt, {})
+        wprice = wd.get("price")
+        wpct   = wd.get("change_pct")
+        wtgt   = wd.get("target")
+        ps2    = f'${wprice:,.2f}' if wprice else "取得中"
+
+        if wpct is None:
+            pct_html = '<span class="t3">—</span>'
+            row_cls  = ""
+            badge    = ""
+        elif wpct <= -5:
+            pct_html = f'<span style="font-size:22px;font-weight:700;color:var(--r)">{wpct:+.2f}%</span>'
+            row_cls  = "dip-strong"
+            badge    = '<div class="pill pill-r" style="font-size:11px;margin-top:3px">🔥 急落</div>'
+        elif wpct <= -3:
+            pct_html = f'<span style="font-size:22px;font-weight:700;color:var(--o)">{wpct:+.2f}%</span>'
+            row_cls  = "dip-mod"
+            badge    = '<div class="pill pill-r" style="font-size:11px;margin-top:3px;background:var(--o);color:#000">👀 下落中</div>'
+        elif wpct >= 3:
+            pct_html = f'<span style="font-size:20px;font-weight:600;color:var(--g)">{wpct:+.2f}%</span>'
+            row_cls  = ""
+            badge    = ""
+        else:
+            pct_html = f'<span style="font-size:20px;font-weight:500;color:var(--t2)">{wpct:+.2f}%</span>'
+            row_cls  = ""
+            badge    = ""
+
+        tgt_s = f'<div style="font-size:11px;color:var(--t3);margin-top:2px">目標 ${wtgt:,.2f}</div>' if wtgt else ""
+        dip_rows += f"""
+<div class="dip-row {row_cls}">
   <div class="s-left">
-    <div class="s-ticker" style="font-size:17px">{o['ticker']}</div>
-    <div class="s-name">{o['name']}</div>
-    <div style="font-size:12px;color:var(--t3);margin-top:3px">{ic2} {msg}</div>
+    <div class="s-ticker" style="font-size:17px">{wt}</div>
+    <div class="s-name">{wname}</div>
   </div>
   <div style="text-align:right">
-    <div style="font-size:22px;font-weight:700;color:var(--r)">{o['change_pct']:+.2f}%</div>
+    {pct_html}
     <div style="font-size:16px;font-weight:500;margin-top:2px">{ps2}</div>
-    <div class="pill {pill_cls}" style="margin-top:4px;font-size:12px">急落中</div>
+    {tgt_s}{badge}
   </div>
 </div>"""
-    else:
-        dip_rows = '<div class="t3" style="padding:14px 16px;font-size:14px">今日は大きな急落なし。引き続き定期確認を。</div>'
 
     # Earnings calendar
     earn_chips = ""
