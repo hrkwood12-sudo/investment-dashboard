@@ -573,7 +573,7 @@ def get_news():
     for ticker, url, category in stock_feeds:
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:3]:
+            for entry in feed.entries[:2]:
                 title = entry.get("title", "").strip()
                 if not title or title in seen:
                     continue
@@ -600,11 +600,8 @@ def get_news():
     macro_queries = [
         ("Federal Reserve interest rate inflation",  "FRB・金利"),
         ("Bank of Japan yen dollar BOJ policy",      "日銀・円相場"),
-        ("Malaysia economy ringgit MYR",             "マレーシア・MYR"),
         ("AI semiconductor chip demand nvidia",      "AI・半導体業界"),
         ("NASDAQ stock market technology outlook",   "NASDAQ市場"),
-        ("defense drone military autonomous spending","防衛・宇宙"),
-        ("SpaceX IPO space industry",                "宇宙・SpaceX"),
     ]
 
     for query, category in macro_queries:
@@ -636,7 +633,7 @@ def get_news():
         except Exception as e:
             print(f"  Macro news error ({category}): {e}")
 
-    return items[:28]
+    return items[:14]
 
 # ============================================================
 # Currency Tools
@@ -1196,6 +1193,115 @@ WISE_TIPS = [
 ]
 
 
+INVESTOR_QUOTES = [
+    {
+        "quote":    "Be fearful when others are greedy, and greedy when others are fearful.",
+        "ja":       "他人が貪欲なときは恐れを持ち、他人が恐れているときは貪欲になれ。",
+        "who":      "Warren Buffett（ウォーレン・バフェット）",
+        "bio":      "オマハの賢人。世界最大の投資持株会社バークシャー・ハサウェイのCEO。",
+        "lesson":   "VIXが急上昇して市場全体が売られている時こそ、優良株の買いチャンス。",
+    },
+    {
+        "quote":    "The stock market is a device for transferring money from the impatient to the patient.",
+        "ja":       "株式市場は、せっかちな人から忍耐強い人へお金を移す装置だ。",
+        "who":      "Warren Buffett（ウォーレン・バフェット）",
+        "bio":      "60年以上にわたり年率約20%の複利リターンを達成した伝説の投資家。",
+        "lesson":   "短期の株価の動きに惑わされず、長期目線で保有し続けることが最大の武器。",
+    },
+    {
+        "quote":    "In the short run, the market is a voting machine, but in the long run, it is a weighing machine.",
+        "ja":       "短期的に市場は人気投票機だが、長期的には体重計だ。",
+        "who":      "Benjamin Graham（ベンジャミン・グレアム）",
+        "bio":      "「証券分析」著者・バフェットの師匠。バリュー投資の父と呼ばれる。",
+        "lesson":   "短期の株価は感情で動くが、最終的には企業の本当の価値に収束する。",
+    },
+    {
+        "quote":    "The biggest risk is not taking any risk.",
+        "ja":       "最大のリスクは、リスクを取らないことだ。",
+        "who":      "Mark Zuckerberg（マーク・ザッカーバーグ）",
+        "bio":      "Meta（Facebook）創業者・CEO。長期的な大局観で大胆な投資判断をすることで知られる。",
+        "lesson":   "何もしないこと自体がリスク。少額でも投資を始めた今のあなたの選択は正しい。",
+    },
+    {
+        "quote":    "Know what you own, and know why you own it.",
+        "ja":       "自分が何を持っているかを理解し、なぜ持っているかを知れ。",
+        "who":      "Peter Lynch（ピーター・リンチ）",
+        "bio":      "フィデリティ・マゼランファンドを運用し年率29%のリターンを達成した伝説のファンドマネジャー。",
+        "lesson":   "NVDA・AVGO・KTOS・UPST・UBER・TMC、それぞれ「なぜ持っているか」を答えられることが大事。",
+    },
+    {
+        "quote":    "The individual investor should act consistently as an investor and not as a speculator.",
+        "ja":       "個人投資家は常に投資家として行動し、投機家として行動してはならない。",
+        "who":      "Benjamin Graham（ベンジャミン・グレアム）",
+        "bio":      "価格（Price）と価値（Value）の違いを重視するバリュー投資の基礎を確立した。",
+        "lesson":   "短期の株価の動きを「ゲーム」として追うのではなく、企業の長期成長に投資するのが本質。",
+    },
+    {
+        "quote":    "It's not whether you're right or wrong, but how much money you make when you're right and how much you lose when you're wrong.",
+        "ja":       "正しいか間違いかではなく、正しい時にどれだけ稼ぎ、間違いの時にどれだけ損を抑えるかが重要だ。",
+        "who":      "George Soros（ジョージ・ソロス）",
+        "bio":      "クォンタム・ファンドを運用した伝説のヘッジファンドマネジャー。1992年にポンドを売り崩したことで有名。",
+        "lesson":   "損切りの設定（-20%〜-30%ライン）は、負けを小さくするための重要な仕組み。",
+    },
+    {
+        "quote":    "The four most dangerous words in investing are: 'This time it's different.'",
+        "ja":       "投資で最も危険な言葉は「今回は違う」だ。",
+        "who":      "John Templeton（ジョン・テンプルトン）",
+        "bio":      "グローバル分散投資の先駆者。テンプルトン・ファンドで半世紀にわたり高リターンを達成。",
+        "lesson":   "「AIバブルは今回は違う」「この株だけは絶対下がらない」…歴史は繰り返す。謙虚さが大切。",
+    },
+    {
+        "quote":    "The secret to investing is to figure out the value of something and then pay a lot less.",
+        "ja":       "投資の秘訣は、何かの価値を見極め、それよりずっと安く買うことだ。",
+        "who":      "Joel Greenblatt（ジョエル・グリーンブラット）",
+        "bio":      "ゴッサム・キャピタル創業者。「株デビューする前に知っておくべき「魔法の公式」」著者。",
+        "lesson":   "ウォッチリストの急落銘柄（-5%以上）は、価値より安く買えるチャンスかもしれない。",
+    },
+    {
+        "quote":    "An investment in knowledge pays the best interest.",
+        "ja":       "知識への投資が最も高い利息を生む。",
+        "who":      "Benjamin Franklin（ベンジャミン・フランクリン）",
+        "bio":      "米国建国の父。政治家・科学者であり、賢明な資産管理で知られた。",
+        "lesson":   "ダッシュボードで毎日学習することが、長期的に最も高いリターンをもたらす投資になる。",
+    },
+    {
+        "quote":    "Risk comes from not knowing what you're doing.",
+        "ja":       "リスクとは、自分が何をしているかを理解していないことから来る。",
+        "who":      "Warren Buffett（ウォーレン・バフェット）",
+        "bio":      "自分の「能力の輪（Circle of Competence）」の外には投資しないという原則で有名。",
+        "lesson":   "TMCやKTOSを保有するなら、深海採掘・防衛ドローン業界を理解する努力を続けること。",
+    },
+    {
+        "quote":    "Compound interest is the eighth wonder of the world. He who understands it, earns it; he who doesn't, pays it.",
+        "ja":       "複利は世界第八の不思議だ。理解する者はそれを稼ぎ、理解しない者はそれを払う。",
+        "who":      "Albert Einstein（アルベルト・アインシュタイン）",
+        "bio":      "物理学者。この言葉は投資コミュニティで広く引用されており、複利の威力を端的に表現している。",
+        "lesson":   "毎月積み立て・配当再投資・長期保有を続けることで、複利の効果が数十年後に最大化する。",
+    },
+    {
+        "quote":    "The best time to plant a tree was 20 years ago. The second best time is now.",
+        "ja":       "木を植える最良の時は20年前だった。次に良い時は今だ。",
+        "who":      "中国のことわざ（投資格言として広く使われる）",
+        "bio":      "長期投資の後悔と行動の大切さを伝える格言。「もっと早く始めれば良かった」は禁物。",
+        "lesson":   "投資を始めた今日が、残りの人生で一番早い始まり。今始めたことは将来の自分への贈り物。",
+    },
+    {
+        "quote":    "I will tell you how to become rich. Close the doors. Be fearful when others are greedy. Be greedy when others are fearful.",
+        "ja":       "金持ちになる方法を教えよう。扉を閉めよ。他人が貪欲な時は恐れ、他人が恐れている時は貪欲になれ。",
+        "who":      "Warren Buffett（ウォーレン・バフェット）",
+        "bio":      "ネブラスカ州オマハ在住。生涯で最も成功した投資家の一人で、資産は約1,500億ドル。",
+        "lesson":   "市場全体が恐怖で売られる日（VIX急上昇・急落）こそ、長期保有株を追加購入するタイミング。",
+    },
+    {
+        "quote":    "The market can stay irrational longer than you can stay solvent.",
+        "ja":       "市場は、あなたが破産するよりも長く非合理的でいられる。",
+        "who":      "John Maynard Keynes（ジョン・メイナード・ケインズ）",
+        "bio":      "20世紀最大の経済学者。個人投資家としても優れた実績を持ち、「美人投票理論」でも有名。",
+        "lesson":   "「割安なはずなのに下がり続ける」は普通にある。損切りラインを守り、全財産を一銘柄に賭けない。",
+    },
+]
+
+
 def get_learning_content(indices, currencies, stocks):
     """Return multi-section learning content for the day."""
     today     = datetime.now(pytz.timezone("Asia/Tokyo"))
@@ -1222,6 +1328,7 @@ def get_learning_content(indices, currencies, stocks):
         "trend":   INDUSTRY_TRENDS[day_idx % len(INDUSTRY_TRENDS)],
         "term":    INVESTMENT_TERMS[day_idx % len(INVESTMENT_TERMS)],
         "wise":    WISE_TIPS[day_idx % len(WISE_TIPS)],
+        "quote":   INVESTOR_QUOTES[day_idx % len(INVESTOR_QUOTES)],
     }
 
 # ============================================================
@@ -1280,6 +1387,18 @@ def _learning_html(learning):
   <div class="learn-lbl lw">💳 WISE活用法</div>
   <div class="learn-ttl">{w['title']}</div>
   <div class="learn-body">{w['content']}</div>
+</div>""")
+
+    q = learning.get("quote")
+    if q:
+        parts.append(f"""
+<div class="learn-item">
+  <div class="learn-lbl lq">💬 今日の投資家の言葉</div>
+  <div class="quote-en">"{q['quote']}"</div>
+  <div class="quote-ja">「{q['ja']}」</div>
+  <div class="quote-who">— {q['who']}</div>
+  <div class="quote-bio t3">{q['bio']}</div>
+  <div class="quote-lesson">📌 {q['lesson']}</div>
 </div>""")
 
     return "\n".join(parts)
@@ -1943,7 +2062,12 @@ a{{color:var(--b);text-decoration:none}}
 .learn-item{{padding:15px 16px;border-bottom:.5px solid var(--sep)}}
 .learn-item:last-child{{border-bottom:none}}
 .learn-lbl{{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}}
-.learn-lbl.lc{{color:var(--p)}}.learn-lbl.lt{{color:var(--g)}}.learn-lbl.lk{{color:var(--b)}}.learn-lbl.lw{{color:var(--teal)}}.learn-lbl.lu{{color:var(--y)}}
+.learn-lbl.lc{{color:var(--p)}}.learn-lbl.lt{{color:var(--g)}}.learn-lbl.lk{{color:var(--b)}}.learn-lbl.lw{{color:var(--teal)}}.learn-lbl.lu{{color:var(--y)}}.learn-lbl.lq{{color:var(--o)}}
+.quote-en{{font-size:14px;font-style:italic;color:var(--t1);line-height:1.6;margin-bottom:8px;padding-left:10px;border-left:3px solid var(--o)}}
+.quote-ja{{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:8px;padding-left:10px}}
+.quote-who{{font-size:13px;font-weight:600;color:var(--o);margin-bottom:3px}}
+.quote-bio{{font-size:11px;margin-bottom:8px}}
+.quote-lesson{{font-size:12px;color:var(--t2);background:rgba(255,159,10,.08);border-radius:6px;padding:7px 10px;line-height:1.6}}
 .learn-ttl{{font-size:16px;font-weight:600;margin-bottom:8px}}
 .learn-meta{{font-size:12px;color:var(--t3);margin-bottom:6px}}
 .learn-body{{font-size:14px;color:var(--t2);line-height:1.7}}
